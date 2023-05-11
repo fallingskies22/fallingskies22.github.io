@@ -1,0 +1,858 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://fallingskies22.github.io</id>
+    <title>fallingskies</title>
+    <updated>2023-05-11T18:01:28.931Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://fallingskies22.github.io"/>
+    <link rel="self" href="https://fallingskies22.github.io/atom.xml"/>
+    <subtitle>&lt;h3&gt;想要去月球&lt;h3&gt;</subtitle>
+    <logo>https://fallingskies22.github.io/images/avatar.png</logo>
+    <icon>https://fallingskies22.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2023, fallingskies</rights>
+    <entry>
+        <title type="html"><![CDATA[五·一]]></title>
+        <id>https://fallingskies22.github.io/post/wu-yi/</id>
+        <link href="https://fallingskies22.github.io/post/wu-yi/">
+        </link>
+        <updated>2023-05-04T01:31:32.000Z</updated>
+        <content type="html"><![CDATA[<p>第一次开车出游<br>
+目的地：青城山下</p>
+<p>民宿的路标<br>
+<img src="https://fallingskies22.github.io/post-images/1683163980989.jpg" alt="" loading="lazy"></p>
+<p>分头行动，买菜+买水果<br>
+<img src="https://fallingskies22.github.io/post-images/1683163988058.jpg" alt="" loading="lazy"></p>
+<p>自己做的烤肉很好吃😋<br>
+<img src="https://fallingskies22.github.io/post-images/1683164030055.jpg" alt="" loading="lazy"></p>
+<p>楼顶有泳池，不过晚上下雨了<br>
+<img src="https://fallingskies22.github.io/post-images/1683164051646.jpg" alt="" loading="lazy"></p>
+<p>儿童区👼<br>
+<img src="https://fallingskies22.github.io/post-images/1683164372371.jpg" alt="" loading="lazy"></p>
+<p>深夜聊天区<br>
+<img src="https://fallingskies22.github.io/post-images/1683164156956.jpg" alt="" loading="lazy"></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[HDCTF 2023 - Reverse - Writeup]]></title>
+        <id>https://fallingskies22.github.io/post/hdctf2023-rev-writeup/</id>
+        <link href="https://fallingskies22.github.io/post/hdctf2023-rev-writeup/">
+        </link>
+        <updated>2023-04-23T13:39:36.000Z</updated>
+        <content type="html"><![CDATA[<p><ul class="markdownIt-TOC">
+<li><a href="#0x01%E5%89%8D%E8%A8%80">0x01前言</a></li>
+<li><a href="#0x02-%E9%A2%98%E7%9B%AE">0x02 题目</a>
+<ul>
+<li><a href="#0x01-easy_re">0x01 easy_re</a></li>
+<li><a href="#0x02-easy_asm">0x02 easy_asm</a></li>
+<li><a href="#0x03-double_code">0x03 double_code</a></li>
+<li><a href="#0x04-fake_game">0x04 fake_game</a></li>
+<li><a href="#0x05-%E4%B9%B0%E4%BA%86%E4%BA%9B%E4%BB%80%E4%B9%88%E5%91%A2">0x05 买了些什么呢</a></li>
+<li><a href="#0x06-enc">0x06 enc</a></li>
+</ul>
+</li>
+<li><a href="#0x03-%E6%80%BB%E7%BB%93">0x03 总结</a></li>
+</ul>
+</p>
+<h1 id="0x01前言">0x01前言</h1>
+<p>这次偶然参加了这个CTF，没想到逆向全是exe，真让人头大。还有就是不得不吐槽的是，逆向你出一个算法题干嘛，又不是ACM 😦  。但还是有些题目很有质量，比如double code这种接近实战的逆向分析。也学到了很多windows方面逆向的一些知识吧。 还有要吐槽的，题目都能出错来，fake_game那道题我就说算出来flag怎么不对😓，暴打出题人就完事儿了。</p>
+<h1 id="0x02-题目">0x02 题目</h1>
+<h2 id="0x01-easy_re">0x01 easy_re</h2>
+<p>使用exeinfope工具查看<br>
+可以看到有upx壳<br>
+<img src="https://fallingskies22.github.io/post-images/1682258432714.png" alt="" loading="lazy"><br>
+直接用ida打开，ida也能识别<br>
+<img src="https://fallingskies22.github.io/post-images/1682258449108.png" alt="" loading="lazy"></p>
+<p>使用<a href="https://github.com/upx/upx">upx</a>进行脱壳<br>
+命令：upx.exe -d re.exe<br>
+再将文件丢进ida中，就能看到清楚的函数了。<br>
+<img src="https://fallingskies22.github.io/post-images/1682258894282.png" alt="" loading="lazy"><br>
+对逐个函数进行分析。<br>
+<img src="https://fallingskies22.github.io/post-images/1682258976209.png" alt="" loading="lazy"><br>
+f3函数是对输入字符串进行reverse<br>
+总共32次，偶数次，就相当于没有变</p>
+<p>然后是func函数，这个函数其实是base64加密，因为不太熟悉，一开始分析起来好困难😵<br>
+后面根据函数大概逻辑，三位变四位，大概能猜出来是base64.</p>
+<pre><code class="language-c">void __cdecl func(char *x, char *y)
+{
+  unsigned __int8 *v3; // rax
+  unsigned __int8 v4; // cl
+  int v5; // ecx
+  int v6; // eax
+  int v7; // ecx
+  int v8; // eax
+  int v9; // eax
+  int v10; // eax
+  unsigned __int8 a4[4]; // [rsp+29h] [rbp-67h]
+  unsigned __int8 a3[3]; // [rsp+2Dh] [rbp-63h]
+  char b[65]; // [rsp+30h] [rbp-60h] BYREF
+  int k; // [rsp+7Ch] [rbp-14h]
+  int j; // [rsp+80h] [rbp-10h]
+  int i; // [rsp+84h] [rbp-Ch]
+  int len; // [rsp+88h] [rbp-8h]
+  int index; // [rsp+8Ch] [rbp-4h]
+  char *xa; // [rsp+A0h] [rbp+10h]
+
+  xa = x;
+  index = 0;
+  len = strlen(x);
+  i = 0;
+  j = 0;
+  k = 0;
+  strcpy(b, &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;);
+  while ( len-- )
+  {
+    v3 = (unsigned __int8 *)xa++;
+    v4 = *v3;
+    LODWORD(v3) = i++;
+    a3[(int)v3] = v4;
+    if ( i == 3 )
+    {
+      a4[0] = a3[0] &gt;&gt; 2;
+      a4[1] = ((16 * a3[0]) &amp; 0x30) + (a3[1] &gt;&gt; 4);
+      a4[2] = ((4 * a3[1]) &amp; 0x3C) + (a3[2] &gt;&gt; 6);
+      a4[3] = a3[2] &amp; 0x3F;
+      for ( i = 0; i &lt;= 3; ++i )
+      {
+        v5 = a4[i];
+        v6 = index++;
+        y[v6] = b[v5];
+      }
+      i = 0;
+    }
+  }
+  if ( i )
+  {
+    for ( j = i; j &lt;= 2; ++j )
+      a3[j] = 0;
+    a4[0] = a3[0] &gt;&gt; 2;
+    a4[1] = ((16 * a3[0]) &amp; 0x30) + (a3[1] &gt;&gt; 4);
+    a4[2] = ((4 * a3[1]) &amp; 0x3C) + (a3[2] &gt;&gt; 6);
+    a4[3] = a3[2] &amp; 0x3F;
+    for ( j = 0; i &gt;= j; ++j )
+    {
+      v7 = a4[j];
+      v8 = index++;
+      y[v8] = b[v7];
+    }
+    while ( 1 )
+    {
+      v9 = i++;
+      if ( v9 &gt; 2 )
+        break;
+      v10 = index++;
+      y[v10] = 61;
+    }
+  }
+  y[index] = 0;
+}
+</code></pre>
+<p>将输入字符base64后与字符串a进行比较。<br>
+<img src="https://fallingskies22.github.io/post-images/1682259351525.png" alt="" loading="lazy"><br>
+将字符串a进行base64解码得到flag<br>
+HDCTF{Y0u_h@v2_//@57er3d_7he_r3v3rs3}</p>
+<h2 id="0x02-easy_asm">0x02 easy_asm</h2>
+<p>这题的exe运行不了，就只能静态分析了，但是还好代码很少。<br>
+程序的大概流程图如下<br>
+<img src="https://fallingskies22.github.io/post-images/1682259840639.png" alt="" loading="lazy"></p>
+<p>有个地方没搞懂的是，对字符串进行操作时，都指向的asc_10000，而正确的字符串很明显是另一个字符串。<br>
+<img src="https://fallingskies22.github.io/post-images/1682259866631.png" alt="" loading="lazy"><br>
+<img src="https://fallingskies22.github.io/post-images/1682259943709.png" alt="" loading="lazy"></p>
+<p>从汇编来看<br>
+0x52-0x47刚好等于11<br>
+就是字符串Not equal!$ 的长度。<br>
+所有对应的字符串指向，应该如下图所示。也符合程序的逻辑。<br>
+<img src="https://fallingskies22.github.io/post-images/1682260275015.png" alt="" loading="lazy"><br>
+查看上半部分的汇编，将输入字符，对0x10异或后再对字符作比较。<br>
+<img src="https://fallingskies22.github.io/post-images/1682260557093.png" alt="" loading="lazy"></p>
+<p>根据之前的猜测，很明显0x59就是指向，后面的字符串了<br>
+<img src="https://fallingskies22.github.io/post-images/1682260743507.png" alt="" loading="lazy"></p>
+<p>根据IDA的提示知道<code>$</code>是停止符，就不管。<br>
+<img src="https://fallingskies22.github.io/post-images/1682260870281.png" alt="" loading="lazy"><br>
+得到flag<br>
+HDCTF{Hust_a_e3sy_aSm}</p>
+<h2 id="0x03-double_code">0x03 double_code</h2>
+<p>从start函数一路找，这里的Code参数名也算是一个提示了，点进去继续看。<br>
+<img src="https://fallingskies22.github.io/post-images/1682262878869.png" alt="" loading="lazy"></p>
+<p>从这里的分配内存，写入内存，创建线程，可以知道是shellcode loader。<br>
+<img src="https://fallingskies22.github.io/post-images/1682263050986.png" alt="" loading="lazy"></p>
+<p>对照windows官方文档，<a href="https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-writeprocessmemory">writememory函数</a></p>
+<p>第三个参数应该是buffer的指针。<br>
+<img src="https://fallingskies22.github.io/post-images/1682263611938.png" alt="" loading="lazy"></p>
+<p>但是这里，IDA把这个指针识别成了函数🤣，就是说帮我们把shellcode逆向了<br>
+<img src="https://fallingskies22.github.io/post-images/1682263678376.png" alt="" loading="lazy"></p>
+<p>strcpy这里就是把flag放进了v15里，然后长度%5取余，分情况做不一样的计算。<br>
+（具体的不用看太懂，因为ida识别的不是很好，要么就自己分析汇编😂）<br>
+<img src="https://fallingskies22.github.io/post-images/1682267062707.png" alt="" loading="lazy"></p>
+<p>编写脚本如下：</p>
+<pre><code class="language-pyton">code = [0x48,0x67,0x45,0x51,0x42,0x7b,0x70,0x6a,0x30,0x68,0x6c,0x60,0x32,0x61,0x61,0x5f,0x42,0x70,0x61,0x5b,0x30,0x53,0x65,0x6c,0x60,0x65,0x7c,0x63,0x69,0x2d,0x5f,0x46,0x35,0x70,0x75,0x7d]
+
+for i in range(len(code)):
+    if(i%5 == 1):
+        code[i] ^= 0x23
+    if(i%5 == 2):
+        code[i] -= 2
+    if(i%5 == 3):
+        code[i] += 3
+    if(i%5 == 4):
+        code[i] += 4
+    if(i%5 == 5):
+        code[i] += 25
+
+
+for i in code:
+    print(chr(i),end=&quot;&quot;)
+</code></pre>
+<p>得到flag<br>
+HDCTF{Sh3llC0de_and_0pcode_al1_e3sy}</p>
+<p>这里我想问一下，i%5咋可能等于5啊，写个i%5==在这儿？是故意的还是不小心的👀</p>
+<h2 id="0x04-fake_game">0x04 fake_game</h2>
+<p>看exe图标可以发现，是使用pyinstaller生成的exe.<br>
+使用工具<a href="https://github.com/pyinstxtractor/pyinstxtractor-ng">pyinstxtractor-ng</a>将exe转换为pyc文件。</p>
+<p>使用python库uncompyle6进行反编译<br>
+pip3 install uncompyle6<br>
+uncompyle6.exe game.pyc &gt; game.py</p>
+<p>然后分析py代码，关键部分代码如下</p>
+<pre><code class="language-python">xorr = [
+         0] * 4
+        ans = [0] * 55
+        flag = [178868, 188, 56953, 2413, 178874, 131, 56957, 2313, 178867, 156, 
+         56933, 2377, 178832, 202, 56899, 2314, 178830, 167, 56924, 
+         2313, 178830, 167, 56938, 2383, 178822, 217, 56859, 2372]
+        self.init_window()
+        self.init_plant_points()
+        self.init_map()
+        self.init_zombies()
+        while not GAMEOVER:
+            MainGame.window.fill((255, 255, 255))
+            MainGame.window.blit(self.draw_text('当前钱数$: {}'.format(MainGame.money), 26, (255,
+                                                                                         0,
+                                                                                         0)), (500,
+                                                                                               40))
+            MainGame.window.blit(self.draw_text('当前关数{}，得分{},距离下关还差{}分'.format(MainGame.shaoguan, MainGame.score, MainGame.remnant_score), 26, (255,
+                                                                                                                                                0,
+                                                                                                                                                0)), (5,
+                                                                                                                                                      40))
+            self.load_help_text()
+            xorr[0] = MainGame.money
+            xorr[1] = MainGame.shaoguan
+            xorr[2] = MainGame.score
+            xorr[3] = MainGame.remnant_score
+            if xorr[0] * 256 - xorr[1] / 2 + xorr[2] * 23 + xorr[3] / 2 == 47118166:
+                if xorr[0] * 252 - xorr[1] * 366 + xorr[2] * 23 + xorr[3] / 2 - 1987 == 46309775:
+                    if xorr[0] * 6 - xorr[1] * 88 + xorr[2] / 2 + xorr[3] / 2 - 11444 == 1069997:
+                        if (xorr[0] - 652) * 2 - xorr[1] * 366 + xorr[2] * 233 + xorr[3] / 2 - 13333 == 13509025:
+                            for i in range(len(flag)):
+                                ans[i] = flag[i] ^ xorr[i % 4]
+                            else:
+                                with open('flag.txt', 'w') as (f):
+                                    f.write(''.join([chr(a) for a in ans]))
+</code></pre>
+<p>发现需要金钱、分数啥的满足四个方程，再用这四个参数对flag列表进行异或。</p>
+<p>编写脚本</p>
+<pre><code class="language-python">from scipy.optimize import fsolve
+
+
+def solve_function(unsolved_value):
+    x, y, z, a= unsolved_value[0], unsolved_value[1], unsolved_value[2], unsolved_value[3]
+    return [
+        x * 256 - y / 2 + z * 23 + a / 2 - 47118166,
+        x * 252 - y * 366 + z * 23 + a / 2 - 1987 - 46309775,
+        x * 6 - y * 88 + z / 2 + a / 2 - 11444 - 1069997,
+        (x - 652) * 2 - y * 366 + z * 233 + a / 2 - 13333 - 13509025,
+    ]
+
+
+solved = fsolve(solve_function, [0, 0, 0,0])
+print(solved)
+
+xorr = [0] * 4
+ans = [0] * 55
+flag = [178868, 188, 56953, 2413, 178874, 131, 56957, 2313, 178867, 156, 
+56933, 2377, 178832, 202, 56899, 2314, 178830, 167, 56924, 
+2313, 178830, 167, 56938, 2383, 178822, 217, 56859, 2372]
+
+
+xorr[0] = int(solved[0])
+xorr[1] = int(solved[1]+1)
+xorr[2] = int(solved[2]+1)
+xorr[3] = int(solved[3]+2)
+                
+print(xorr)
+for i in range(len(flag)):
+    ans[i] = flag[i] ^ xorr[i % 4]
+
+print(''.join([chr(a) for a in ans]))
+</code></pre>
+<p>因为这题本身出的就有问题，所以需要根据HDCT这四个对应字符，调整一下xorr<br>
+最后得到flag<br>
+HDCTF{G0Od_pl2y3r_f0r_Pvz!!}</p>
+<h2 id="0x05-买了些什么呢">0x05 买了些什么呢</h2>
+<p>这道题是考算法的，01背包问题，<br>
+但是ida中反编译后的knapsack函数就相当于解法，所以还算有点逆向😅<br>
+直接拿来用就行</p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+int dp[500][500];
+int __cdecl knapsack(int W, int* wt, int* val, int n)
+{
+    int j_0; // [esp+0h] [ebp-10h]
+    int i_0; // [esp+4h] [ebp-Ch]
+    int j; // [esp+8h] [ebp-8h]
+    int i; // [esp+Ch] [ebp-4h]
+
+    for (i = 0; i &lt;= n; ++i)
+    {
+        for (j = 0; j &lt;= W; ++j)
+            dp[i][j] = 0;
+    }
+    for (i_0 = 1; i_0 &lt;= n; ++i_0)
+    {
+        for (j_0 = 1; j_0 &lt;= W; ++j_0)
+        {
+            if (j_0 &lt; wt[i_0 - 1])
+            {
+                dp[i_0][j_0] = dp[i_0 - 1][j_0];
+            }
+            else
+            {
+                dp[i_0][j_0] = dp[i_0 - 1][j_0];
+                if (dp[i_0 - 1][j_0 - wt[i_0 - 1]] + val[i_0 - 1] &gt; dp[i_0][j_0])
+                    dp[i_0][j_0] = val[i_0 - 1] + dp[i_0 - 1][j_0 - wt[i_0 - 1]];
+            }
+        }
+    }
+    return 0;
+
+}
+int main()
+{
+    int W = 50;
+    int n = 40;
+    int wt[0xA0];
+    int val[0xA0];
+    srand(1);
+    for (int i = 0; i &lt; n; i++)
+    {
+        wt[i] = rand() % 10 + 1;
+        val[i] = rand() % 10 + 1;
+        printf(&quot;|    %d    |   %d   |   %d   |\n&quot;, i + 1, wt[i], val[i]);
+    }
+    knapsack(W, wt, val, n);
+    std::cout &lt;&lt; &quot;动态规划数组为: &quot; &lt;&lt; std::endl;
+    for (int i = 0; i &lt;= n; i++)
+    {
+        for (int j = 0; j &lt;= W; j++)
+        {
+            std::cout &lt;&lt; dp[i][j] &lt;&lt; &quot; &quot;;
+        }
+        std::cout &lt;&lt; std::endl;
+    }
+    std::vector&lt;int&gt; indices;
+    int w = W;
+    for (int i = n; i &gt; 0 &amp;&amp; w &gt; 0; i--)
+    {
+        if (dp[i][w] != dp[i - 1][w])
+        {
+            indices.push_back(i - 1);
+            w -= wt[i - 1];
+        }
+    }
+    std::cout &lt;&lt; &quot;选择的物品的下标为: &quot;;
+    for (int i = indices.size() - 1; i &gt;= 0; i--)
+    {
+        std::cout &lt;&lt; indices[i] &lt;&lt; &quot; &quot;;
+    }
+}
+</code></pre>
+<p>得到flag<br>
+HDCTF{0 4 6 10 11 13 16 18 21 22 24 26 31 33 34 36 39}</p>
+<h2 id="0x06-enc">0x06 enc</h2>
+<p>这题主要考察一系列加密算法。<br>
+主函数逻辑如下<br>
+<img src="https://fallingskies22.github.io/post-images/1682308248861.png" alt="" loading="lazy"></p>
+<p>参考文章：https://www.anquanke.com/post/id/224198<br>
+对照可以发现sub_411523函数其实是tea加密算法。<br>
+<img src="https://fallingskies22.github.io/post-images/1682308354971.png" alt="" loading="lazy"></p>
+<p>但是这里ida把<code>add 0x9E3779B9</code>识别成减法了，虽然效果一样，但第一眼有点让人困惑🙃</p>
+<p>直接使用tea的解密算法解密就行。</p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;  // 使用uint32_t数据类型需要包含此头文件
+#include &lt;string.h&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+
+void encrypt(uint32_t v[2], const uint32_t k[4]) {
+    uint32_t v0 = v[0], v1 = v[1], sum = 0, i;           /* set up */
+    uint32_t delta = 0x9E3779B9;                     /* a key schedule constant */
+    uint32_t k0 = k[0], k1 = k[1], k2 = k[2], k3 = k[3];   /* cache key */
+    for (i = 0; i &lt; 32; i++) {                         /* basic cycle start */
+        sum += delta;
+        v0 += ((v1 &lt;&lt; 4) + k0) ^ (v1 + sum) ^ ((v1 &gt;&gt; 5) + k1);
+        v1 += ((v0 &lt;&lt; 4) + k2) ^ (v0 + sum) ^ ((v0 &gt;&gt; 5) + k3);
+    }                                              /* end cycle */
+    v[0] = v0; v[1] = v1;
+}
+
+void decrypt(uint32_t v[2], const uint32_t k[4]) {
+    uint32_t v0 = v[0], v1 = v[1], sum = 0xC6EF3720, i;  /* set up; sum is 32*delta */
+    uint32_t delta = 0x9E3779B9;                     /* a key schedule constant */
+    uint32_t k0 = k[0], k1 = k[1], k2 = k[2], k3 = k[3];   /* cache key */
+    for (i = 0; i &lt; 32; i++) {                         /* basic cycle start */
+        v1 -= ((v0 &lt;&lt; 4) + k2) ^ (v0 + sum) ^ ((v0 &gt;&gt; 5) + k3);
+        v0 -= ((v1 &lt;&lt; 4) + k0) ^ (v1 + sum) ^ ((v1 &gt;&gt; 5) + k1);
+        sum -= delta;
+    }                                              /* end cycle */
+    v[0] = v0; v[1] = v1;
+}
+
+int main() {
+    uint32_t enc[2] = { 0x60FCDEF7,0x236DBEC };
+    uint32_t key[] = { 0x12,0x34,0x56,0x78 };
+    decrypt(enc, key);
+    cout &lt;&lt; enc[0];
+    return 0;
+}
+</code></pre>
+<p>解出v10 = 3<br>
+然后将它传入sub_4113DE函数，这个函数其实是一个smc函数<br>
+参考：https://www.anquanke.com/post/id/238645<br>
+<img src="https://fallingskies22.github.io/post-images/1682309298849.png" alt="" loading="lazy"></p>
+<p>查看代码段，可以很明显看到一段类似于shellcode的数据<br>
+<img src="https://fallingskies22.github.io/post-images/1682309402300.png" alt="" loading="lazy"></p>
+<p>smc函数对这段code做了xor处理。异或的数就是我们之前解出的3<br>
+<img src="https://fallingskies22.github.io/post-images/1682315216225.png" alt="" loading="lazy"><br>
+编写idapython来还原</p>
+<pre><code class="language-python">for i in range(5620):
+ rightVal = idc.Byte(0x41D00C + i) ^ 0x3
+ PatchByte(0x41D00C + i, rightVal)
+</code></pre>
+<p>修改后点击apply patch to input file<br>
+<img src="https://fallingskies22.github.io/post-images/1682317438749.png" alt="" loading="lazy"><br>
+重新打开，就可以看到正常的sub_411302函数了。</p>
+<p>这个函数用rc4加密输入的字符串，与另一个字符串作比较。<br>
+<img src="https://fallingskies22.github.io/post-images/1682318734537.png" alt="" loading="lazy"></p>
+<p>直接使用官方wp的脚本</p>
+<pre><code class="language-c++">#include&lt;iostream&gt;
+#include&lt;algorithm&gt;
+#include&lt;cstdio&gt;
+#include&lt;cmath&gt;
+#include&lt;map&gt;
+#include&lt;vector&gt;
+#include&lt;queue&gt;
+#include&lt;stack&gt;
+#include&lt;set&gt;
+#include&lt;string&gt;
+#include&lt;cstring&gt;
+#include&lt;list&gt;
+#include&lt;stdlib.h&gt;
+using namespace std;
+typedef int status;
+typedef int selemtype;
+
+
+
+/*初始化函数*/
+void rc4_init(unsigned char* s, unsigned char* key, unsigned long Len)
+{
+    int i = 0, j = 0;
+    char k[256] = { 0 };
+    unsigned char tmp = 0;
+    for (i = 0; i &lt; 256; i++)
+    {
+        s[i] = i;
+        k[i] = key[i % Len];
+    }
+    for (i = 0; i &lt; 256; i++)
+    {
+        j = (j + s[i] + k[i]) % 256;
+        tmp = s[i];
+        s[i] = s[j];//交换s[i]和s[j]
+        s[j] = tmp;
+    }
+}
+
+/*加解密*/
+void rc4_crypt(unsigned char* s, unsigned char* Data, unsigned long Len)
+{
+    int i = 0, j = 0, t = 0;
+    unsigned long k = 0;
+    unsigned char tmp;
+    for (k = 0; k &lt; Len; k++)
+    {
+        i = (i + 1) % 256;
+        j = (j + s[i]) % 256;
+        tmp = s[i];
+        s[i] = s[j];//交换s[x]和s[y]
+        s[j] = tmp;
+        t = (s[i] + s[j]) % 256;
+        Data[k] ^= s[t];
+    }
+}
+
+int main()
+{
+    unsigned char s[256] = { 0 }, s2[256] = { 0 };//S-box
+    char key[256] = { &quot;you_are_master&quot; };
+    unsigned char pData[512] = {
+         0xf,0x94,0xae,0xf2,0xc0,0x57,0xc2,0xe0,0x9a,0x45,
+         0x37,0x50,0xf5,0xa0,0x5e,0xcb,0x2c,0x16,0x28,0x29,
+         0xfe,0xff,0x33,0x46,0xe,0x57,0x82,0x22,0x52,0x26,
+         0x2b,0x6e,0xe4,0x82,0x24
+    };
+    unsigned long len = 35;
+    int i;
+
+    printf(&quot;pData=%s\n&quot;, pData);
+    printf(&quot;key=%s,length=%d\n\n&quot;, key, strlen(key));
+    rc4_init(s, (unsigned char*)key, strlen(key));//已经完成了初始化
+    printf(&quot;完成对S[i]的初始化，如下：\n\n&quot;);
+    for (i = 0; i &lt; 256; i++)
+    {
+        printf(&quot;%02X&quot;, s[i]);
+        if (i &amp;&amp; (i + 1) % 16 == 0)putchar('\n');
+    }
+    printf(&quot;\n\n&quot;);
+    for (i = 0; i &lt; 256; i++)//用s2[i]暂时保留经过初始化的s[i]，很重要的！！！
+    {
+        s2[i] = s[i];
+    }
+
+    rc4_crypt(s, (unsigned char*)pData, len);//加密
+
+    printf(&quot;现在解密:\n\n&quot;);
+    //rc4_init(s,(unsignedchar*)key,strlen(key));//初始化密钥
+    //rc4_crypt(s2, (unsigned char*)pData, len);//解密
+    printf(&quot;pData=%s\n\n&quot;, pData);
+    return 0;
+}
+</code></pre>
+<p>得到flag<br>
+HDCTF{y0u_ar3_rc4_t3a_smc_m4ster!!}</p>
+<p>直接用cyberchef也行<br>
+<img src="https://fallingskies22.github.io/post-images/1682319091231.png" alt="" loading="lazy"></p>
+<p>最后还有一道谜语题，就不复现了🤣</p>
+<h1 id="0x03-总结">0x03 总结</h1>
+<p>总的来说还是学到了很多加密方式的逆向，熟悉了之后以后就能快速识别了。<br>
+也学到了很多windows相关的shellcode的逆向方法。还是有收获的🤠</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[汇编中浮点数（float）的表达方式]]></title>
+        <id>https://fallingskies22.github.io/post/hui-bian-zhong-fu-dian-shu-floatde-biao-da-fang-shi/</id>
+        <link href="https://fallingskies22.github.io/post/hui-bian-zhong-fu-dian-shu-floatde-biao-da-fang-shi/">
+        </link>
+        <updated>2023-04-21T02:46:11.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="0x01-前言">0x01 前言</h2>
+<p>在buuoj刷题时，遇到一道<code>cicsn_2019_n_1</code>。<br>
+这题很简单，就是简单的溢出覆盖变量值。<br>
+但遇到了一个新的知识点，浮点数。</p>
+<h2 id="0x02-介绍">0x02 介绍</h2>
+<p>题目如下：<br>
+根据提示，我们要让v2等于11.28125<br>
+<img src="https://fallingskies22.github.io/post-images/1682045448904.png" alt="" loading="lazy"></p>
+<p>看汇编代码是如何进行比较的。<br>
+这里的movss、ucomiss都是单精度浮点数的操作符号，等同于mov、comp<br>
+<img src="https://fallingskies22.github.io/post-images/1682045455202.png" alt="" loading="lazy"></p>
+<p>看到进行比较的数实际上是0x41348000<br>
+<img src="https://fallingskies22.github.io/post-images/1682045461138.png" alt="" loading="lazy"></p>
+<h2 id="0x03-google">0x03 google</h2>
+<p><img src="https://fallingskies22.github.io/post-images/1682045740935.png" alt="" loading="lazy"><br>
+参考文章https://www.zengl.com/a/201312/114.html<br>
+详细介绍了浮点数的二进制表达方式。</p>
+<p>参照方法计算一下</p>
+<pre><code>11.28125
+
+11
+
+11/2  -&gt; 5  1
+5/2   -&gt; 2  1
+2/2   -&gt; 1  0
+1/2   -&gt; 0  1
+
+1011
+
+0.28125
+
+0.28125 * 2 = 0.5625 -&gt; 0
+0.5625 * 2 = 1.125   -&gt; 1
+0.125 *2 = 0.25      -&gt; 0
+0.25  * 2 = 0.5      -&gt; 0
+0.5 * 2 = 1          -&gt; 1
+
+.01001
+
+1011.01001
+
+1.01101001 * 2^3
+
+0 10000010 01101001000000000000000
+
+0100 0001 0011 0100 1000 0000 0000 0000
+
+41348000
+</code></pre>
+<p>perfect 😃)))</p>
+<p>这里再附上一个自动计算浮点数转换的网站：https://lostphp.com/hexconvert/</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Midjounrny制作图片]]></title>
+        <id>https://fallingskies22.github.io/post/midjounrny-zhi-zuo-tu-pian/</id>
+        <link href="https://fallingskies22.github.io/post/midjounrny-zhi-zuo-tu-pian/">
+        </link>
+        <updated>2023-04-10T16:10:56.000Z</updated>
+        <content type="html"><![CDATA[<p>就是这样</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[计算机操作系统（第四版）课后习题答案-----第一章]]></title>
+        <id>https://fallingskies22.github.io/post/ji-suan-ji-cao-zuo-xi-tong-di-si-ban-ke-hou-xi-ti-da-an-di-yi-zhang/</id>
+        <link href="https://fallingskies22.github.io/post/ji-suan-ji-cao-zuo-xi-tong-di-si-ban-ke-hou-xi-ti-da-an-di-yi-zhang/">
+        </link>
+        <updated>2023-04-09T10:26:30.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="font-colorred-1设计现代os的主要目标是什么-font"><font color=red> 1.设计现代OS的主要目标是什么？ </font></h2>
+<p>方便性，有效性，可扩充性和开放性。<br>
+方便性：系统可以使用编译命令将用户采用高级语言书写的程序翻译成机器代码，或者直接通过OS所提供的各种命令操作计算机系统。<br>
+有效性：提高系统资源的利用率；提高系统的吞吐量<br>
+可扩充性：能方便地增添新的功能和模块，以及对原有的功能和模块进行修改<br>
+开放性：使得不同厂家按照标准生产的软、硬件都能在本国范围内很好地相互兼容</p>
+<h2 id="font-colorred-2os的作用可表现在哪几个方面-font"><font color=red> 2.OS的作用可表现在哪几个方面？ </font></h2>
+<p>作为用户与计算机硬件系统之间的接口：OS处于用户与计算机硬件系统之间。用户通过OS来使用计算机系统。<br>
+作为计算机系统资源的管理者：资源：处理机、存储器、I/O设备以及文件（数据和程序）。<br>
+实现了对计算机资源的抽象。</p>
+<h2 id="font-colorred-3为什么说操作系统实现了对计算机资源的抽象-font"><font color=red> 3.为什么说操作系统实现了对计算机资源的抽象？ </font></h2>
+<p>裸机向用户提供的仅是硬件接口，用户必须对物理接口十分熟悉，使物理机器难于广泛使用。<br>
+在裸机上铺设的I/O软件隐藏了I/O 设备的具体细节，向上提供了一组抽象的I/O设备。I/O设备管理软件实现了对计算机硬件操作的第一个层次的抽象；文件管理软件实现了对硬件资源操作的第二个层次的抽象；再覆盖一层面向用户的窗口软件。</p>
+<h2 id="font-colorred-4试说明推动多道批系统形成和发展的主要动力是什么-font"><font color=red> 4.试说明推动多道批系统形成和发展的主要动力是什么？ </font></h2>
+<p>不断提高计算机资源利用率；方便用户；器件的不断更新换代；计算机体系结构的不断发展；不断提出新的应用要求。</p>
+<h2 id="font-colorred-5何谓脱机io和联机io-font"><font color=red> 5.何谓脱机I/O和联机I/O？ </font></h2>
+<p>脱机I/O：程序和数据的输入和输出都是在外围机的控制下完成的。在脱离主机的情况下进行的。<br>
+联机I/O：是指程序和数据的输入输出都是在主机的直接控制下进行的。<br>
+假脱机：在联机情况下实现的同时操作的技术。</p>
+<h2 id="font-colorred-6试说明推动分时系统形成和发展的主要动力是什么-font"><font color=red> 6.试说明推动分时系统形成和发展的主要动力是什么。 </font></h2>
+<p>为了满足用户对人-机交互的需求。</p>
+<h2 id="font-colorred-7实现分时系统的关键问题是什么应如何解决-font"><font color=red> 7.实现分时系统的关键问题是什么？应如何解决？ </font></h2>
+<p>及时接收：在系统中配置一个多路卡即可。多路卡的作用：实现分时多路复用，即主机以很快的速度周期性地扫描各个终端，在每个终端处停留很短的时间。<br>
+及时处理：作业直接进入内存；采用轮转运行方式。</p>
+<h2 id="font-colorred-8为什么要引入实时操作系统-font"><font color=red> 8.为什么要引入实时操作系统？ </font></h2>
+<p>如果嵌入式系统的功能比较复杂，需要网络功能、存储器管理、进程/线程管理等，则通过嵌入式操作系统的帮助，可加快嵌入式系统软件的开发进度和可靠性。</p>
+<h2 id="font-colorred-9什么是硬实时任务和软实时任务试举例说明-font"><font color=red> 9.什么是硬实时任务和软实时任务？试举例说明。 </font></h2>
+<p>硬实时任务：系统必须满足任务队截止时间的要求，否则可能出现难以预测的后果。用于工业和武器控制的实时系统。<br>
+软实时任务：对于截止时间不严格，即使错过了，对系统的影响也不太大。信息查询系统和多媒体系统中的实时系统。</p>
+<h2 id="font-colorred-10试从交互性-及时性以及可靠性方面将分时系统与实时系统进行比较-font"><font color=red> 10.试从交互性、及时性以及可靠性方面将分时系统与实时系统进行比较。 </font></h2>
+<p>交互性：在信息查询系统中，人与系统的交互性仅限于访问系统中某些特定的专用服务程序。它并不像分时系统那样，能向终端用户提供数据处理、资源共享等服务。而多媒体系统的交互性也仅限于用户发送某些特定的命令，如开始、停止、快进等，由系统立即响应。<br>
+及时性：信息查询系统对实时性的要求是依据人所能接受的等待时间确定，而多媒体系统实时性的要求是，播放出来的音乐和电视能令人满意。实时控制系统的实时性则是以控制对象所要求的截止时间来确定的，一般为秒级到毫秒级。<br>
+可靠性：分时系统要求系统可靠，实时系统要求系统高度可靠，因为任何差错都可能带来无法预料的后果。因此，在实时系统中，往往都采取了多级容错技术来保障系统的安全性及数据的安全性。</p>
+<h2 id="font-colorred-11os有哪几大特征其最基本的特征是什么-font"><font color=red> 11.OS有哪几大特征？其最基本的特征是什么？ </font></h2>
+<p>并发性，共享性，虚拟性和异步性。<br>
+最基本：并发性<br>
+并行是指两个或多个时间在同一时刻发生。<br>
+并发是指两个或多个事件在同一时间间隔内发生。<br>
+共享：系统中的资源可供内存中多个并发执行的进程共同使用。<br>
+虚拟：通过某种技术将一个物理实体变为若干个逻辑上的对应物的功能。（时分复用技术和空分复用技术）<br>
+时分复用技术：利用某设备为一用户服务的空闲时间，又转去为其他用户服务，使设备得到最充分的利用。<br>
+空分复用技术：利用存储器的空闲空间分区域存放和运行其他的多道程序，以此来提高内存的利用率。<br>
+异步：进程是以人们不可预知的速度向前推进的。</p>
+<h2 id="font-colorred-12在多道程序技术的os环境下的资源共享与一般情况下的资源共享有何不同对独占资源应采取何种共享技术-font"><font color=red> 12.在多道程序技术的OS环境下的资源共享与一般情况下的资源共享有何不同？对独占资源应采取何种共享技术？ </font></h2>
+<p>一般情况下的共享只是说明某种资源能被大家使用，只要通过适当的安排，用户之间并不会产生对资源的竞争，因此资源管理是比较简单的。<br>
+而在OS环境下的资源共享或称为资源复用，是指系统中的资源可供内存中多个并发执行的进程共同使用。<br>
+对独占资源应采取互斥式共享。</p>
+<h2 id="font-colorred-13什么是时分复用技术举例说明它能提高资源利用率的根本原因是什么-font"><font color=red> 13.什么是时分复用技术？举例说明它能提高资源利用率的根本原因是什么。 </font></h2>
+<p>时分复用技术：利用某设备为一用户服务的空闲时间，又转去为其他用户服务，使设备得到最充分的利用。<br>
+举例：虚拟处理机技术：利用多道程序设计技术（时分复用技术），可将一台物理上的处理机虚拟为多台逻辑上的处理机，在每台逻辑处理机上运行一道程序。</p>
+<h2 id="font-colorred-14是什么原因使操作系统具有异步性特征-font"><font color=red> 14.是什么原因使操作系统具有异步性特征？ </font></h2>
+<p>对于内存中的每个进程，在何时能获得处理机运行，何时又因提出某种资源请求而暂停，以及进程以怎样的速度向前推进，每道程序总共需要多少时间才能完成等，都是不可预知的，进程是以人们不可预知的速度向前推进的，此即进程的异步性。</p>
+<h2 id="font-colorred-15处理机管理有哪些主要功能其主要任务是什么-font"><font color=red> 15.处理机管理有哪些主要功能？其主要任务是什么？ </font></h2>
+<p>进程控制；进程同步；进程通信；调度<br>
+主要功能：创建和撤销进程，对诸进程的运行进行协调，实现进程之间的信息交换，以及按照一定的算法把处理机分配给进程。</p>
+<h2 id="font-colorred-16内存存储器管理有哪些主要功能其主要任务是什么-font"><font color=red> 16.内存（存储器）管理有哪些主要功能？其主要任务是什么？ </font></h2>
+<p>内存分配；内存保护；地址映射；内存扩充<br>
+主要任务：是为多道程序的运行提供良好的环境，提高存储器的利用率，方便用户使用，并能从逻辑上扩充内存。</p>
+<h2 id="font-colorred-17设备管理有哪些主要功能其主要任务是什么-font"><font color=red> 17.设备管理有哪些主要功能？其主要任务是什么？ </font></h2>
+<p>缓冲管理；设备分配；设备处理<br>
+主要任务：完成用户进程提出的I/O请求，为用户进程分配所需的I/O设备，并完成指定的I/O操作。<br>
+提高CPU和I/O设备的利用率，提高I/O速度，方便用户使用I/O设备。</p>
+<h2 id="font-colorred-18文件管理有哪些主要功能其主要任务是什么-font"><font color=red> 18.文件管理有哪些主要功能？其主要任务是什么？ </font></h2>
+<p>主要任务：对用户文件和系统文件进行管理以方便用户使用，并保证文件的安全性。<br>
+文件存储空间的管理；目录管理；文件的读/写管理和保护</p>
+<h2 id="font-colorred-19试说明推动传统os演变为现代os的主要因素是什么-font"><font color=red> 19.试说明推动传统OS演变为现代OS的主要因素是什么？ </font></h2>
+<p>系统安全；网络的功能和服务；支持多媒体</p>
+<h2 id="font-colorred-20什么是微内核os-font"><font color=red> 20.什么是微内核OS？ </font></h2>
+<p>从四个方面对微内核结构的操作系统进行描述：足够小的内核；基于客户/服务器模式；应用“机制与策略分离”的原理；采用面向对象技术</p>
+<h2 id="font-colorred-21微内核操作系统具有哪些优点它为何能有这些优点-font"><font color=red> 21.微内核操作系统具有哪些优点？它为何能有这些优点？ </font></h2>
+<p>由于微内核OS结构是建立在模块化、层次化结构的基础上的，并采用了客户/服务器模式和面向对象的程序设计技术，因此，微内核结构的操作系统是集各种技术优点之大成，因而具有如下优点：<br>
+1）提高了系统的可扩展性<br>
+2）增强了系统的可靠性<br>
+3）可移植性强<br>
+4）提供了对分布式系统的支持<br>
+5）融入了面向对象技术</p>
+<h2 id="font-colorred-22现代操作系统较之传统操作系统又增加了哪些功能和特征-font"><font color=red> 22.现代操作系统较之传统操作系统又增加了哪些功能和特征？ </font></h2>
+<p>进程（线程）管理；低级存储器管理；中断和陷入管理</p>
+<h2 id="font-colorred-23在微内核os中为什么要采用客户服务器模式-font"><font color=red> 23.在微内核OS中，为什么要采用客户/服务器模式？ </font></h2>
+<p>数据的分布处理和存储；便于集中管理；灵活性和可扩充性；易于改编应用软件</p>
+<h2 id="font-colorred-24在基于微内核结构的os中应用了那些新技术-font"><font color=red> 24.在基于微内核结构的OS中，应用了那些新技术？ </font></h2>
+<p>采用面向对象的程序设计技术。</p>
+<h2 id="font-colorred-25何谓微内核技术在微内核中通常提供了哪些功能-font"><font color=red> 25.何谓微内核技术？在微内核中通常提供了哪些功能？ </font></h2>
+<p>把操作系统中更多的成分和功能放到更高的层次（即用户模式）去运行，而留下一个尽量小的内核，用它来完成操作系统最基本的核心功能称这种技术为微内核技术。在微内核中通常提供了进程（线程）管理；低级存储器管理；中断和陷入管理等功能。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[WolvCTF 2023 - Reverse - Homework Help]]></title>
+        <id>https://fallingskies22.github.io/post/wolvctf-2023-reverse-homework-help/</id>
+        <link href="https://fallingskies22.github.io/post/wolvctf-2023-reverse-homework-help/">
+        </link>
+        <updated>2023-03-26T17:03:14.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="静态分析">静态分析</h2>
+<p>在<code>__stack_check_fail</code>中存在比较FLAG的逻辑。<br>
+按字符对FLAG进行比较，比较错误即输出“Nope.”。（学习了一下longjmp和setjmp函数）<br>
+FLAG是在<code>eval</code>函数中进行输入的。（不用管它：））</p>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1679850304609.png" alt="" loading="lazy"></figure>
+<h2 id="动态调试">动态调试</h2>
+<p>直接跳进<code>__stack_check_fail</code>函数中，将比较逻辑设置为永远正确，输出进行比较的字符。<br>
+断点处，指令如下：<br>
+<img src="https://fallingskies22.github.io/post-images/1679850856562.png" alt="" loading="lazy"><br>
+gdb脚本如下：</p>
+<pre><code class="language-gdb">start
+set $rip=0x555555554000+0x1290
+b *0x5555555553e0
+commands
+  set $rdx=$rsi
+  p/c $rsi
+  c
+end
+c
+</code></pre>
+<p>成功输出flag<br>
+<img src="https://fallingskies22.github.io/post-images/1679850605952.png" alt="" loading="lazy"></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[WolvCTF 2023 - Reverse - child-re]]></title>
+        <id>https://fallingskies22.github.io/post/wolvctf-2023-reverse-child-re/</id>
+        <link href="https://fallingskies22.github.io/post/wolvctf-2023-reverse-child-re/">
+        </link>
+        <updated>2023-03-26T07:49:20.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="静态分析">静态分析</h2>
+<p>先使用IDA进行静态分析。<br>
+查看main函数。<br>
+<img src="https://fallingskies22.github.io/post-images/1679817221791.png" alt="" loading="lazy"></p>
+<p>对我们输入字符进行比较，根据提示应输入42，然后就没有后续了。<br>
+看看其他函数。</p>
+<p>这个函数<mark>sub_1165</mark>很明显是输出flag的函数。并且这个函数需要一个输入参数，那就是42了。<br>
+<img src="https://fallingskies22.github.io/post-images/1679817358966.png" alt="" loading="lazy"></p>
+<h2 id="动态调试">动态调试</h2>
+<p>使用<code>start</code>命令，程序会自动断在main() 主函数的起始位置。<br>
+使用<code>info proc mappings</code>查看程序基址。<br>
+<img src="https://fallingskies22.github.io/post-images/1679818301539.png" alt="" loading="lazy"><br>
+使用<code>set $rip=0x555555554000+0x1165</code>将程序跳转到函数。<br>
+这里的<code>0x1165</code>由IDA中函数名<code>sub_1165</code>得到。<br>
+使用<code>x/50i $rip</code>查看函数指令，<br>
+<img src="https://fallingskies22.github.io/post-images/1679818296172.png" alt="" loading="lazy"><br>
+使用<code>b *0x555555555227</code>在puts函数处设置断点。<br>
+使用<code>set $rdi=42</code>设置函数的参数。<br>
+<code>c</code>继续执行函数。<br>
+查看到flag。<br>
+<img src="https://fallingskies22.github.io/post-images/1679818613410.png" alt="" loading="lazy"></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[第一篇博客]]></title>
+        <id>https://fallingskies22.github.io/post/di-yi-pian-bo-ke/</id>
+        <link href="https://fallingskies22.github.io/post/di-yi-pian-bo-ke/">
+        </link>
+        <updated>2023-03-15T04:34:43.000Z</updated>
+        <summary type="html"><![CDATA[<p>这是简介，第一篇博客的简介，简单的介绍，细致的，正确的，有用的，可行的，持续的，太多的，世界的，朋友的</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>这是简介，第一篇博客的简介，简单的介绍，细致的，正确的，有用的，可行的，持续的，太多的，世界的，朋友的</p>
+<!-- more -->
+<h2 id="第一个标题">第一个标题</h2>
+<blockquote>
+<p>这是引言<br>
+这也是引言</p>
+</blockquote>
+<p>这是分隔线👇</p>
+<hr>
+<p><a href="http://www.google.com/">Google</a><br>
+第一篇博客，，测试一下怎么样。</p>
+<p>来一个列表</p>
+<table>
+<thead>
+<tr>
+<th>name</th>
+<th>age</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LearnShare</td>
+<td>12</td>
+</tr>
+<tr>
+<td>Mike</td>
+<td>32</td>
+</tr>
+</tbody>
+</table>
+<p><mark>高亮是这样的</mark></p>
+<p>任务栏是这样的</p>
+<ul class="contains-task-list">
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox" id="task-item-6196172"><label class="task-list-item-label" for="task-item-6196172"> Eat</label></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" checked="" disabled="" type="checkbox" id="task-item-6910313"><label class="task-list-item-label" for="task-item-6910313"> Code</label>
+<ul class="contains-task-list">
+<li class="task-list-item"><input class="task-list-item-checkbox" checked="" disabled="" type="checkbox" id="task-item-432918"><label class="task-list-item-label" for="task-item-432918"> HTML</label></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" checked="" disabled="" type="checkbox" id="task-item-3547270"><label class="task-list-item-label" for="task-item-3547270"> CSS</label></li>
+<li class="task-list-item"><input class="task-list-item-checkbox" checked="" disabled="" type="checkbox" id="task-item-5873511"><label class="task-list-item-label" for="task-item-5873511"> JavaScript</label></li>
+</ul>
+</li>
+<li class="task-list-item"><input class="task-list-item-checkbox" disabled="" type="checkbox" id="task-item-7687320"><label class="task-list-item-label" for="task-item-7687320"> Sleep</label></li>
+</ul>
+<p><kbd>ctrl</kbd> + <kbd>R<kbd></p>
+<h2 id="第二个标题">第二个标题</h2>
+<p>😊 可以用表情不错</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>e</mi><mi>c</mi><mi>h</mi><mi>o</mi></mrow><annotation encoding="application/x-tex">echo</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">e</span><span class="mord mathdefault">c</span><span class="mord mathdefault">h</span><span class="mord mathdefault">o</span></span></span></span></p>
+<!-- fsfjdjf -->
+<p><code>#include&lt;stdio.h&gt;</code></p>
+<p>试一下代码怎么样</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+</code></pre>
+<p>最重要的是图片<br>
+<img src="https://fallingskies22.github.io/post-images/1678855107404.png" alt="" loading="lazy"></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Hello Gridea]]></title>
+        <id>https://fallingskies22.github.io/post/hello-gridea/</id>
+        <link href="https://fallingskies22.github.io/post/hello-gridea/">
+        </link>
+        <updated>2018-12-11T16:00:00.000Z</updated>
+        <summary type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
+✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>👏  欢迎使用 <strong>Gridea</strong> ！<br>
+✍️  <strong>Gridea</strong> 一个静态博客写作客户端。你可以用它来记录你的生活、心情、知识、笔记、创意... ...</p>
+<!-- more -->
+<p><a href="https://github.com/getgridea/gridea">Github</a><br>
+<a href="https://gridea.dev/">Gridea 主页</a><br>
+<a href="https://fehey.com/">示例网站</a></p>
+<h2 id="特性">特性👇</h2>
+<p>📝  你可以使用最酷的 <strong>Markdown</strong> 语法，进行快速创作</p>
+<p>🌉  你可以给文章配上精美的封面图和在文章任意位置插入图片</p>
+<p>🏷️  你可以对文章进行标签分组</p>
+<p>📋  你可以自定义菜单，甚至可以创建外部链接菜单</p>
+<p>💻  你可以在 <strong>Windows</strong>，<strong>MacOS</strong> 或 <strong>Linux</strong> 设备上使用此客户端</p>
+<p>🌎  你可以使用 <strong>𝖦𝗂𝗍𝗁𝗎𝖻 𝖯𝖺𝗀𝖾𝗌</strong> 或 <strong>Coding Pages</strong> 向世界展示，未来将支持更多平台</p>
+<p>💬  你可以进行简单的配置，接入 <a href="https://github.com/gitalk/gitalk">Gitalk</a> 或 <a href="https://github.com/SukkaW/DisqusJS">DisqusJS</a> 评论系统</p>
+<p>🇬🇧  你可以使用<strong>中文简体</strong>或<strong>英语</strong></p>
+<p>🌁  你可以任意使用应用内默认主题或任意第三方主题，强大的主题自定义能力</p>
+<p>🖥  你可以自定义源文件夹，利用 OneDrive、百度网盘、iCloud、Dropbox 等进行多设备同步</p>
+<p>🌱 当然 <strong>Gridea</strong> 还很年轻，有很多不足，但请相信，它会不停向前 🏃</p>
+<p>未来，它一定会成为你离不开的伙伴</p>
+<p>尽情发挥你的才华吧！</p>
+<p>😘 Enjoy~</p>
+]]></content>
+    </entry>
+</feed>
