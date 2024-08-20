@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>DamCTF2024 - Web - Writeup | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="flower-power
+
+DNS Rebinding
+
+查看源码发现是一个flask框架的页面
+使用以下代码检查是否是内网地址
+if r_ip in ipaddress.ip_network('192.168.0.0/16') \
+   ..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">DamCTF2024 - Web - Writeup</h2>
+            <div class="post-date">2024-04-09</div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="flower-power">flower-power</h1>
+<ul>
+<li>DNS Rebinding</li>
+</ul>
+<p>查看源码发现是一个flask框架的页面<br>
+使用以下代码检查是否是内网地址</p>
+<pre><code class="language-python">if r_ip in ipaddress.ip_network('192.168.0.0/16') \
+        or r_ip in ipaddress.ip_network('172.16.0.0/12') \
+        or r_ip in ipaddress.ip_network('10.0.0.0/8') \
+        or r_ip in ipaddress.ip_network('127.0.0.0/8'):
+        return &quot;Definitely not a flower!&quot;
+</code></pre>
+<p>flag.png位于<code>/special_flower</code>，但是只能内网访问。<br>
+通过<code>/filter_flower</code>,可以输入图片url，如果检测是图片，则返回图片内容。</p>
+<pre><code class="language-python">_ = (proprietary_secret_ai_algorithm := 'Cih2Oj1yYW5kb20uY2hvaWNlcyhbMTQyNSwyMzQsMTIsMHg3QiwtOTEyLDU2LDg3LDI5NCwweDIwLDM5NCwzOCwweDRELDgwMCwxMjMsMzU2LDB4N0QsMTI4NywxNzEyLDMyLDBdLGs9NCksdls6Oi0xXVtpbnQuZnJvbV9ieXRlcyhieXRlcyhmbG93ZXJbMTAwOjEwNF0pKSAlIDRdLy84ICsgdlszXSUyMCA8IDI2MCBhbmQgKHBhdGgubG93ZXIoKS5lbmRzd2l0aCgoJy5wbmcnLCcuanBnJywnLmpwZWcnLCcuYm1wJykpIG9yIGZsb3dlci5zdGFydHN3aXRoKGJ5dGVzKFsweDg5LCAweDUwLCAweDRFLCAweDQ3LCAweDBELCAweDBBLCAweDFBLCAweDBBXSkpKSlbMV0gCg=='                                          ,proprietary_secret_ai_algorithm:=base64.b64decode(proprietary_secret_ai_algorithm))
+is_flower = compile(proprietary_secret_ai_algorithm, &quot;&lt;0x1172947815&gt;&quot;, &quot;eval&quot;)
+...
+    check = eval(is_flower,None,{&quot;flower&quot;:r.content,&quot;path&quot;:path})
+</code></pre>
+<p>这里is_flower函数使用的python字节码形式，有点难看懂<br>
+base64解码一下</p>
+<pre><code class="language-python">(v:=random.choices([1425,234,12,0x7B,-912,56,87,294,0x20,394,38,0x4D,800,123,356,0x7D,1287,1712,32,0],k=4),
+     v[::-1][int.from_bytes(bytes(flower[100:104]),'little') % 4]//8 + v[3]%20 &lt; 260 and 
+     (path.lower().endswith(('.png','.jpg','.jpeg','.bmp')) or 
+      flower.startswith(bytes([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]))))[1]
+</code></pre>
+<p>具体就是检测路径结尾是否是图片后缀，或者图片内容有png魔术头。<br>
+前面有一个随机数比大小，不知道干嘛用的，基本都能通过。<br>
+代码先对ip检测通过后，再访问url地址，这里可以使用DNS Rebinding绕过<br>
+检测时返回正常ip，访问时再返回本地ip。</p>
+<p>使用http://ceye.io/dns-rebinding<br>
+payload</p>
+<pre><code>http://r.fc6p8y.ceye.io/special_flower
+</code></pre>
+<h2 id="彩蛋">彩蛋</h2>
+<p>发现其他人的解法更简单</p>
+<pre><code>http://0.0.0.0/special_flower
+</code></pre>
+<p>原因是<a href="https://superuser.com/questions/1307050/how-does-the-os-resolve-a-request-to-connect-to-0-0-0-0">在linux中会将0.0.0.0修改为127.0.0.1</a></p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshownodejs/">
+                  <h3 class="post-title">
+                    [ctfshow]nodejs
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

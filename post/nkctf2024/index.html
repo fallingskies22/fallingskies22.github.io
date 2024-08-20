@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>NKCTF2024 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="MISC
+Webshell_pro
+查看流量包，发现返回包字符只有大写，且有四个等号的情况，猜测是base32
+
+成功解密后，一个数据包返回了hint.py的内容
+提示发送数据是通过rsa加密的。
+根据加密脚本解密数据。
+import ba..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">NKCTF2024</h2>
+            <div class="post-date">2024-03-23</div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="misc">MISC</h1>
+<h2 id="webshell_pro">Webshell_pro</h2>
+<p>查看流量包，发现返回包字符只有大写，且有四个等号的情况，猜测是base32<br>
+<img src="https://fallingskies22.github.io/post-images/1711202930614.png" alt="" loading="lazy"></p>
+<p>成功解密后，一个数据包返回了hint.py的内容<br>
+提示发送数据是通过rsa加密的。<br>
+根据加密脚本解密数据。</p>
+<pre><code class="language-python">import base64
+
+import libnum
+from Crypto.PublicKey import RSA
+
+pubkey = &quot;&quot;&quot;-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCK/qv5P8ixWjoFI2rzF62tm6sDFnRsKsGhVSCuxQIxuehMWQLmv6TPxyTQPefIKufzfUFaca/YHkIVIC19ohmE5X738TtxGbOgiGef4bvd9sU6M42k8vMlCPJp1woDFDOFoBQpr4YzH4ZTR6Ps+HP8VEIJMG5uiLQOLxdKdxi41QIDAQAB
+-----END PUBLIC KEY-----
+&quot;&quot;&quot;
+
+prikey = &quot;&quot;&quot;-----BEGIN PRIVATE KEY-----
+MIICdgIBADANBgkqhkiG9w0BAQEFAASCAmAwggJcAgEAAoGBAIr+q/k/yLFaOgUjavMXra2bqwMWdGwqwaFVIK7FAjG56ExZAua/pM/HJNA958gq5/N9QVpxr9geQhUgLX2iGYTlfvfxO3EZs6CIZ5/hu932xTozjaTy8yUI8mnXCgMUM4WgFCmvhjMfhlNHo+z4c/xUQgkwbm6ItA4vF0p3GLjVAgMBAAECgYBDsqawT5DAUOHRft6oZ+//jsJMTrOFu41ztrKkbPAUqCesh+4R1WXAjY4wnvY1WDCBN5CNLLIo4RPuli2R81HZ4OpZuiHv81sNMccauhrJrioDdbxhxbM7/jQ6M9YajwdNisL5zClXCOs1/y01+9vDiMDk0kX8hiIYlpPKDwjqQQJBAL6Y0fuoJng57GGhdwvN2c656tLDPj9GRi0sfeeMqavRTMz6/qea1LdAuzDhRoS2Wb8ArhOkYns0GMazzc1q428CQQC6sM9OiVR4EV/ewGnBnF+0p3alcYr//Gp1wZ6fKIrFJQpbHTzf27AhKgOJ1qB6A7P/mQS6JvYDPsgrVkPLRnX7AkEAr/xpfyXfB4nsUqWFR3f2UiRmx98RfdlEePeo9YFzNTvX3zkuo9GZ8e8qKNMJiwbYzT0yft59NGeBLQ/eynqUrwJAE6Nxy0Mq/Y5mVVpMRa+babeMBY9SHeeBk22QsBFlt6NT2Y3Tz4CeoH547NEFBJDLKIICO0rJ6kF6cQScERASbQJAZy088sVY6DJtGRLPuysv3NiyfEvikmczCEkDPex4shvFLddwNUlmhzml5pscIie44mBOJ0uX37y+co3q6UoRQg==
+-----END PRIVATE KEY-----
+&quot;&quot;&quot;
+
+pubkey = RSA.import_key(pubkey)
+prikey = RSA.import_key(prikey)
+n = pubkey.n
+
+def enc_replace(base64_str: str):
+    base64_str = base64_str.replace(&quot;&quot;, &quot;e5Lg^FM5EQYe5!yF&amp;62%V$UG*B*RfQeM&quot;)
+    base64_str = base64_str.replace(&quot;+&quot;, &quot;&quot;)
+    return base64_str.replace(&quot;=&quot;, &quot;JXWUDuLUgwRLKD9fD6&amp;VY2aFeE&amp;r@Ff2&quot;)
+
+def dec_replace(base64_str: str):
+    base64_str = base64_str.replace(&quot;e5Lg^FM5EQYe5!yF&amp;62%V$UG*B*RfQeM&quot;, &quot;/&quot;)
+    base64_str = base64_str.replace(&quot;n6&amp;B8G6nE@2tt4UR6h3QBt*5&amp;C&amp;pVu8W&quot;, &quot;+&quot;)
+    return base64_str.replace(&quot;JXWUDuLUgwRLKD9fD6&amp;VY2aFeE&amp;r@Ff2&quot;, &quot;=&quot;)
+
+def encrypt(plain_text):
+    # ç§é¥å å¯
+    cipher_text = b&quot;&quot;
+    for i in range(0, len(plain_text), 128):
+        part = plain_text[i:i+128]
+        enc = libnum.n2s(pow(libnum.s2n(part), prikey.d, n))
+        cipher_text += enc
+    return enc_replace(base64.b64encode(cipher_text).decode())
+
+def decrypt(cipher_text):
+    cipher_text = dec_replace(cipher_text)
+    print(cipher_text)
+    cipher_text = base64.b64decode(cipher_text)
+    plain_text = b&quot;&quot;
+    for i in range(0, len(cipher_text), 128):
+        part = cipher_text[i:i+128]
+        dec = libnum.n2s(pow(libnum.s2n(part), prikey.e, n))
+        plain_text += dec
+    return plain_text
+
+if __name__ == '__main__':
+    c = &quot;G1TUg4bIVOFYi8omV2SQrTa8fzYfboRNN7fV6FJn6&amp;B8G6nE@2tt4UR6h3QBt*5&amp;C&amp;pVu8Wbm3O74uCUbwMkvRCYae44TX1ZO8X4w2Nk1igaIZjSQIJ9MMHhD9cn6&amp;B8G6nE@2tt4UR6h3QBt*5&amp;C&amp;pVu8WSV5EzikNsyM5c1nlPS8uqw1P2pJuYLaLxloK0x5xhQHDqqAxkuKrBzPn0noQ2bDn6&amp;B8G6nE@2tt4UR6h3QBt*5&amp;C&amp;pVu8WlVnGwsfP7YP9PYJXWUDuLUgwRLKD9fD6&amp;VY2aFeE&amp;r@Ff2&quot;
+    
+    t = decrypt(c)
+    print(t)
+
+</code></pre>
+<p>结果为</p>
+<pre><code class="language-sh">echo U2FsdGVkX1+SslS2BbHfe3c4/t/KxLaM6ZFlOdbtfMHnG8lepnhMnde40tNOYjSvoErLzy0csL7c5d4TlMntBQ== &gt; /root/FLAG/flag.txt
+</code></pre>
+<p>尝试base64解码，发现头为salt，根据另一个返回数据包提示，密码为Password-based-encryption<br>
+使用AES解密</p>
+<pre><code>flag{d0e1183c-07c3-49ea-b048-addbe6cc1b20}
+</code></pre>
+
+            </div>
+            
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

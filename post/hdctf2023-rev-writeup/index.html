@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>HDCTF 2023 - Reverse - Writeup | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="
+0x01前言
+0x02 题目
+
+0x01 easy_re
+0x02 easy_asm
+0x03 double_code
+0x04 fake_game
+0x05 买了些什么呢
+0x06 enc
+
+
+0x03 总结
+
+
+0x01前言
+这次偶然..." />
+    <meta name="keywords" content="ctf" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">HDCTF 2023 - Reverse - Writeup</h2>
+            <div class="post-date">2023-04-23</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/hdctf2023-rev-writeup.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p><ul class="markdownIt-TOC">
+<li><a href="#0x01%E5%89%8D%E8%A8%80">0x01前言</a></li>
+<li><a href="#0x02-%E9%A2%98%E7%9B%AE">0x02 题目</a>
+<ul>
+<li><a href="#0x01-easy_re">0x01 easy_re</a></li>
+<li><a href="#0x02-easy_asm">0x02 easy_asm</a></li>
+<li><a href="#0x03-double_code">0x03 double_code</a></li>
+<li><a href="#0x04-fake_game">0x04 fake_game</a></li>
+<li><a href="#0x05-%E4%B9%B0%E4%BA%86%E4%BA%9B%E4%BB%80%E4%B9%88%E5%91%A2">0x05 买了些什么呢</a></li>
+<li><a href="#0x06-enc">0x06 enc</a></li>
+</ul>
+</li>
+<li><a href="#0x03-%E6%80%BB%E7%BB%93">0x03 总结</a></li>
+</ul>
+</p>
+<h1 id="0x01前言">0x01前言</h1>
+<p>这次偶然参加了这个CTF，没想到逆向全是exe，真让人头大。还有就是不得不吐槽的是，逆向你出一个算法题干嘛，又不是ACM 😦  。但还是有些题目很有质量，比如double code这种接近实战的逆向分析。也学到了很多windows方面逆向的一些知识吧。 还有要吐槽的，题目都能出错来，fake_game那道题我就说算出来flag怎么不对😓，暴打出题人就完事儿了。</p>
+<h1 id="0x02-题目">0x02 题目</h1>
+<h2 id="0x01-easy_re">0x01 easy_re</h2>
+<p>使用exeinfope工具查看<br>
+可以看到有upx壳<br>
+<img src="https://fallingskies22.github.io/post-images/1682258432714.png" alt="" loading="lazy"><br>
+直接用ida打开，ida也能识别<br>
+<img src="https://fallingskies22.github.io/post-images/1682258449108.png" alt="" loading="lazy"></p>
+<p>使用<a href="https://github.com/upx/upx">upx</a>进行脱壳<br>
+命令：upx.exe -d re.exe<br>
+再将文件丢进ida中，就能看到清楚的函数了。<br>
+<img src="https://fallingskies22.github.io/post-images/1682258894282.png" alt="" loading="lazy"><br>
+对逐个函数进行分析。<br>
+<img src="https://fallingskies22.github.io/post-images/1682258976209.png" alt="" loading="lazy"><br>
+f3函数是对输入字符串进行reverse<br>
+总共32次，偶数次，就相当于没有变</p>
+<p>然后是func函数，这个函数其实是base64加密，因为不太熟悉，一开始分析起来好困难😵<br>
+后面根据函数大概逻辑，三位变四位，大概能猜出来是base64.</p>
+<pre><code class="language-c">void __cdecl func(char *x, char *y)
+{
+  unsigned __int8 *v3; // rax
+  unsigned __int8 v4; // cl
+  int v5; // ecx
+  int v6; // eax
+  int v7; // ecx
+  int v8; // eax
+  int v9; // eax
+  int v10; // eax
+  unsigned __int8 a4[4]; // [rsp+29h] [rbp-67h]
+  unsigned __int8 a3[3]; // [rsp+2Dh] [rbp-63h]
+  char b[65]; // [rsp+30h] [rbp-60h] BYREF
+  int k; // [rsp+7Ch] [rbp-14h]
+  int j; // [rsp+80h] [rbp-10h]
+  int i; // [rsp+84h] [rbp-Ch]
+  int len; // [rsp+88h] [rbp-8h]
+  int index; // [rsp+8Ch] [rbp-4h]
+  char *xa; // [rsp+A0h] [rbp+10h]
+
+  xa = x;
+  index = 0;
+  len = strlen(x);
+  i = 0;
+  j = 0;
+  k = 0;
+  strcpy(b, &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;);
+  while ( len-- )
+  {
+    v3 = (unsigned __int8 *)xa++;
+    v4 = *v3;
+    LODWORD(v3) = i++;
+    a3[(int)v3] = v4;
+    if ( i == 3 )
+    {
+      a4[0] = a3[0] &gt;&gt; 2;
+      a4[1] = ((16 * a3[0]) &amp; 0x30) + (a3[1] &gt;&gt; 4);
+      a4[2] = ((4 * a3[1]) &amp; 0x3C) + (a3[2] &gt;&gt; 6);
+      a4[3] = a3[2] &amp; 0x3F;
+      for ( i = 0; i &lt;= 3; ++i )
+      {
+        v5 = a4[i];
+        v6 = index++;
+        y[v6] = b[v5];
+      }
+      i = 0;
+    }
+  }
+  if ( i )
+  {
+    for ( j = i; j &lt;= 2; ++j )
+      a3[j] = 0;
+    a4[0] = a3[0] &gt;&gt; 2;
+    a4[1] = ((16 * a3[0]) &amp; 0x30) + (a3[1] &gt;&gt; 4);
+    a4[2] = ((4 * a3[1]) &amp; 0x3C) + (a3[2] &gt;&gt; 6);
+    a4[3] = a3[2] &amp; 0x3F;
+    for ( j = 0; i &gt;= j; ++j )
+    {
+      v7 = a4[j];
+      v8 = index++;
+      y[v8] = b[v7];
+    }
+    while ( 1 )
+    {
+      v9 = i++;
+      if ( v9 &gt; 2 )
+        break;
+      v10 = index++;
+      y[v10] = 61;
+    }
+  }
+  y[index] = 0;
+}
+</code></pre>
+<p>将输入字符base64后与字符串a进行比较。<br>
+<img src="https://fallingskies22.github.io/post-images/1682259351525.png" alt="" loading="lazy"><br>
+将字符串a进行base64解码得到flag<br>
+HDCTF{Y0u_h@v2_//@57er3d_7he_r3v3rs3}</p>
+<h2 id="0x02-easy_asm">0x02 easy_asm</h2>
+<p>这题的exe运行不了，就只能静态分析了，但是还好代码很少。<br>
+程序的大概流程图如下<br>
+<img src="https://fallingskies22.github.io/post-images/1682259840639.png" alt="" loading="lazy"></p>
+<p>有个地方没搞懂的是，对字符串进行操作时，都指向的asc_10000，而正确的字符串很明显是另一个字符串。<br>
+<img src="https://fallingskies22.github.io/post-images/1682259866631.png" alt="" loading="lazy"><br>
+<img src="https://fallingskies22.github.io/post-images/1682259943709.png" alt="" loading="lazy"></p>
+<p>从汇编来看<br>
+0x52-0x47刚好等于11<br>
+就是字符串Not equal!$ 的长度。<br>
+所有对应的字符串指向，应该如下图所示。也符合程序的逻辑。<br>
+<img src="https://fallingskies22.github.io/post-images/1682260275015.png" alt="" loading="lazy"><br>
+查看上半部分的汇编，将输入字符，对0x10异或后再对字符作比较。<br>
+<img src="https://fallingskies22.github.io/post-images/1682260557093.png" alt="" loading="lazy"></p>
+<p>根据之前的猜测，很明显0x59就是指向，后面的字符串了<br>
+<img src="https://fallingskies22.github.io/post-images/1682260743507.png" alt="" loading="lazy"></p>
+<p>根据IDA的提示知道<code>$</code>是停止符，就不管。<br>
+<img src="https://fallingskies22.github.io/post-images/1682260870281.png" alt="" loading="lazy"><br>
+得到flag<br>
+HDCTF{Hust_a_e3sy_aSm}</p>
+<h2 id="0x03-double_code">0x03 double_code</h2>
+<p>从start函数一路找，这里的Code参数名也算是一个提示了，点进去继续看。<br>
+<img src="https://fallingskies22.github.io/post-images/1682262878869.png" alt="" loading="lazy"></p>
+<p>从这里的分配内存，写入内存，创建线程，可以知道是shellcode loader。<br>
+<img src="https://fallingskies22.github.io/post-images/1682263050986.png" alt="" loading="lazy"></p>
+<p>对照windows官方文档，<a href="https://learn.microsoft.com/en-us/windows/win32/api/memoryapi/nf-memoryapi-writeprocessmemory">writememory函数</a></p>
+<p>第三个参数应该是buffer的指针。<br>
+<img src="https://fallingskies22.github.io/post-images/1682263611938.png" alt="" loading="lazy"></p>
+<p>但是这里，IDA把这个指针识别成了函数🤣，就是说帮我们把shellcode逆向了<br>
+<img src="https://fallingskies22.github.io/post-images/1682263678376.png" alt="" loading="lazy"></p>
+<p>strcpy这里就是把flag放进了v15里，然后长度%5取余，分情况做不一样的计算。<br>
+（具体的不用看太懂，因为ida识别的不是很好，要么就自己分析汇编😂）<br>
+<img src="https://fallingskies22.github.io/post-images/1682267062707.png" alt="" loading="lazy"></p>
+<p>编写脚本如下：</p>
+<pre><code class="language-pyton">code = [0x48,0x67,0x45,0x51,0x42,0x7b,0x70,0x6a,0x30,0x68,0x6c,0x60,0x32,0x61,0x61,0x5f,0x42,0x70,0x61,0x5b,0x30,0x53,0x65,0x6c,0x60,0x65,0x7c,0x63,0x69,0x2d,0x5f,0x46,0x35,0x70,0x75,0x7d]
+
+for i in range(len(code)):
+    if(i%5 == 1):
+        code[i] ^= 0x23
+    if(i%5 == 2):
+        code[i] -= 2
+    if(i%5 == 3):
+        code[i] += 3
+    if(i%5 == 4):
+        code[i] += 4
+    if(i%5 == 5):
+        code[i] += 25
+
+
+for i in code:
+    print(chr(i),end=&quot;&quot;)
+</code></pre>
+<p>得到flag<br>
+HDCTF{Sh3llC0de_and_0pcode_al1_e3sy}</p>
+<p>这里我想问一下，i%5咋可能等于5啊，写个i%5==在这儿？是故意的还是不小心的👀</p>
+<h2 id="0x04-fake_game">0x04 fake_game</h2>
+<p>看exe图标可以发现，是使用pyinstaller生成的exe.<br>
+使用工具<a href="https://github.com/pyinstxtractor/pyinstxtractor-ng">pyinstxtractor-ng</a>将exe转换为pyc文件。</p>
+<p>使用python库uncompyle6进行反编译<br>
+pip3 install uncompyle6<br>
+uncompyle6.exe game.pyc &gt; game.py</p>
+<p>然后分析py代码，关键部分代码如下</p>
+<pre><code class="language-python">xorr = [
+         0] * 4
+        ans = [0] * 55
+        flag = [178868, 188, 56953, 2413, 178874, 131, 56957, 2313, 178867, 156, 
+         56933, 2377, 178832, 202, 56899, 2314, 178830, 167, 56924, 
+         2313, 178830, 167, 56938, 2383, 178822, 217, 56859, 2372]
+        self.init_window()
+        self.init_plant_points()
+        self.init_map()
+        self.init_zombies()
+        while not GAMEOVER:
+            MainGame.window.fill((255, 255, 255))
+            MainGame.window.blit(self.draw_text('当前钱数$: {}'.format(MainGame.money), 26, (255,
+                                                                                         0,
+                                                                                         0)), (500,
+                                                                                               40))
+            MainGame.window.blit(self.draw_text('当前关数{}，得分{},距离下关还差{}分'.format(MainGame.shaoguan, MainGame.score, MainGame.remnant_score), 26, (255,
+                                                                                                                                                0,
+                                                                                                                                                0)), (5,
+                                                                                                                                                      40))
+            self.load_help_text()
+            xorr[0] = MainGame.money
+            xorr[1] = MainGame.shaoguan
+            xorr[2] = MainGame.score
+            xorr[3] = MainGame.remnant_score
+            if xorr[0] * 256 - xorr[1] / 2 + xorr[2] * 23 + xorr[3] / 2 == 47118166:
+                if xorr[0] * 252 - xorr[1] * 366 + xorr[2] * 23 + xorr[3] / 2 - 1987 == 46309775:
+                    if xorr[0] * 6 - xorr[1] * 88 + xorr[2] / 2 + xorr[3] / 2 - 11444 == 1069997:
+                        if (xorr[0] - 652) * 2 - xorr[1] * 366 + xorr[2] * 233 + xorr[3] / 2 - 13333 == 13509025:
+                            for i in range(len(flag)):
+                                ans[i] = flag[i] ^ xorr[i % 4]
+                            else:
+                                with open('flag.txt', 'w') as (f):
+                                    f.write(''.join([chr(a) for a in ans]))
+</code></pre>
+<p>发现需要金钱、分数啥的满足四个方程，再用这四个参数对flag列表进行异或。</p>
+<p>编写脚本</p>
+<pre><code class="language-python">from scipy.optimize import fsolve
+
+
+def solve_function(unsolved_value):
+    x, y, z, a= unsolved_value[0], unsolved_value[1], unsolved_value[2], unsolved_value[3]
+    return [
+        x * 256 - y / 2 + z * 23 + a / 2 - 47118166,
+        x * 252 - y * 366 + z * 23 + a / 2 - 1987 - 46309775,
+        x * 6 - y * 88 + z / 2 + a / 2 - 11444 - 1069997,
+        (x - 652) * 2 - y * 366 + z * 233 + a / 2 - 13333 - 13509025,
+    ]
+
+
+solved = fsolve(solve_function, [0, 0, 0,0])
+print(solved)
+
+xorr = [0] * 4
+ans = [0] * 55
+flag = [178868, 188, 56953, 2413, 178874, 131, 56957, 2313, 178867, 156, 
+56933, 2377, 178832, 202, 56899, 2314, 178830, 167, 56924, 
+2313, 178830, 167, 56938, 2383, 178822, 217, 56859, 2372]
+
+
+xorr[0] = int(solved[0])
+xorr[1] = int(solved[1]+1)
+xorr[2] = int(solved[2]+1)
+xorr[3] = int(solved[3]+2)
+                
+print(xorr)
+for i in range(len(flag)):
+    ans[i] = flag[i] ^ xorr[i % 4]
+
+print(''.join([chr(a) for a in ans]))
+</code></pre>
+<p>因为这题本身出的就有问题，所以需要根据HDCT这四个对应字符，调整一下xorr<br>
+最后得到flag<br>
+HDCTF{G0Od_pl2y3r_f0r_Pvz!!}</p>
+<h2 id="0x05-买了些什么呢">0x05 买了些什么呢</h2>
+<p>这道题是考算法的，01背包问题，<br>
+但是ida中反编译后的knapsack函数就相当于解法，所以还算有点逆向😅<br>
+直接拿来用就行</p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+
+int dp[500][500];
+int __cdecl knapsack(int W, int* wt, int* val, int n)
+{
+    int j_0; // [esp+0h] [ebp-10h]
+    int i_0; // [esp+4h] [ebp-Ch]
+    int j; // [esp+8h] [ebp-8h]
+    int i; // [esp+Ch] [ebp-4h]
+
+    for (i = 0; i &lt;= n; ++i)
+    {
+        for (j = 0; j &lt;= W; ++j)
+            dp[i][j] = 0;
+    }
+    for (i_0 = 1; i_0 &lt;= n; ++i_0)
+    {
+        for (j_0 = 1; j_0 &lt;= W; ++j_0)
+        {
+            if (j_0 &lt; wt[i_0 - 1])
+            {
+                dp[i_0][j_0] = dp[i_0 - 1][j_0];
+            }
+            else
+            {
+                dp[i_0][j_0] = dp[i_0 - 1][j_0];
+                if (dp[i_0 - 1][j_0 - wt[i_0 - 1]] + val[i_0 - 1] &gt; dp[i_0][j_0])
+                    dp[i_0][j_0] = val[i_0 - 1] + dp[i_0 - 1][j_0 - wt[i_0 - 1]];
+            }
+        }
+    }
+    return 0;
+
+}
+int main()
+{
+    int W = 50;
+    int n = 40;
+    int wt[0xA0];
+    int val[0xA0];
+    srand(1);
+    for (int i = 0; i &lt; n; i++)
+    {
+        wt[i] = rand() % 10 + 1;
+        val[i] = rand() % 10 + 1;
+        printf(&quot;|    %d    |   %d   |   %d   |\n&quot;, i + 1, wt[i], val[i]);
+    }
+    knapsack(W, wt, val, n);
+    std::cout &lt;&lt; &quot;动态规划数组为: &quot; &lt;&lt; std::endl;
+    for (int i = 0; i &lt;= n; i++)
+    {
+        for (int j = 0; j &lt;= W; j++)
+        {
+            std::cout &lt;&lt; dp[i][j] &lt;&lt; &quot; &quot;;
+        }
+        std::cout &lt;&lt; std::endl;
+    }
+    std::vector&lt;int&gt; indices;
+    int w = W;
+    for (int i = n; i &gt; 0 &amp;&amp; w &gt; 0; i--)
+    {
+        if (dp[i][w] != dp[i - 1][w])
+        {
+            indices.push_back(i - 1);
+            w -= wt[i - 1];
+        }
+    }
+    std::cout &lt;&lt; &quot;选择的物品的下标为: &quot;;
+    for (int i = indices.size() - 1; i &gt;= 0; i--)
+    {
+        std::cout &lt;&lt; indices[i] &lt;&lt; &quot; &quot;;
+    }
+}
+</code></pre>
+<p>得到flag<br>
+HDCTF{0 4 6 10 11 13 16 18 21 22 24 26 31 33 34 36 39}</p>
+<h2 id="0x06-enc">0x06 enc</h2>
+<p>这题主要考察一系列加密算法。<br>
+主函数逻辑如下<br>
+<img src="https://fallingskies22.github.io/post-images/1682308248861.png" alt="" loading="lazy"></p>
+<p>参考文章：https://www.anquanke.com/post/id/224198<br>
+对照可以发现sub_411523函数其实是tea加密算法。<br>
+<img src="https://fallingskies22.github.io/post-images/1682308354971.png" alt="" loading="lazy"></p>
+<p>但是这里ida把<code>add 0x9E3779B9</code>识别成减法了，虽然效果一样，但第一眼有点让人困惑🙃</p>
+<p>直接使用tea的解密算法解密就行。</p>
+<pre><code class="language-c++">#include &lt;stdio.h&gt;
+#include &lt;stdint.h&gt;  // 使用uint32_t数据类型需要包含此头文件
+#include &lt;string.h&gt;
+#include &lt;iostream&gt;
+using namespace std;
+
+
+void encrypt(uint32_t v[2], const uint32_t k[4]) {
+    uint32_t v0 = v[0], v1 = v[1], sum = 0, i;           /* set up */
+    uint32_t delta = 0x9E3779B9;                     /* a key schedule constant */
+    uint32_t k0 = k[0], k1 = k[1], k2 = k[2], k3 = k[3];   /* cache key */
+    for (i = 0; i &lt; 32; i++) {                         /* basic cycle start */
+        sum += delta;
+        v0 += ((v1 &lt;&lt; 4) + k0) ^ (v1 + sum) ^ ((v1 &gt;&gt; 5) + k1);
+        v1 += ((v0 &lt;&lt; 4) + k2) ^ (v0 + sum) ^ ((v0 &gt;&gt; 5) + k3);
+    }                                              /* end cycle */
+    v[0] = v0; v[1] = v1;
+}
+
+void decrypt(uint32_t v[2], const uint32_t k[4]) {
+    uint32_t v0 = v[0], v1 = v[1], sum = 0xC6EF3720, i;  /* set up; sum is 32*delta */
+    uint32_t delta = 0x9E3779B9;                     /* a key schedule constant */
+    uint32_t k0 = k[0], k1 = k[1], k2 = k[2], k3 = k[3];   /* cache key */
+    for (i = 0; i &lt; 32; i++) {                         /* basic cycle start */
+        v1 -= ((v0 &lt;&lt; 4) + k2) ^ (v0 + sum) ^ ((v0 &gt;&gt; 5) + k3);
+        v0 -= ((v1 &lt;&lt; 4) + k0) ^ (v1 + sum) ^ ((v1 &gt;&gt; 5) + k1);
+        sum -= delta;
+    }                                              /* end cycle */
+    v[0] = v0; v[1] = v1;
+}
+
+int main() {
+    uint32_t enc[2] = { 0x60FCDEF7,0x236DBEC };
+    uint32_t key[] = { 0x12,0x34,0x56,0x78 };
+    decrypt(enc, key);
+    cout &lt;&lt; enc[0];
+    return 0;
+}
+</code></pre>
+<p>解出v10 = 3<br>
+然后将它传入sub_4113DE函数，这个函数其实是一个smc函数<br>
+参考：https://www.anquanke.com/post/id/238645<br>
+<img src="https://fallingskies22.github.io/post-images/1682309298849.png" alt="" loading="lazy"></p>
+<p>查看代码段，可以很明显看到一段类似于shellcode的数据<br>
+<img src="https://fallingskies22.github.io/post-images/1682309402300.png" alt="" loading="lazy"></p>
+<p>smc函数对这段code做了xor处理。异或的数就是我们之前解出的3<br>
+<img src="https://fallingskies22.github.io/post-images/1682315216225.png" alt="" loading="lazy"><br>
+编写idapython来还原</p>
+<pre><code class="language-python">for i in range(5620):
+ rightVal = idc.Byte(0x41D00C + i) ^ 0x3
+ PatchByte(0x41D00C + i, rightVal)
+</code></pre>
+<p>修改后点击apply patch to input file<br>
+<img src="https://fallingskies22.github.io/post-images/1682317438749.png" alt="" loading="lazy"><br>
+重新打开，就可以看到正常的sub_411302函数了。</p>
+<p>这个函数用rc4加密输入的字符串，与另一个字符串作比较。<br>
+<img src="https://fallingskies22.github.io/post-images/1682318734537.png" alt="" loading="lazy"></p>
+<p>直接使用官方wp的脚本</p>
+<pre><code class="language-c++">#include&lt;iostream&gt;
+#include&lt;algorithm&gt;
+#include&lt;cstdio&gt;
+#include&lt;cmath&gt;
+#include&lt;map&gt;
+#include&lt;vector&gt;
+#include&lt;queue&gt;
+#include&lt;stack&gt;
+#include&lt;set&gt;
+#include&lt;string&gt;
+#include&lt;cstring&gt;
+#include&lt;list&gt;
+#include&lt;stdlib.h&gt;
+using namespace std;
+typedef int status;
+typedef int selemtype;
+
+
+
+/*初始化函数*/
+void rc4_init(unsigned char* s, unsigned char* key, unsigned long Len)
+{
+    int i = 0, j = 0;
+    char k[256] = { 0 };
+    unsigned char tmp = 0;
+    for (i = 0; i &lt; 256; i++)
+    {
+        s[i] = i;
+        k[i] = key[i % Len];
+    }
+    for (i = 0; i &lt; 256; i++)
+    {
+        j = (j + s[i] + k[i]) % 256;
+        tmp = s[i];
+        s[i] = s[j];//交换s[i]和s[j]
+        s[j] = tmp;
+    }
+}
+
+/*加解密*/
+void rc4_crypt(unsigned char* s, unsigned char* Data, unsigned long Len)
+{
+    int i = 0, j = 0, t = 0;
+    unsigned long k = 0;
+    unsigned char tmp;
+    for (k = 0; k &lt; Len; k++)
+    {
+        i = (i + 1) % 256;
+        j = (j + s[i]) % 256;
+        tmp = s[i];
+        s[i] = s[j];//交换s[x]和s[y]
+        s[j] = tmp;
+        t = (s[i] + s[j]) % 256;
+        Data[k] ^= s[t];
+    }
+}
+
+int main()
+{
+    unsigned char s[256] = { 0 }, s2[256] = { 0 };//S-box
+    char key[256] = { &quot;you_are_master&quot; };
+    unsigned char pData[512] = {
+         0xf,0x94,0xae,0xf2,0xc0,0x57,0xc2,0xe0,0x9a,0x45,
+         0x37,0x50,0xf5,0xa0,0x5e,0xcb,0x2c,0x16,0x28,0x29,
+         0xfe,0xff,0x33,0x46,0xe,0x57,0x82,0x22,0x52,0x26,
+         0x2b,0x6e,0xe4,0x82,0x24
+    };
+    unsigned long len = 35;
+    int i;
+
+    printf(&quot;pData=%s\n&quot;, pData);
+    printf(&quot;key=%s,length=%d\n\n&quot;, key, strlen(key));
+    rc4_init(s, (unsigned char*)key, strlen(key));//已经完成了初始化
+    printf(&quot;完成对S[i]的初始化，如下：\n\n&quot;);
+    for (i = 0; i &lt; 256; i++)
+    {
+        printf(&quot;%02X&quot;, s[i]);
+        if (i &amp;&amp; (i + 1) % 16 == 0)putchar('\n');
+    }
+    printf(&quot;\n\n&quot;);
+    for (i = 0; i &lt; 256; i++)//用s2[i]暂时保留经过初始化的s[i]，很重要的！！！
+    {
+        s2[i] = s[i];
+    }
+
+    rc4_crypt(s, (unsigned char*)pData, len);//加密
+
+    printf(&quot;现在解密:\n\n&quot;);
+    //rc4_init(s,(unsignedchar*)key,strlen(key));//初始化密钥
+    //rc4_crypt(s2, (unsigned char*)pData, len);//解密
+    printf(&quot;pData=%s\n\n&quot;, pData);
+    return 0;
+}
+</code></pre>
+<p>得到flag<br>
+HDCTF{y0u_ar3_rc4_t3a_smc_m4ster!!}</p>
+<p>直接用cyberchef也行<br>
+<img src="https://fallingskies22.github.io/post-images/1682319091231.png" alt="" loading="lazy"></p>
+<p>最后还有一道谜语题，就不复现了🤣</p>
+<h1 id="0x03-总结">0x03 总结</h1>
+<p>总的来说还是学到了很多加密方式的逆向，熟悉了之后以后就能快速识别了。<br>
+也学到了很多windows相关的shellcode的逆向方法。还是有收获的🤠</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://fallingskies22.github.io/tag/Y9TWaF-JA/" class="tag">
+                    ctf
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/hui-bian-zhong-fu-dian-shu-floatde-biao-da-fang-shi/">
+                  <h3 class="post-title">
+                    汇编中浮点数（float）的表达方式
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

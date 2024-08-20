@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>计算机操作系统（第四版）课后习题答案-----第一章 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content=" 1.设计现代OS的主要目标是什么？ 
+方便性，有效性，可扩充性和开放性。
+方便性：系统可以使用编译命令将用户采用高级语言书写的程序翻译成机器代码，或者直接通过OS所提供的各种命令操作计算机系统。
+有效性：提高系统资源的利用率；提高系统的吞..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">计算机操作系统（第四版）课后习题答案-----第一章</h2>
+            <div class="post-date">2023-04-09</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ji-suan-ji-cao-zuo-xi-tong-di-si-ban-ke-hou-xi-ti-da-an-di-yi-zhang.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="font-colorred-1设计现代os的主要目标是什么-font"><font color=red> 1.设计现代OS的主要目标是什么？ </font></h2>
+<p>方便性，有效性，可扩充性和开放性。<br>
+方便性：系统可以使用编译命令将用户采用高级语言书写的程序翻译成机器代码，或者直接通过OS所提供的各种命令操作计算机系统。<br>
+有效性：提高系统资源的利用率；提高系统的吞吐量<br>
+可扩充性：能方便地增添新的功能和模块，以及对原有的功能和模块进行修改<br>
+开放性：使得不同厂家按照标准生产的软、硬件都能在本国范围内很好地相互兼容</p>
+<h2 id="font-colorred-2os的作用可表现在哪几个方面-font"><font color=red> 2.OS的作用可表现在哪几个方面？ </font></h2>
+<p>作为用户与计算机硬件系统之间的接口：OS处于用户与计算机硬件系统之间。用户通过OS来使用计算机系统。<br>
+作为计算机系统资源的管理者：资源：处理机、存储器、I/O设备以及文件（数据和程序）。<br>
+实现了对计算机资源的抽象。</p>
+<h2 id="font-colorred-3为什么说操作系统实现了对计算机资源的抽象-font"><font color=red> 3.为什么说操作系统实现了对计算机资源的抽象？ </font></h2>
+<p>裸机向用户提供的仅是硬件接口，用户必须对物理接口十分熟悉，使物理机器难于广泛使用。<br>
+在裸机上铺设的I/O软件隐藏了I/O 设备的具体细节，向上提供了一组抽象的I/O设备。I/O设备管理软件实现了对计算机硬件操作的第一个层次的抽象；文件管理软件实现了对硬件资源操作的第二个层次的抽象；再覆盖一层面向用户的窗口软件。</p>
+<h2 id="font-colorred-4试说明推动多道批系统形成和发展的主要动力是什么-font"><font color=red> 4.试说明推动多道批系统形成和发展的主要动力是什么？ </font></h2>
+<p>不断提高计算机资源利用率；方便用户；器件的不断更新换代；计算机体系结构的不断发展；不断提出新的应用要求。</p>
+<h2 id="font-colorred-5何谓脱机io和联机io-font"><font color=red> 5.何谓脱机I/O和联机I/O？ </font></h2>
+<p>脱机I/O：程序和数据的输入和输出都是在外围机的控制下完成的。在脱离主机的情况下进行的。<br>
+联机I/O：是指程序和数据的输入输出都是在主机的直接控制下进行的。<br>
+假脱机：在联机情况下实现的同时操作的技术。</p>
+<h2 id="font-colorred-6试说明推动分时系统形成和发展的主要动力是什么-font"><font color=red> 6.试说明推动分时系统形成和发展的主要动力是什么。 </font></h2>
+<p>为了满足用户对人-机交互的需求。</p>
+<h2 id="font-colorred-7实现分时系统的关键问题是什么应如何解决-font"><font color=red> 7.实现分时系统的关键问题是什么？应如何解决？ </font></h2>
+<p>及时接收：在系统中配置一个多路卡即可。多路卡的作用：实现分时多路复用，即主机以很快的速度周期性地扫描各个终端，在每个终端处停留很短的时间。<br>
+及时处理：作业直接进入内存；采用轮转运行方式。</p>
+<h2 id="font-colorred-8为什么要引入实时操作系统-font"><font color=red> 8.为什么要引入实时操作系统？ </font></h2>
+<p>如果嵌入式系统的功能比较复杂，需要网络功能、存储器管理、进程/线程管理等，则通过嵌入式操作系统的帮助，可加快嵌入式系统软件的开发进度和可靠性。</p>
+<h2 id="font-colorred-9什么是硬实时任务和软实时任务试举例说明-font"><font color=red> 9.什么是硬实时任务和软实时任务？试举例说明。 </font></h2>
+<p>硬实时任务：系统必须满足任务队截止时间的要求，否则可能出现难以预测的后果。用于工业和武器控制的实时系统。<br>
+软实时任务：对于截止时间不严格，即使错过了，对系统的影响也不太大。信息查询系统和多媒体系统中的实时系统。</p>
+<h2 id="font-colorred-10试从交互性-及时性以及可靠性方面将分时系统与实时系统进行比较-font"><font color=red> 10.试从交互性、及时性以及可靠性方面将分时系统与实时系统进行比较。 </font></h2>
+<p>交互性：在信息查询系统中，人与系统的交互性仅限于访问系统中某些特定的专用服务程序。它并不像分时系统那样，能向终端用户提供数据处理、资源共享等服务。而多媒体系统的交互性也仅限于用户发送某些特定的命令，如开始、停止、快进等，由系统立即响应。<br>
+及时性：信息查询系统对实时性的要求是依据人所能接受的等待时间确定，而多媒体系统实时性的要求是，播放出来的音乐和电视能令人满意。实时控制系统的实时性则是以控制对象所要求的截止时间来确定的，一般为秒级到毫秒级。<br>
+可靠性：分时系统要求系统可靠，实时系统要求系统高度可靠，因为任何差错都可能带来无法预料的后果。因此，在实时系统中，往往都采取了多级容错技术来保障系统的安全性及数据的安全性。</p>
+<h2 id="font-colorred-11os有哪几大特征其最基本的特征是什么-font"><font color=red> 11.OS有哪几大特征？其最基本的特征是什么？ </font></h2>
+<p>并发性，共享性，虚拟性和异步性。<br>
+最基本：并发性<br>
+并行是指两个或多个时间在同一时刻发生。<br>
+并发是指两个或多个事件在同一时间间隔内发生。<br>
+共享：系统中的资源可供内存中多个并发执行的进程共同使用。<br>
+虚拟：通过某种技术将一个物理实体变为若干个逻辑上的对应物的功能。（时分复用技术和空分复用技术）<br>
+时分复用技术：利用某设备为一用户服务的空闲时间，又转去为其他用户服务，使设备得到最充分的利用。<br>
+空分复用技术：利用存储器的空闲空间分区域存放和运行其他的多道程序，以此来提高内存的利用率。<br>
+异步：进程是以人们不可预知的速度向前推进的。</p>
+<h2 id="font-colorred-12在多道程序技术的os环境下的资源共享与一般情况下的资源共享有何不同对独占资源应采取何种共享技术-font"><font color=red> 12.在多道程序技术的OS环境下的资源共享与一般情况下的资源共享有何不同？对独占资源应采取何种共享技术？ </font></h2>
+<p>一般情况下的共享只是说明某种资源能被大家使用，只要通过适当的安排，用户之间并不会产生对资源的竞争，因此资源管理是比较简单的。<br>
+而在OS环境下的资源共享或称为资源复用，是指系统中的资源可供内存中多个并发执行的进程共同使用。<br>
+对独占资源应采取互斥式共享。</p>
+<h2 id="font-colorred-13什么是时分复用技术举例说明它能提高资源利用率的根本原因是什么-font"><font color=red> 13.什么是时分复用技术？举例说明它能提高资源利用率的根本原因是什么。 </font></h2>
+<p>时分复用技术：利用某设备为一用户服务的空闲时间，又转去为其他用户服务，使设备得到最充分的利用。<br>
+举例：虚拟处理机技术：利用多道程序设计技术（时分复用技术），可将一台物理上的处理机虚拟为多台逻辑上的处理机，在每台逻辑处理机上运行一道程序。</p>
+<h2 id="font-colorred-14是什么原因使操作系统具有异步性特征-font"><font color=red> 14.是什么原因使操作系统具有异步性特征？ </font></h2>
+<p>对于内存中的每个进程，在何时能获得处理机运行，何时又因提出某种资源请求而暂停，以及进程以怎样的速度向前推进，每道程序总共需要多少时间才能完成等，都是不可预知的，进程是以人们不可预知的速度向前推进的，此即进程的异步性。</p>
+<h2 id="font-colorred-15处理机管理有哪些主要功能其主要任务是什么-font"><font color=red> 15.处理机管理有哪些主要功能？其主要任务是什么？ </font></h2>
+<p>进程控制；进程同步；进程通信；调度<br>
+主要功能：创建和撤销进程，对诸进程的运行进行协调，实现进程之间的信息交换，以及按照一定的算法把处理机分配给进程。</p>
+<h2 id="font-colorred-16内存存储器管理有哪些主要功能其主要任务是什么-font"><font color=red> 16.内存（存储器）管理有哪些主要功能？其主要任务是什么？ </font></h2>
+<p>内存分配；内存保护；地址映射；内存扩充<br>
+主要任务：是为多道程序的运行提供良好的环境，提高存储器的利用率，方便用户使用，并能从逻辑上扩充内存。</p>
+<h2 id="font-colorred-17设备管理有哪些主要功能其主要任务是什么-font"><font color=red> 17.设备管理有哪些主要功能？其主要任务是什么？ </font></h2>
+<p>缓冲管理；设备分配；设备处理<br>
+主要任务：完成用户进程提出的I/O请求，为用户进程分配所需的I/O设备，并完成指定的I/O操作。<br>
+提高CPU和I/O设备的利用率，提高I/O速度，方便用户使用I/O设备。</p>
+<h2 id="font-colorred-18文件管理有哪些主要功能其主要任务是什么-font"><font color=red> 18.文件管理有哪些主要功能？其主要任务是什么？ </font></h2>
+<p>主要任务：对用户文件和系统文件进行管理以方便用户使用，并保证文件的安全性。<br>
+文件存储空间的管理；目录管理；文件的读/写管理和保护</p>
+<h2 id="font-colorred-19试说明推动传统os演变为现代os的主要因素是什么-font"><font color=red> 19.试说明推动传统OS演变为现代OS的主要因素是什么？ </font></h2>
+<p>系统安全；网络的功能和服务；支持多媒体</p>
+<h2 id="font-colorred-20什么是微内核os-font"><font color=red> 20.什么是微内核OS？ </font></h2>
+<p>从四个方面对微内核结构的操作系统进行描述：足够小的内核；基于客户/服务器模式；应用“机制与策略分离”的原理；采用面向对象技术</p>
+<h2 id="font-colorred-21微内核操作系统具有哪些优点它为何能有这些优点-font"><font color=red> 21.微内核操作系统具有哪些优点？它为何能有这些优点？ </font></h2>
+<p>由于微内核OS结构是建立在模块化、层次化结构的基础上的，并采用了客户/服务器模式和面向对象的程序设计技术，因此，微内核结构的操作系统是集各种技术优点之大成，因而具有如下优点：<br>
+1）提高了系统的可扩展性<br>
+2）增强了系统的可靠性<br>
+3）可移植性强<br>
+4）提供了对分布式系统的支持<br>
+5）融入了面向对象技术</p>
+<h2 id="font-colorred-22现代操作系统较之传统操作系统又增加了哪些功能和特征-font"><font color=red> 22.现代操作系统较之传统操作系统又增加了哪些功能和特征？ </font></h2>
+<p>进程（线程）管理；低级存储器管理；中断和陷入管理</p>
+<h2 id="font-colorred-23在微内核os中为什么要采用客户服务器模式-font"><font color=red> 23.在微内核OS中，为什么要采用客户/服务器模式？ </font></h2>
+<p>数据的分布处理和存储；便于集中管理；灵活性和可扩充性；易于改编应用软件</p>
+<h2 id="font-colorred-24在基于微内核结构的os中应用了那些新技术-font"><font color=red> 24.在基于微内核结构的OS中，应用了那些新技术？ </font></h2>
+<p>采用面向对象的程序设计技术。</p>
+<h2 id="font-colorred-25何谓微内核技术在微内核中通常提供了哪些功能-font"><font color=red> 25.何谓微内核技术？在微内核中通常提供了哪些功能？ </font></h2>
+<p>把操作系统中更多的成分和功能放到更高的层次（即用户模式）去运行，而留下一个尽量小的内核，用它来完成操作系统最基本的核心功能称这种技术为微内核技术。在微内核中通常提供了进程（线程）管理；低级存储器管理；中断和陷入管理等功能。</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/wolvctf-2023-reverse-homework-help/">
+                  <h3 class="post-title">
+                    WolvCTF 2023 - Reverse - Homework Help
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

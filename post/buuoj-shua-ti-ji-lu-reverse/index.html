@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[BUUOJ刷题][FlareOn4]IgniteMe | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="IDA打开
+
+跟进sub_4010F0函数
+
+这个函数用来读取输入，并将输入存入byte_403078中。
+sub_401020函数是用来计算字符串长度的。
+跟进sub_401040函数
+
+这个函数将byte_403078进行处理后，再与b..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[BUUOJ刷题][FlareOn4]IgniteMe</h2>
+            <div class="post-date">2024-02-23</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/buuoj-shua-ti-ji-lu-reverse.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p>IDA打开<br>
+<img src="https://fallingskies22.github.io/post-images/1709029158226.png" alt="" loading="lazy"></p>
+<p>跟进sub_4010F0函数<br>
+<img src="https://fallingskies22.github.io/post-images/1709029231840.png" alt="" loading="lazy"><br>
+这个函数用来读取输入，并将输入存入byte_403078中。<br>
+sub_401020函数是用来计算字符串长度的。</p>
+<p>跟进sub_401040函数<br>
+<img src="https://fallingskies22.github.io/post-images/1709029305068.png" alt="" loading="lazy"><br>
+这个函数将byte_403078进行处理后，再与byte_403000比较。</p>
+<p>跟进sub_401000函数<br>
+<img src="https://fallingskies22.github.io/post-images/1709029457974.png" alt="" loading="lazy"><br>
+这个函数会计算得到关键的v4，__ROL4__是循环左移。<br>
+这里直接动态调试出v4会方便点。<br>
+<img src="https://fallingskies22.github.io/post-images/1709030069162.png" alt="" loading="lazy"><br>
+因为v4是char类型的，所以v4=4</p>
+<p>编写脚本如下：</p>
+<pre><code class="language-c++">#include &lt;iostream&gt;
+
+int main()
+{
+    int v1 = 39;
+    int v4 = 4;
+    unsigned char byte_403000[] =
+    {
+      0x0D, 0x26, 0x49, 0x45, 0x2A, 0x17, 0x78, 0x44, 0x2B, 0x6C,
+      0x5D, 0x5E, 0x45, 0x12, 0x2F, 0x17, 0x2B, 0x44, 0x6F, 0x6E,
+      0x56, 0x09, 0x5F, 0x45, 0x47, 0x73, 0x26, 0x0A, 0x0D, 0x13,
+      0x17, 0x48, 0x42, 0x01, 0x40, 0x4D, 0x0C, 0x02, 0x69,
+    };
+
+    unsigned char byte_403180[40];
+    
+
+    for (int i = v1 - 1; i &gt;= 0; --i)
+    {
+        byte_403180[i] = v4 ^ byte_403000[i];
+        v4 = byte_403180[i];
+    }
+
+    byte_403180[39] = 0x00;
+    std::cout &lt;&lt; byte_403180;
+}
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/2024/">
+                  <h3 class="post-title">
+                    2024
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

