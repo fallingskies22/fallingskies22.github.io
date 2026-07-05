@@ -1,0 +1,2027 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[SCU]复试上机题库 - 2024 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1783248062137">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="
+
+
+0x01 韩信点兵
+0x02 2的幂次表示
+0x03 分数求和
+0x04 栅栏上色
+0x05 取彩球的可能
+0x06 统计单词个数
+0x07 数组遍历
+0x08 勒让德
+0x09 谁能笑道最后
+0x10 单链表（链表的排序）
+0x11..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1783248062137" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[SCU]复试上机题库 - 2024</h2>
+            <div class="post-date">2025-03-08</div>
+            
+            <div class="post-content" v-pre>
+              <p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#0x01-%E9%9F%A9%E4%BF%A1%E7%82%B9%E5%85%B5">0x01 韩信点兵</a></li>
+<li><a href="#0x02-2%E7%9A%84%E5%B9%82%E6%AC%A1%E8%A1%A8%E7%A4%BA">0x02 2的幂次表示</a></li>
+<li><a href="#0x03-%E5%88%86%E6%95%B0%E6%B1%82%E5%92%8C">0x03 分数求和</a></li>
+<li><a href="#0x04-%E6%A0%85%E6%A0%8F%E4%B8%8A%E8%89%B2">0x04 栅栏上色</a></li>
+<li><a href="#0x05-%E5%8F%96%E5%BD%A9%E7%90%83%E7%9A%84%E5%8F%AF%E8%83%BD">0x05 取彩球的可能</a></li>
+<li><a href="#0x06-%E7%BB%9F%E8%AE%A1%E5%8D%95%E8%AF%8D%E4%B8%AA%E6%95%B0">0x06 统计单词个数</a></li>
+<li><a href="#0x07-%E6%95%B0%E7%BB%84%E9%81%8D%E5%8E%86">0x07 数组遍历</a></li>
+<li><a href="#0x08-%E5%8B%92%E8%AE%A9%E5%BE%B7">0x08 勒让德</a></li>
+<li><a href="#0x09-%E8%B0%81%E8%83%BD%E7%AC%91%E9%81%93%E6%9C%80%E5%90%8E">0x09 谁能笑道最后</a></li>
+<li><a href="#0x10-%E5%8D%95%E9%93%BE%E8%A1%A8%E9%93%BE%E8%A1%A8%E7%9A%84%E6%8E%92%E5%BA%8F">0x10 单链表（链表的排序）</a></li>
+<li><a href="#0x11-%E5%AF%BB%E6%89%BE%E5%8D%95%E8%BA%AB%E6%B1%AA">0x11 寻找单身汪</a></li>
+<li><a href="#0x12-%E4%B8%AD%E5%BF%8D%E8%80%83%E8%AF%95">0x12 中忍考试</a></li>
+<li><a href="#0x13-%E6%81%B6%E6%90%9E%E6%8C%87%E6%95%B0">0x13 恶搞指数</a></li>
+<li><a href="#0x14-%E5%A4%A7%E6%95%B4%E6%95%B0%E4%B9%98%E6%B3%95">0x14 大整数乘法</a></li>
+<li><a href="#0x15-pongo-light-the-lamp">0x15 Pongo light the lamp</a></li>
+<li><a href="#0x16-dna%E6%8E%92%E5%BA%8F">0x16 DNA排序</a></li>
+<li><a href="#0x17-%E6%BB%91%E9%9B%AA">0x17 滑雪</a></li>
+<li><a href="#0x18-%E4%BF%84%E7%BD%97%E6%96%AF%E6%96%B9%E5%9D%97">0x18 俄罗斯方块</a></li>
+<li><a href="#0x19-%E8%B7%AF%E5%BE%84%E8%A7%A3%E6%9E%90">0x19 路径解析</a></li>
+<li><a href="#0x20-%E7%81%AB%E8%BD%A6%E8%B4%AD%E7%A5%A8">0x20 火车购票</a></li>
+<li><a href="#0x21-%E6%A0%BC%E9%9B%B7%E7%A0%81">0x21 格雷码</a></li>
+<li><a href="#0x22-%E6%AC%A7%E5%87%A0%E9%87%8C%E5%BE%97%E6%89%A9%E5%B1%95">0x22 欧几里得扩展</a></li>
+<li><a href="#0x23-scu%E7%8C%AB%E6%8A%93%E8%80%81%E9%BC%A0">0x23 SCU猫抓老鼠</a></li>
+<li><a href="#0x24-%E4%B8%8D%E7%94%98%E5%BF%83%E7%9A%87%E5%90%8E">0x24 不甘心皇后</a></li>
+<li><a href="#0x25-%E7%82%89%E7%9F%B3%E4%BC%A0%E8%AF%B4">0x25 炉石传说</a></li>
+<li><a href="#0x26-%E5%B0%8F%E8%B4%9D%E5%BE%97%E6%B1%89%E8%AF%BA%E5%A1%94">0x26 小贝得汉诺塔</a></li>
+<li><a href="#0x27-%E5%AD%90%E6%96%87%E7%95%A5%E7%95%A5%E7%95%A5">0x27 子文略略略</a></li>
+<li><a href="#0x28-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E5%B1%82%E6%AC%A1%E9%81%8D%E5%8E%86">0x28 二叉树的层次遍历</a></li>
+<li><a href="#0x29-%E4%B8%89%E6%AC%A1%E7%82%B9%E5%87%BB%E5%88%A0%E9%99%A4">0x29 三次点击删除</a></li>
+<li><a href="#0x30-%E4%BA%8C%E5%8F%89%E6%8E%92%E5%BA%8F%E6%A0%91">0x30 二叉排序树</a></li>
+</ul>
+</li>
+</ul>
+</p>
+<h2 id="0x01-韩信点兵">0x01 韩信点兵</h2>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1741419053873.png" alt="" loading="lazy"></figure>
+<p>这题应该是想考中国剩余定理，但是代码实现比较困难，理论也比较复杂，直接使用暴力方法实现。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+
+int main(){
+	int n;
+	scanf(&quot;%d&quot;,&amp;n);
+	int i,j,m;
+	int flag=0;
+	while(n--){
+		flag=0;
+		scanf(&quot;%d %d %d&quot;, &amp;i,&amp;j,&amp;m);
+		for(int k=10;k&lt;=100;k++){
+			if(k%3==i&amp;&amp;k%5==j&amp;&amp;k%7==m){
+				flag = 1;
+				printf(&quot;%d\n&quot;,k);
+				break;
+			}
+		}
+		if(flag==0){
+			printf(&quot;Impossible\n&quot;);
+		}
+		
+		
+	}
+	return 0;
+}
+</code></pre>
+<h2 id="0x02-2的幂次表示">0x02 2的幂次表示</h2>
+<p>https://blog.csdn.net/u011815404/article/details/80275486</p>
+<p>主要考察递归思想</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+void calculate(int n,int step)
+{
+    if(n==0)
+        return;
+    calculate(n/2,step+1);
+    if(n%2)
+    {
+        if(n/2)
+            printf(&quot;+&quot;);
+        if(step==1)
+            printf(&quot;2&quot;);
+        else
+        {
+            printf(&quot;2(&quot;);
+            if(step==0){
+                printf(&quot;0&quot;);
+			}else{
+				calculate(step,0);
+			}
+            printf(&quot;)&quot;);
+        }
+    }
+}
+
+int main()
+{
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    calculate(n,0);
+    return 0;
+}
+</code></pre>
+<h2 id="0x03-分数求和">0x03 分数求和</h2>
+<p>https://blog.csdn.net/u011815404/article/details/80275484</p>
+<p>求最大公约数使用欧几里得算法（辗转相除法）</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int a[20],b[20];
+int gcd(int a,int b)
+{
+    if(b==0)
+        return a;
+    return gcd(b,a%b);
+}
+int main()
+{
+    int n;
+    int cnt=0;
+    int numerator=0,denominator=1;
+    int divisor;
+    char s[20];
+ 
+    scanf(&quot;%d&quot;,&amp;n);
+    while(n--)
+    {
+        scanf(&quot;%d/%d&quot;,&amp;a[cnt],&amp;b[cnt]);
+        cnt++;
+    }
+    for(int i=0;i&lt;cnt;i++)
+        denominator*=b[i];
+    for(int i=0;i&lt;cnt;i++)
+        numerator=numerator+denominator*a[i]/b[i];
+ 
+    divisor=gcd(denominator,numerator);
+    denominator/=divisor;
+    numerator/=divisor;
+ 
+    if(denominator==1)
+        printf(&quot;%d&quot;,numerator);
+    else
+        printf(&quot;%d/%d&quot;,numerator,denominator);
+    return 0;
+}
+</code></pre>
+<h2 id="0x04-栅栏上色">0x04 栅栏上色</h2>
+<p>https://blog.csdn.net/itcodexy/article/details/117309618</p>
+<p>m个栅栏，n种颜色，同颜色相连不能大于等于k</p>
+<p>递归方法，大数运算会超时。<br>
+采用非递归动态规划的方法。</p>
+<p>使用long long int,防止大数溢出</p>
+<p>前k-1个没有限制，排列为<code>a[i] = n^(i)</code><br>
+第k个开始有限制,去除掉所有颜色相同的情况<code>a[i] = a[i-1]*n - n</code><br>
+第k+b个，因为<code>a[k+b-1]</code>个为前<code>k+b-1</code>个满足情况的所有排列，所以颜色相同的情况只能是因为加入了第<code>k+b</code>个，<br>
+前b个的排列为<code>a[b]</code>，后面k个颜色相同，且不能和前b个的最后一个值相同，故为<code>(n-1)</code><br>
+计算公式为<code>a[i] = a[i-1]*n - a[i-k]*(n-1);</code></p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+	int m,n,k;
+	int i;
+	scanf(&quot;%d %d %d&quot;,&amp;m,&amp;n,&amp;k);
+	long long int a[m]= {0};
+	a[0] = 1;
+	if(k&gt;n){
+		printf(&quot;Input Error&quot;);
+		return 0;
+	}
+	for(i=1;i&lt;k;i++){
+		a[i] = a[i-1]*n;
+	}
+	a[i] = a[i-1]*n - n;
+	i++;
+	for(;i&lt;=m;i++){
+		a[i] = a[i-1]*n - a[i-k]*(n-1);
+	}
+	printf(&quot;%lld&quot;,a[m]);
+	return 1;
+	
+}
+</code></pre>
+<h2 id="0x05-取彩球的可能">0x05 取彩球的可能</h2>
+<p>红球3个，白球3个，黑球6个，取n个球的种类</p>
+<p>暴力解法，直接遍历所有情况。</p>
+<pre><code class="language-c"> #include&lt;stdio.h&gt;
+ 
+ int main()
+ {
+    int cnt=0;
+    int i,j,k;
+    int m;
+    int n;
+    scanf(&quot;%d&quot;,&amp;m);
+    int red=3;
+    int white=3;
+    int black=6;
+    while(m)
+    {
+        scanf(&quot;%d&quot;,&amp;n);
+        for(i=0;i&lt;=red;i++)
+        {
+            for(j=0;j&lt;=white;j++)
+            {
+                for(k=0;k&lt;=black;k++)
+                {
+                    if(i+j+k==n)
+                    {
+                        cnt++;
+                    }
+                }
+            }
+        }
+        printf(&quot;%d\n&quot;,cnt);
+        cnt=0;
+        m--;
+    }
+    return 0;
+ }
+</code></pre>
+<h2 id="0x06-统计单词个数">0x06 统计单词个数</h2>
+<p>设置flag标志，当读取字符不为空格时置1，<br>
+读取字符为空格且flag=1时，视为有一个单词。</p>
+<p>最后换行时，可能少掉一个，需要对flag进行判断。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+ #include&lt;string.h&gt;
+ int main()
+ {
+    int flag=0;
+    char str;
+    int cnt=0;
+    while(str=getchar(),str!='\n')
+    {
+        if(str==' '&amp;&amp;flag==1)
+        {
+            cnt++;
+            flag=0;
+        }else
+        {
+            if(str!=' ')
+            {
+                flag=1;
+            }   
+        }
+    }
+    if(flag==1)
+    {
+        cnt++;
+    } 
+    printf(&quot;%d\n&quot;,cnt);
+    return 0;
+ }
+</code></pre>
+<h2 id="0x07-数组遍历">0x07 数组遍历</h2>
+<p>计算从矩阵的左上角 (0, 0) 到右下角 (m-1, n-1) 的最小路径和<br>
+(只能往右走，下走)<br>
+使用动态规划的方法</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+ int A[10][10];
+ int m,n;
+ void Init();
+ void GetMin();
+ int main()
+ {
+    scanf(&quot;%d %d&quot;,&amp;m,&amp;n);
+    Init();
+    GetMin();
+    return 0;
+ }
+ void GetMin()
+ {
+    int i,j;
+    for(i=0;i&lt;m;i++)
+    {
+        for(j=0;j&lt;n;j++)
+        {
+        	if(i==0&amp;&amp;j==0){
+				continue;
+            }else if(i==0)
+            {
+                A[i][j]+=A[i][j-1];
+            }
+            else if(j==0)
+            {
+                A[i][j]+=A[i-1][j];
+            }
+            else
+            {
+                A[i][j] += (A[i - 1][j] &lt; A[i][j - 1]) ? A[i - 1][j] : A[i][j - 1];
+            }
+        }
+    }
+    printf(&quot;%d&quot;,A[m-1][n-1]);
+ }
+ void Init()
+ {
+    int i,j;
+    for(i=0;i&lt;m;i++)
+    {
+        for(j=0;j&lt;n;j++)
+        {
+            scanf(&quot;%d&quot;,&amp;A[i][j]);
+        }
+    }
+ }
+</code></pre>
+<h2 id="0x08-勒让德">0x08 勒让德</h2>
+<p>https://www.cnblogs.com/mjn1/p/8439926.html</p>
+<p>简单的递归，注意保留6位小数，处理n为负数时。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+float p(int n,float x){
+	if(n==0){
+		return 1;
+	}else if(n==1){
+		return x;
+	}else{
+		return ((2*n-1)*x*p(n-1,x)-(n-1)*p(n-2,x))/n;
+	}
+}
+
+int main(){
+	int m;
+	int n;
+	float r,x;
+	scanf(&quot;%d&quot;,&amp;m);
+	while(m--){
+		scanf(&quot;%d %f&quot;,&amp;n,&amp;x);
+		if(n&lt;0){
+			printf(&quot;Input Error\n&quot;);
+			continue;
+		}
+		r = p(n,x);
+		printf(&quot;%.6f\n&quot;,r);
+	}
+	return 0;
+}
+</code></pre>
+<h2 id="0x09-谁能笑道最后">0x09 谁能笑道最后</h2>
+<p>其实就是约瑟夫环，直接使用数组形式模拟运行。</p>
+<p>常规方法是使用循环链表来实现。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+	int n,k;
+	while(scanf(&quot;%d %d&quot;,&amp;n,&amp;k)!=EOF){
+		
+		if(n==0||k==0){
+			printf(&quot;End Of Input\n&quot;);
+			return 0;
+		}
+		if(n&lt;3||n&gt;1000||k&lt;3||k&gt;=n){
+			printf(&quot;Input Error\n&quot;);
+			continue;
+		}
+		
+		int a[n];
+		for (int i = 0; i &lt; n; i++){  
+	        a[i] = 1;
+	    }  
+		int flag=0;
+		int lose=0;
+		for(int i=0;;i=(i+1)%n){
+			if(a[i] == 1){
+				flag++;
+			}
+			
+			if(flag == k){
+				lose++;
+				if(lose == n){
+					printf(&quot;%d\n&quot;,i+1);
+					break;
+				}
+				a[i] = 0;
+				flag = 0;
+			}
+			
+		}
+		
+	}
+}
+</code></pre>
+<h2 id="0x10-单链表链表的排序">0x10 单链表（链表的排序）</h2>
+<p>描述<br>
+ <br>
+有n个学生成绩信息（包括学号、姓名、语文成绩、英语成绩、数学成绩、总成绩）要求算出总成绩、并按照总成绩排名输出，总成绩相同，按照姓名的字典序输出。<br>
+定义结构体入下：<br>
+struct student{<br>
+    char name[21];//姓名<br>
+    int sno;//学号<br>
+    int chinese;//语文<br>
+    int english;//英语<br>
+    int math;//数学<br>
+    int sum;//总成绩<br>
+    struct student *next;<br>
+};<br>
+ <br>
+输入<br>
+ <br>
+按照姓名，学号，语文成绩、英语成绩、数学成绩的顺序输入学生信息，各个数据之间空格隔开，当输入exit时输出截止。</p>
+<p>输出<br>
+学生信息排序之后按照样例的格式输出。<br>
+ <br>
+样例<br>
+ <br>
+输入	输出<br>
+zhangsan 2 85 88 90<br>
+lisi 3 89 99 100<br>
+exit	[{name:lisi,sum:288,sno:3},<br>
+{name:zhangsan,sum:263,sno:2}]<br>
+输出格式： 每次输出{name:xxx,sum:xxx,sno:x},后换行<br>
+ <br>
+提示<br>
+ <br>
+请从标准输入读入数据，将结果输出到标准输出。</p>
+<p>按序插入链表，保持链表的顺序性。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+#include&lt;string.h&gt;
+
+
+struct student{
+    char name[21];//姓名
+    int sno;//学号
+    int chinese;//语文
+    int english;//英语
+    int math;//数学
+    int sum;//总成绩
+    struct student *next;
+ };
+ 
+ 
+ void Output(struct student *head);
+ void Insert(struct student *head, struct student *p);
+ 
+ int main()
+ {
+    struct student *head=(struct student*)malloc(sizeof(struct student));
+    head-&gt;next=NULL;
+    while(1)
+    {
+        struct student *q=(struct student*)malloc(sizeof(struct student));
+        scanf(&quot;%s&quot;,q-&gt;name);
+        if(strcmp(q-&gt;name,&quot;exit&quot;)==0)
+        {
+            break;
+        }
+        scanf(&quot;%d %d %d %d&quot;,&amp;q-&gt;sno,&amp;q-&gt;chinese,&amp;q-&gt;english,&amp;q-&gt;math);
+        q-&gt;sum=q-&gt;chinese+q-&gt;english+q-&gt;math;
+        Insert(head,q);
+    }
+    Output(head);
+    return 0;
+ }
+ 
+void Output(struct student *head)
+ {
+    head=head-&gt;next;
+    if(head)
+    {
+        printf(&quot;[&quot;);
+    }
+    while(head)
+    {
+        printf(&quot;{name:%s,sum:%d,sno:%d}&quot;,head-&gt;name,head-&gt;sum,head-&gt;sno);
+        if(head-&gt;next!=NULL)
+        {
+            printf(&quot;,\n&quot;);
+        }else
+        {
+            printf(&quot;]&quot;);
+        }
+        head=head-&gt;next;
+    }
+ }
+void Insert(struct student *head,struct student *p){
+	
+	while(head-&gt;next != NULL){
+		if(head-&gt;next-&gt;sum &lt; p-&gt;sum){
+			break;
+		}else{
+			head = head-&gt;next;
+		}
+	}
+	
+    head-&gt;next = p;
+    p-&gt;next = head-&gt;next;
+}
+</code></pre>
+<h2 id="0x11-寻找单身汪">0x11 寻找单身汪</h2>
+<p>同leetcode求只出现一次的数字</p>
+<p>使用异或的方式。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+	int n,k;
+	int r=0;
+	scanf(&quot;%d&quot;,&amp;n);
+	while(n--){
+		scanf(&quot;%d&quot;,&amp;k);
+		r ^= k;
+	}
+	
+	printf(&quot;%d&quot;,r);
+	return 0;
+}
+</code></pre>
+<h2 id="0x12-中忍考试">0x12 中忍考试</h2>
+<p>https://blog.csdn.net/qq_45703684/article/details/107756533</p>
+<p>注意如何读取字符串。以及使用strlen函数和fmin函数时调用的库。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;math.h&gt;
+
+int main(){
+	int n,l,k,y;
+	scanf(&quot;%d %d %d %d&quot;,&amp;n,&amp;l,&amp;k,&amp;y);
+	int min = 0;
+	while(n--){
+		int sum = 0;
+		char s[100];
+		scanf(&quot;%s&quot;,s);
+		for(int i=0;i&lt;strlen(s);i++){
+			if(s[i] == 'A'){
+				sum+=l+k+y;
+			}else if(s[i] == 'B'){
+				sum+=2*l+k;
+			}else if(s[i] == 'C'){
+				sum+=3*l+3*k+2*y;
+			}
+		}
+		if(min == 0){
+			min = sum;
+		}
+		min = fmin(min,sum);
+	}
+	printf(&quot;%d&quot;,min);
+	return 0;
+}
+</code></pre>
+<h2 id="0x13-恶搞指数">0x13 恶搞指数</h2>
+<p>小明的朋友过生日，小明准备了一件礼物，不过小明想恶搞一下他的朋友，所以他准备了一堆盒子，其中有一个盒子里面装了礼物。盒子里面可以再放零个或者多个盒子。假设放礼物的盒子里不再放其他盒子。小明想让你帮他算出恶搞指数，即最少需要拆多少个盒子才能拿到礼物。</p>
+<p>输入<br>
+输入一个长度不大于1000,只包含（，）和 B 三种字符的字符串，用()表示一个盒子，B表示礼物。</p>
+<p>输出<br>
+输出恶搞指数，即最少需要拆多少个盒子才能拿到礼物。</p>
+<p>输入示例<br>
+(()(B))()()</p>
+<p>输出示例<br>
+2</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;string.h&gt;
+ 
+char Stack[1000];
+int main()
+{
+	int i;
+	char str[1000];
+	int rear=0;
+	scanf(&quot;%s&quot;,str);
+	for(i=0;i&lt;strlen(str);i++){
+	    if(str[i]=='(')
+	    {
+	        Stack[rear]=str[i];
+	        rear=rear+1;
+	    }
+	    if(str[i]==')')
+	    {
+	        rear=rear-1;
+	    }
+	    if(str[i]=='B')
+	    {
+	        printf(&quot;%d&quot;,rear);
+	        break;
+	    }
+	}
+	return 0;
+}
+</code></pre>
+<p>把左括号看成盒盖，右括号看成盒底。<br>
+最快的方式，直接拿盒盖就找到。<br>
+当拿到盒底时，说明我们开到一个空盒，需要减去。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int main(){
+	char s[1000];
+	scanf(&quot;%s&quot;,s);
+	int num = 0;
+	for(int i=0;i&lt;strlen(s);i++){
+		if(s[i] == '('){
+			num++;
+		}
+		if(s[i] == ')'){
+			num--;
+		}
+		if(s[i] == 'B'){
+			printf(&quot;%d&quot;,num);
+			return 0;
+		}
+	}
+}
+</code></pre>
+<h2 id="0x14-大整数乘法">0x14 大整数乘法</h2>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1741776838611.png" alt="" loading="lazy"></figure>
+<p>以字符串形式读入两乘数。<br>
+使用ascii码转化为int数组。</p>
+<p>两数组，逐项相乘，同次的结果放在一起。</p>
+<p>将结果中每位超过10的进行进位。<br>
+从尾向前第一个不为0的数开始输出</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;string.h&gt;
+#define Max 100000
+
+
+int main()
+{
+    char a[Max],b[Max];
+    int c[Max],d[Max],e[Max];
+    int a1,a2;
+    while(scanf(&quot;%s %s&quot;,a,b)!=EOF)
+    {
+        memset(c,0,sizeof(c));
+        memset(d,0,sizeof(d));
+        memset(e,0,sizeof(e));
+        a1=strlen(a);
+        a2=strlen(b);
+ 
+        int x=0;
+        int i,j;
+        for( i=a1-1; i&gt;=0; i--)
+        {
+            c[x]=a[i]-48;
+            x++;
+        }
+ 
+        x=0;
+        for( i=a2-1; i&gt;=0; i--)
+        {
+            d[x]=b[i]-48;
+            x++;
+        }
+ 
+        for( i=0; i&lt;a1; i++)
+        {
+            for( j=0; j&lt;a2; j++)
+            {
+                e[i+j]+=(c[i]*d[j]);
+            }
+        }
+ 
+        for( j=0; j&lt;Max; j++)
+        {
+            if(e[j]&gt;=10)
+            {
+                e[j+1]+=e[j]/10;
+                e[j]%=10;
+            }
+        }
+        for(i=Max-1; i&gt;=0; i--)
+        {
+            if(e[i]!=0)
+                break;
+        }
+        for(;i&gt;=0; i--)
+        {
+            printf(&quot;%d&quot;,e[i]);
+        }
+        printf(&quot;\n&quot;);
+    }
+    return 0;
+}
+
+</code></pre>
+<h2 id="0x15-pongo-light-the-lamp">0x15 Pongo light the lamp</h2>
+<p>有 k 盏灯和 k 只喜欢拉灯的猩猩，他们分别编号为 1 2 3... k，k 盏灯排成一排，每个猩猩都从这k盏灯前面走过，并且拉一下编号是他倍数的灯，比如编号为3的猩猩会拉编号为 3 6 9...的灯。开始的时候每盏灯是关着的，每拉一下灯的状态就改变一下（亮暗之间），问最后有多少盏灯是亮的。猩猩和灯的编号都是顺序的。<br>
+输入格式：输入 k (k &gt;= 1 &amp;&amp; k &lt;= 2,000,000)，当 k 为 0 时输入结束，请不要对这种情况输出任何结 果。<br>
+输出格式：输出最后亮着的灯的数目。</p>
+<p>输入样例：<br>
+5<br>
+4<br>
+0<br>
+输出样例：<br>
+2<br>
+2</p>
+<p>用异或来模拟开关灯，用数组来存灯开关状态。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+	int k;
+	while(1){
+		scanf(&quot;%d&quot;,&amp;k);
+		if(k == 0){
+			return 0;
+		}
+		int a[k+1] = {0};
+		for(int i=1;i&lt;=k;i++){
+			for(int j=1;j&lt;=k;j++){
+				if(j%i==0){
+					a[j] ^= 1;
+				}
+			}
+		}
+		int flag=0;
+		for(int m=1;m&lt;=k;m++){
+			if(a[m] == 1){
+				flag++;
+			}
+		}
+		printf(&quot;%d\n&quot;,flag);
+		
+	} 
+	
+}
+</code></pre>
+<p>https://www.nowcoder.com/discuss/353146879821160448</p>
+<p>利用公式推导，可以直接计算出数量</p>
+<pre><code class="language-c"> #include&lt;stdio.h&gt;
+ #include&lt;math.h&gt;
+ int main()
+ {
+    int k;
+    scanf(&quot;%d&quot;,&amp;k);
+    while(k!=0)
+    {
+        printf(&quot;%d\n&quot;,(int)sqrt(k));
+        scanf(&quot;%d&quot;,&amp;k);
+    }
+    return 0;
+ }
+</code></pre>
+<h2 id="0x16-dna排序">0x16 DNA排序</h2>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1741585477019.png" alt="" loading="lazy"></figure>
+<p>需要存字符串和相应的无序度在一起，最好使用链表的形式，加上有序插入即可。</p>
+<p>这里使用一个字符数组，再加一个数组存序号和无序度。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+	int n,m;
+	while(scanf(&quot;%d %d&quot;,&amp;n,&amp;m)!=EOF){
+		int a[n][2];
+		char s[m][n+1];
+		
+		int p=0;
+		while(p&lt;m){
+			
+			scanf(&quot;%s&quot;,s[p]);
+			int num=0;
+			for(int i=0;i&lt;n-1;i++){
+				for(int j=i+1;j&lt;n;j++){
+					if(s[p][i]&gt;s[p][j]){
+						num++;
+					}
+				}
+			}
+			a[p][0]=num;
+			a[p][1]=p;
+			p++;
+		}
+		
+		for(int i=0;i&lt;m-1;i++){
+			for(int j=i;j&lt;m;j++){
+				if(a[i][0] &gt; a[j][0]){
+					int tmp = a[i][0];
+					a[i][0] = a[j][0];
+					a[j][0] = tmp;
+					tmp = a[i][1];
+					a[i][1] = a[j][1];
+					a[j][1] = tmp;
+				}
+			}
+		}
+		
+		for(int i=0;i&lt;m;i++){
+			printf(&quot;%s\n&quot;,s[a[i][1]]);
+		}
+		printf(&quot;********************\n&quot;);
+	}
+}
+</code></pre>
+<h2 id="0x17-滑雪">0x17 滑雪</h2>
+<p>https://blog.csdn.net/qqqqq1993qqqqq/article/details/76559419</p>
+<p>动态规划，往四个方向走，取最长。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+
+
+int path[50][50];
+int dp[50][50];
+int m,n; 
+int M[4][2]={{-1,0},{0,-1},{1,0},{0,1}};
+
+int Getpath(int x,int y){
+	int nx;
+	int ny;
+	int i,j,k;
+	int max=0;
+	int temp;
+	if(dp[x][y]&gt;0)	{
+	    return dp[x][y];
+	}
+	for(k=0;k&lt;4;k++){
+	    nx=x+M[k][0];
+	    ny=y+M[k][1];
+	    if(nx&gt;=0&amp;&amp;nx&lt;n&amp;&amp;ny&gt;=0&amp;&amp;ny&lt;m){
+	        if(path[x][y]&gt;path[nx][ny]){
+	            temp=Getpath(nx,ny)+path[x][y]-path[nx][ny];
+	            //要在在这里就把每一次的最大值记录下来 
+	            if(temp&gt;max){
+	                max=temp;
+				}
+			}
+		}
+	}
+	//将从该点出发的最大值记录到dp中，并返回 
+	dp[x][y]=max;
+	return max;
+}
+
+void Init(int n,int m){
+	int i,j;
+	for(i=0;i&lt;n;i++){
+		for(j=0;j&lt;m;j++){
+			scanf(&quot;%d&quot;,&amp;path[i][j]);
+			dp[i][j]=0;
+		}
+	}
+}
+
+
+int main(){
+	
+	int max=0;
+	int depth;
+	int i,j;
+	scanf(&quot;%d %d&quot;,&amp;n,&amp;m);
+	while(m!=0&amp;&amp;n!=0)
+	{
+	    Init(n,m);
+	    for(i=0;i&lt;n;i++)
+	    {
+	        for(j=0;j&lt;m;j++)
+	        {
+	            depth=Getpath(i,j);
+	            //得到所有返回的点中的最大值 
+	            if(depth&gt;max)
+	            {
+	                max=depth;
+	             } 
+	        }
+	    }
+	    printf(&quot;%d\n&quot;,max);
+	    max=0; 
+	    scanf(&quot;%d %d&quot;,&amp;n,&amp;m);
+	}
+	return 0;
+}
+
+</code></pre>
+<h2 id="0x18-俄罗斯方块">0x18 俄罗斯方块</h2>
+<figure data-type="image" tabindex="4"><img src="https://fallingskies22.github.io/post-images/1741603306950.png" alt="" loading="lazy"></figure>
+<p>这题比较复杂，A数组中多加了几行1，防止<code>level+i</code>处越界</p>
+<p>有一种特殊情况需要考虑，就是下面小上面大的图形，能通过一些缺口。</p>
+<p>主要思路就是，先找到哪一层放不了。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+
+int A[20][10];
+int M[4][4];
+int k; 
+ 
+void Merge(int level);
+int Down();
+void Init();
+
+int main()
+{
+	int i,j;
+	int level; 
+	Init();
+	level=Down();
+	Merge(level);
+	for(i=0;i&lt;15;i++){
+		for(j=0;j&lt;10;j++){
+	        printf(&quot;%d &quot;,A[i][j]);
+	    }
+	    printf(&quot;\n&quot;);
+	}
+	return 0;
+}
+void Merge(int level){
+	int flag=0;
+	int i,j;
+	for(i=3;i&gt;=0;i--){
+    	for(j=k-1;j&lt;k+3;j++){
+	        if(A[level+i][j]==1&amp;&amp;M[i][j-k+1]==1){
+	            flag=1;
+	            break;
+        	}
+    	}
+	    if(flag==1){
+	        flag=0;
+	        level--;
+	        i=3;   
+	    }  
+	}
+	for(i=level;i&lt;level+4;i++){
+		for(j=k-1;j&lt;k+3;j++){
+			A[i][j] += M[i-level][j-k+1];
+		}
+	}
+} 
+ 
+int Down()
+{
+	int i,j,n;
+	for(i=0;i&lt;15;i++){
+	    for(j=k-1;j&lt;k+3;j++){
+	        for(n=3;n&gt;=0;n--){
+	            if(A[i][j]+M[n][j-k+1]&gt;1){
+	                return i;
+	            }
+	        }
+	    }
+	}
+	return i;
+}
+ 
+void Init(){
+	int i,j;
+	
+	for(i=0;i&lt;15;i++){
+    	for(j=0;j&lt;10;j++){
+        scanf(&quot;%d&quot;,&amp;A[i][j]);
+    	}
+	}
+	
+	for(i=0;i&lt;10;i++){
+		for(j=15;j&lt;21;j++){
+			A[j][i] = 1;
+		}
+		
+	}
+	for(i=0;i&lt;4;i++){
+	    for(j=0;j&lt;4;j++){
+	        scanf(&quot;%d&quot;,&amp;M[i][j]);
+	    }
+	}
+	
+	scanf(&quot;%d&quot;,&amp;k);
+}
+</code></pre>
+<p>优化一下方法,从上到下一次比较4*4方块，遇到不满足时回退一层即可。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+
+int A[18][10];
+int M[4][4];
+int k; 
+ 
+void Init();
+
+int main()
+{
+	int i,j,m;
+	int level; 
+	int flag = 0;
+	Init();
+	for(i=0;i&lt;15;i++){
+		for(m=0;m&lt;4;m++){
+			for(j=0;j&lt;4;j++){
+				if(A[i+m][k+j-1]==1&amp;&amp;M[m][j]==1){
+					flag=1;
+					break;
+				}
+			}
+			if(flag==1){
+				break;
+			}
+		}
+		if(flag==1){
+			break;
+		}
+	}
+
+	level = i-1;
+	
+	for(i=level;i&lt;level+4;i++){
+		for(j=k-1;j&lt;k+3;j++){
+			A[i][j] += M[i-level][j-k+1];
+		}
+	}
+	for(i=0;i&lt;15;i++){
+		for(j=0;j&lt;10;j++){
+	        printf(&quot;%d &quot;,A[i][j]);
+	    }
+	    printf(&quot;\n&quot;);
+	}
+	return 0;
+}
+
+ 
+void Init(){
+	int i,j;
+	
+	for(i=0;i&lt;15;i++){
+    	for(j=0;j&lt;10;j++){
+        scanf(&quot;%d&quot;,&amp;A[i][j]);
+    	}
+	}
+	
+	for(i=15;i&lt;19;i++){
+		for(j=0;j&lt;10;j++){
+			A[i][j] = 1;
+		}
+	}
+		
+	for(i=0;i&lt;4;i++){
+	    for(j=0;j&lt;4;j++){
+	        scanf(&quot;%d&quot;,&amp;M[i][j]);
+	    }
+	}
+	
+	scanf(&quot;%d&quot;,&amp;k);
+}
+</code></pre>
+<h2 id="0x19-路径解析">0x19 路径解析</h2>
+<p>描述<br>
+在操作系统中，数据通常以文件的形式存储在文件系统中。文件系统一般采用层次化的组织形式，由目录（或者文件夹）和文件构成，形成一棵树的形状。文件有内容，用于存储数据。目录是容器，可包含文件或其他目录。同一个目录下的所有文件和目录的名字各不相同，不同目录下可以有名字相同的文件或目录。<br>
+　　为了指定文件系统中的某个文件，需要用路径来定位。在类 Unix 系统（Linux、Max OS X、FreeBSD等）中，路径由若干部分构成，每个部分是一个目录或者文件的名字，相邻两个部分之间用 / 符号分隔。<br>
+　　有一个特殊的目录被称为根目录，是整个文件系统形成的这棵树的根节点，用一个单独的 / 符号表示。在操作系统中，有当前目录的概念，表示用户目前正在工作的目录。根据出发点可以把路径分为两类：<br>
+　　绝对路径：以 / 符号开头，表示从根目录开始构建的路径。<br>
+　　相对路径：不以 / 符号开头，表示从当前目录开始构建的路径。<br>
+ <br>
+例如，有一个文件系统的结构如下图所示。在这个文件系统中，有根目录 / 和其他普通目录 d1、d2、d3、d4，以及文件 f1、f2、f3、f1、f4。其中，两个 f1 是同名文件，但在不同的目录下。</p>
+<p>对于 d4 目录下的 f1 文件，可以用绝对路径 /d2/d4/f1 来指定。如果当前目录是 /d2/d3，这个文件也可以用相对路径 ../d4/f1 来指定，这里 .. 表示上一级目录（注意，根目录的上一级目录是它本身）。还有 . 表示本目录，例如 /d1/./f1 指定的就是 /d1/f1。注意，如果有多个连续的 / 出现，其效果等同于一个 /，例如 /d1///f1 指定的也是 /d1/f1。<br>
+　　本题会给出一些路径，要求对于每个路径，给出正规化以后的形式。一个路径经过正规化操作后，其指定的文件不变，但是会变成一个不包含 . 和 .. 的绝对路径，且不包含连续多个 / 符号。如果一个路径以 / 结尾，那么它代表的一定是一个目录，正规化操作要去掉结尾的 /。若这个路径代表根目录，则正规化操作的结果是 /。若路径为空字符串，则正规化操作的结果是当前目录。<br>
+ <br>
+输入<br>
+ <br>
+　　第一行包含一个整数 P，表示需要进行正规化操作的路径个数。<br>
+　　第二行包含一个字符串，表示当前目录。<br>
+　　以下 P 行，每行包含一个字符串，表示需要进行正规化操作的路径。<br>
+ <br>
+输出<br>
+ <br>
+　　共 P 行，每行一个字符串，表示经过正规化操作后的路径，顺序与输入对应。<br>
+ <br>
+样例<br>
+ <br>
+输入	<br>
+7<br>
+/d2/d3</p>
+<p>/d2/d4/f1<br>
+../d4/f1<br>
+/d1/./f1<br>
+/d1///f1<br>
+/d1/<br>
+///<br>
+/d1/../../d2</p>
+<p>输出<br>
+/d2/d4/f1<br>
+/d2/d4/f1<br>
+/d1/f1<br>
+/d1/f1<br>
+/d1<br>
+/<br>
+/d2<br>
+ <br>
+ <br>
+用例规模与约定<br>
+ <br>
+　　1 ≤ P ≤ 10。<br>
+　　文件和目录的名字只包含大小写字母、数字和小数点 .、减号 - 以及下划线 _。<br>
+　　不会有文件或目录的名字是 . 或 .. ，它们具有题目描述中给出的特殊含义。<br>
+　　输入的所有路径每个长度不超过 1000 个字符。<br>
+　　对于前 30% 的测试用例，需要正规化的路径的组成部分不包含 . 和 .. 。<br>
+　　对于前 60% 的测试用例，需要正规化的路径都是绝对路径。</p>
+<p>首先判断是相对路径还是绝对路径，拼接成完全路径。</p>
+<p>最后再对路径进行解析。</p>
+<p>遇到<code>.</code>掠过，遇到<code>..</code>跳到上一层路径。</p>
+<p>strtok函数用来分割字符串，以<code>/</code>为标志。</p>
+<pre><code class="language-c">#include &lt;bits/stdc++.h&gt;
+
+char pwd[1001];
+
+void normalize(char* s){
+	char NowDir[2400] = {0};
+	char *stack[2024];
+	int top=0;
+	int len;
+	
+	if(s[0]!='/'){
+		strcpy(NowDir,pwd);
+		len=strlen(NowDir);
+		NowDir[len]='/';
+	}
+	strcat(NowDir,s);
+
+	for(char *p=strtok(NowDir,&quot;/&quot;);p!=NULL;p=strtok(NULL,&quot;/&quot;)){
+		len=strlen(p);
+		if(len==1&amp;&amp;strcmp(p,&quot;.&quot;)==0){
+			continue;
+		}else{
+			if(len==2&amp;&amp;strcmp(p,&quot;..&quot;)==0){
+				if(top&gt;0){
+					top--;
+				}
+			}else{
+				stack[top]=p;
+				top++;
+			}
+		}
+	}
+	
+	if(top==0){
+		printf(&quot;/&quot;);
+	}
+	for(int i=0;i&lt;top;i++){
+		printf(&quot;/&quot;);
+		printf(&quot;%s&quot;,stack[i]);
+	}
+	printf(&quot;\n&quot;);
+	return;
+}
+
+
+
+int main(){
+	int p;
+	scanf(&quot;%d&quot;,&amp;p);
+	scanf(&quot;%s&quot;,pwd);
+	char S[p][2002];
+	for(int i=0;i&lt;p;i++){
+		scanf(&quot;%s&quot;,S[i]);
+	}
+	
+	for(int i=0;i&lt;p;i++){
+		normalize(S[i]);
+	}
+	
+	return 0;
+}
+
+</code></pre>
+<h2 id="0x20-火车购票">0x20 火车购票</h2>
+<p>描述<br>
+ <br>
+　　请实现一个铁路购票系统的简单座位分配算法，来处理一节车厢的座位分配。<br>
+　　假设一节车厢有20排、每一排5个座位。为方便起见，我们用1到100来给所有的座位编号，第一排是1到5号，第二排是6到10号，依次类推，第20排是96到100号。<br>
+　　购票时，一个人可能购一张或多张票，最多不超过5张。如果这几张票可以安排在同一排编号相邻的座位，则应该安排在编号最小的相邻座位。否则应该安排在编号最小的几个空座位中（不考虑是否相邻）。<br>
+　　假设初始时车票全部未被购买，现在给了一些购票指令，请你处理这些指令。<br>
+ <br>
+输入<br>
+ <br>
+　　输入的第一行包含一个整数n，表示购票指令的数量。<br>
+　　第二行包含n个整数，每个整数p在1到5之间，表示要购入的票数，相邻的两个数之间使用一个空格分隔。<br>
+ <br>
+输出<br>
+ <br>
+　　输出n行，每行对应一条指令的处理结果。<br>
+　　对于购票指令p，输出p张车票的编号，按从小到大排序。<br>
+ <br>
+样例<br>
+ <br>
+输入	<br>
+4<br>
+2 5 4 2</p>
+<p>输出<br>
+1 2<br>
+6 7 8 9 10<br>
+11 12 13 14<br>
+3 4<br>
+ <br>
+ <br>
+样例说明<br>
+ <br>
+　　1) 购2张票，得到座位1、2。<br>
+　　2) 购5张票，得到座位6至10。<br>
+　　3) 购4张票，得到座位11至14。<br>
+4) 购2张票，得到座位3、4。 <br>
+ <br>
+评测用例规模与约定<br>
+ <br>
+　　对于所有评测用例，1 ≤ n ≤ 100，所有购票数量之和不超过100。</p>
+<p>依次看每排能放下不，能放下就依次放入。<br>
+不能放入就从头开始找空位放入。</p>
+<pre><code class="language-c">#include &lt;bits/stdc++.h&gt;
+
+int main(){
+	int n;
+	int p[100];
+	int num[20] = {0};
+	
+	
+	scanf(&quot;%d&quot;,&amp;n);
+	for(int i=0;i&lt;n;i++){
+		scanf(&quot;%d&quot;,&amp;p[i]);
+	}
+	
+	for(int j=0;j&lt;n;j++){
+		int flag=0;
+		for(int i=0;i&lt;20;i++){
+			if((5-num[i])&gt;=p[j]){
+				for(int k=num[i];k&lt;num[i]+p[j];k++){
+					printf(&quot;%d &quot;,i*5+k+1);
+				}
+				printf(&quot;\n&quot;);
+				num[i] += p[j];
+				flag=1;
+				break;
+			}
+		}
+//		for(int i = 0;i&lt;20;i++){
+//			printf(&quot;%d&quot;,num[i]);
+//		}
+		if(flag==1){
+			continue;
+		}
+//		printf(&quot;flag:%d&quot;,flag);
+		while(p[j]--){
+			for(int i=0;i&lt;20;i++){
+				if(num[i]&lt;5){
+					printf(&quot;%d &quot;,i*5+num[i]+1); 
+					num[i]++;
+					break;
+				}
+			}
+		}
+		printf(&quot;\n&quot;);
+	}
+	return 0;
+	
+	
+}
+</code></pre>
+<h2 id="0x21-格雷码">0x21 格雷码</h2>
+<p>题目描述<br>
+通常，人们习惯将所有 n 位二进制串按照字典序排列，例如所有 2 位二进制串按字典序从小到大排列为：00，01，10，11。<br>
+格雷码（Gray Code）是一种特殊的 n 位二进制串排列法，它要求相邻的两个二进制串间恰好有一位不同，特别地，第一个串与最后一个串也算作相邻。<br>
+所有 2 位二进制串按格雷码排列的一个例子为：00，01，11，10。<br>
+n 位格雷码不止一种，下面给出其中一种格雷码的生成算法：<br>
+1.1 位格雷码由两个 1 位二进制串组成，顺序为：0，1。<br>
+2.n + 1 位格雷码的前 2^n 个二进制串，可以由依此算法生成的 n 位格雷码（总共 2^n 个 n 位二进制串）按顺序排列，再在每个串前加一个前缀 0 构成。<br>
+3.n + 1 位格雷码的后 2^n 个二进制串，可以由依此算法生成的 n 位格雷码（总共 2^n 个 n 位二进制串）按逆序排列，再在每个串前加一个前缀 1 构成。<br>
+综上，n + 1 位格雷码，由 nn 位格雷码的 2^n 个二进制串按顺序排列再加前缀 0，和按逆序排列再加前缀 1 构成，共 2^(n+1) 个二进制串。另外，对于 n 位格雷码中的 2^n 个 二进制串，我们按上述算法得到的排列顺序将它们从 0∼2^n−1 编号。<br>
+按该算法，2 位格雷码可以这样推出：<br>
+1.已知 1 位格雷码为 0，1。<br>
+2.前两个格雷码为 00，01。后两个格雷码为 11，10。合并得到 00，01，11，10，编号依次为 0 ~ 3。<br>
+同理，3 位格雷码可以这样推出：<br>
+1.已知 2 位格雷码为：00，01，11，10。<br>
+2.前四个格雷码为：000，001，011，010。后四个格雷码为：110，111，101，100。合并得到：000，001，011，010，110，111，101，100，编号依次为 0 ~ 7。<br>
+现在给出 n，k，请你求出按上述算法生成的 n 位格雷码中的 k 号二进制串。<br>
+输入格式<br>
+仅一行两个整数 n，k，意义见题目描述。<br>
+输出格式<br>
+仅一行一个 n 位二进制串表示答案。<br>
+样例 #1<br>
+样例输入 #1<br>
+2 3<br>
+样例输出 #1<br>
+10<br>
+样例 #2<br>
+样例输入 #2<br>
+3 5<br>
+样例输出 #2<br>
+111<br>
+样例 #3<br>
+样例输入 #3<br>
+44 1145141919810<br>
+样例输出 #3<br>
+00011000111111010000001001001000000001100011<br>
+提示<br>
+【样例 1 解释】<br>
+2 位格雷码为：00，01，11，10，编号从 0∼3，因此 3 号串是 10。<br>
+【样例 2 解释】<br>
+3 位格雷码为：000，001，011，010，110，111，101，100，编号从 0∼7，因此 5 号串是 111。<br>
+【数据范围】<br>
+对于 50% 的数据：n≤10<br>
+对于 80% 的数据：k≤5×10^6<br>
+对于 95% 的数据：k≤2^63−1<br>
+对于 100% 的数据：1≤n≤64, 0≤k&lt;2^n<br>
+时空限制<br>
+1s, 256MB<br>
+from CSP-S2019 D1T1</p>
+<p>主要难点在后一半格雷码的逆序，按数学公式转化为前一半中的位置。</p>
+<pre><code class="language-c">#include &lt;bits/stdc++.h&gt;
+
+void GrayCode(char code[], int bit,long long int num){
+	int i=0;
+	if(bit == 1){
+		if(num==0){
+			code[0]='0';
+			return;
+		}else if(num==1){
+			code[0]='1';
+			return;
+		}
+	}
+	if(num&lt;pow(2,bit-1)){
+		code[0]='0';
+		GrayCode(code+1,bit-1,num);
+	}else if(num&gt;=pow(2,bit-1)){
+		code[0]='1';
+		GrayCode(code+1,bit-1,pow(2,bit)-num-1);
+	}
+}
+
+
+int main(){
+	int bit;
+	long long int num;
+	char code[65];
+	while(scanf(&quot;%d %lld&quot;,&amp;bit,&amp;num)!=EOF){
+	
+		GrayCode(code,bit,num);
+		for(int i=0;i&lt;bit;i++){
+			printf(&quot;%c&quot;,code[i]);
+		}
+		printf(&quot;\n&quot;);
+	}
+	return 0;
+}
+</code></pre>
+<h2 id="0x22-欧几里得扩展">0x22 欧几里得扩展</h2>
+<p>描述<br>
+在RSA密码体系中, 欧几里得算法是加密或解密运算的重要组成部分。它的基本运算过程就是解 x*a=1 mod n 这种方程。整个解的过程是这样的，我们用一个例子来说明。<br>
+当 a=1001，n=3837 时，方程为 x∗1001=1(mod3837)<br>
+求解过程：<br>
+3837 = 3 * 1001 + 834<br>
+1001 = 1 * 834 + 167<br>
+834 = 4 * 167 + 166<br>
+167 = 166 + 1<br>
+所以<br>
+1 = 1 * 167 + (–1) * 166<br>
+= 1 * 167 + (-1) * (834 - 4 * 167)<br>
+= -1 * 834 + 5 * 167<br>
+= –1 * 834 + 5 * (1001 - 834)<br>
+= 5 * 1001 + (-6) * 834<br>
+= 5 * 1001 - 6 * (3837 -3 * 1001)<br>
+= -6 * 3837 + 23 * 1001<br>
+然后对等式两端同时除以模3837得<br>
+23 * 1001 = 1 (mod 3837)<br>
+于是 x = 23<br>
+现在给出a和n，你能不能在最短的时间内解出这个方程呢？<br>
+输入<br>
+输入包括多组测试数据。每组测试数据对应输入的一行，每行包括两个整数a和n。1&lt;a,n&lt;2^31(用long可以存下)<br>
+当a=n=0时输入结束，这组数据不包括在需要计算的数据中。<br>
+输出<br>
+对应每组输入数据，输出最小的满足题意的解x。<br>
+样例<br>
+输入<br>
+1001 3837<br>
+136468984 134548555<br>
+0 0<br>
+输出<br>
+23<br>
+112206854<br>
+提示<br>
+1.本题用穷举是不可能做出来的<br>
+2.结果必须是正数</p>
+<p>即求乘法逆元</p>
+<p>当两数互素时，才存在逆元，即最大公约数为1.<br>
+在求最大公约数的递归中，添加了求x，y的代码。<br>
+有点难理解。😢</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+ // 扩展欧几里得算法
+int extendedEuclid(int a, int b, int *x, int *y) {
+	if (b == 0) {
+	    *x = 1;
+	    *y = 0;
+	    return a;
+	}
+	int x1, y1;
+	int gcd = extendedEuclid(b, a % b, &amp;x1, &amp;y1);
+	*x = y1;
+	*y = x1 - (a / b) * y1;
+	return gcd;
+}
+
+
+int main() {
+	int a, n;
+	// 读取输入直到文件结束
+	scanf(&quot;%d %d&quot;, &amp;a, &amp;n);
+	while(a!=0&amp;&amp;n!=0) {
+	    int x, y;
+	    int gcd = extendedEuclid(a, n, &amp;x, &amp;y);
+	    if (gcd == 1) {
+	        // 计算模逆
+	        while (x &lt; 0)
+	            x += n;
+	        
+	        printf(&quot;%d\n&quot;, x);
+	    }
+	    scanf(&quot;%d %d&quot;, &amp;a, &amp;n); 
+	}
+	return 0;
+}
+</code></pre>
+<h2 id="0x23-scu猫抓老鼠">0x23 SCU猫抓老鼠</h2>
+<p>描述<br>
+不知你是否注意到，四川大学每年都会在各宿舍楼里放老鼠药，以解决学生宿舍的老鼠问题。 今年，学校的领导为了更好的展开灭鼠的行动，引进了一项新的技术：SCU(Super Cat Union)。 它是通过两只机器猫对宿舍楼的扫描来判断老鼠的所在，然后采取相应的措施。 这下可惹急了我们的FatMouse，它通过努力，终于找到了SCU的一个bug…<br>
+假设两只猫的工作范围各是一个球，猫位于球中心。在三维空间中两个球的相交点构成一个平面(假设在本题中两个球总是相交的)。 当老鼠在这个相交点构成的平面上时，SCU无法检测到老鼠的存在。 现在我们给出某一时刻两个机器猫的位置和他们工作范围的半径， 请问当FatMouse在某一个位置(x，y，z)上时，SCU是否能检测到FatMouse?<br>
+输入<br>
+输入的第一行为总的测试数据组数n。接下来一共有n行，每行代表一组测试数据。 每组测试数据包括11个整数，前面4个是SCU第一个机器猫所在的位置和它的工作半径，接下来的4个是第二个机器猫的位置和工作半径。 最后3个数是FatMouse的位置。<br>
+输出<br>
+对应每一组输入数据，判断FatMouse是否会被检测到。如果FatMouse能被检测到，输出Yes，否则，输出No。<br>
+样例<br>
+输入<br>
+3<br>
+0 0 0 8 10 0 0 8 5 5 5<br>
+0 0 0 8 10 0 0 8 5 0 0<br>
+0 0 0 8 10 0 0 8 0 8 0<br>
+输出<br>
+No<br>
+No<br>
+Yes</p>
+<p>主要是数学公式，空间几何，</p>
+<p>x<sup>2+y</sup>2+z<sup>2=8</sup>2<br>
+(x-10)<sup>2+y</sup>2+z<sup>2=8</sup>2</p>
+<p>合并两公式，得x=5，即相交点形成的平面。</p>
+<p>再通用一点</p>
+<p>(x-x1)<sup>2+(y-y1)</sup>2+(z-z1)<sup>2=r1</sup>2;<br>
+(x-x2)<sup>2+(y-y1)</sup>2+(z-z1)<sup>2=r2</sup>2;</p>
+<p>当x，y，z带入其中，等式相同时，即为交点形成的平面上的点。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;math.h&gt;
+
+ int main()
+ {
+    int d1;
+    int d2;
+    int x1,y1,z1,r1,x2,y2,z2,r2,x,y,z;
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    while(n--){
+	    scanf(&quot;%d %d %d %d %d %d %d %d %d %d %d&quot;,&amp;x1,&amp;y1,&amp;z1,&amp;r1,&amp;x2,&amp;y2,&amp;z2,&amp;r2,&amp;x,&amp;y,&amp;z);
+	    d1=pow(x1-x,2)+pow(y1-y,2)+pow(z1-z,2)-pow(r1,2);
+	    d2=pow(x2-x,2)+pow(y2-y,2)+pow(z2-z,2)-pow(r2,2);
+	    if(d1&gt;0&amp;&amp;d2&gt;0)
+	    {
+	        printf(&quot;No\n&quot;);
+	    }else
+	    {
+	        if(d1==d2)
+	        {
+	            printf(&quot;No\n&quot;);
+	        }else
+	        {
+	            printf(&quot;Yes\n&quot;);  
+	        }   
+	    }
+	}
+    return 0;
+ }
+</code></pre>
+<h2 id="0x24-不甘心皇后">0x24 不甘心皇后</h2>
+<p>https://noobdream.com/DreamJudge/Issue/page/1970/</p>
+<p>比一般八皇后问题要简单</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;math.h&gt;
+
+int route[11];
+int iniPos[11];
+int result;
+
+bool is_OK(int s)
+{
+    if (s == 1 || abs(route[s] - route[s - 1]) &lt;= 1)
+        return true;
+    else
+        return false;
+}
+
+void queen(int n, int s)
+{
+    if (s &gt; n)
+        result++;
+    else
+    {
+        if (iniPos[s] == 0)
+        {
+            int row;
+            for (row = 1; row &lt;= n; row++)
+            {
+                route[s] = row;
+                if (is_OK(s))
+                    queen(n, s + 1);
+            }
+        }
+        else
+        {
+            route[s] = iniPos[s];
+            if (is_OK(s))
+                queen(n, s + 1);
+        }
+    }
+}
+
+int main()
+{
+    int n;
+    int i;
+    while (scanf(&quot;%d&quot;, &amp;n) == 1 &amp;&amp; n)
+    {
+        result = 0;
+        for (i = 1; i &lt;= n; i++)
+            scanf(&quot;%d&quot;, &amp;iniPos[i]);
+        queen(n, 1);
+        printf(&quot;%d\n&quot;, result);
+    }
+    return 0;
+}
+</code></pre>
+<h2 id="0x25-炉石传说">0x25 炉石传说</h2>
+<h2 id="0x26-小贝得汉诺塔">0x26 小贝得汉诺塔</h2>
+<p>题目背景</p>
+<p>汉诺塔是由三根柱子 A，B，C 组成的。A 柱上有 N个（N&gt;0）穿孔圆盘，盘的尺寸由下到上依次变小，盘的数字编号由上到下依次递增（1号为最顶部，也就是最小的圆盘）。<br>
+要求按下列规则将所有圆盘移至 C 柱：<br>
+1.每次只能移动一个圆盘；<br>
+2.任何时刻都不允许将较大的圆盘压在较小的圆盘之上大盘不能叠在小盘上面；<br>
+3.在满足上述两条规则的前提下，可以将圆盘移动至任何一个柱子。<br>
+要求打印出出若干行，每行表示盘子的一次移动，同时你需要让移动步骤最少。</p>
+<p>如：1 A-&gt;C 表示将 1 号圆盘从 A 柱移到 C 柱<br>
+聪明的小贝很快就用递归的方法解决了这个任务：</p>
+<pre><code class="language-c">void calc(int num, char x, char y, char z) //表示将 num 个盘子，从 x 柱子借助 y 柱子运送到 z 柱子{
+	if (!num) return; 
+	//num=0，不用运送 
+	calc(num - 1, x, z, y); 
+	//先将 x 柱子的 num - 1 个盘子，借助 z 柱子运送到 y 柱子 
+	printf(&quot;%d %c-&gt;%c\n&quot;, num, x, z);
+	//此时 x 柱子就只剩一个盘子了，就可以直接运送到 z 柱子 
+	calc(num - 1, y, x, z);
+	//再将之前运到 y 柱子的 num - 1 个盘子，借助 x 柱子运送到 z 柱子 
+	//这样就实现了函数功能“将 num 个盘子，从 x 柱子借助 y 柱子运送到 z 柱子” 
+}
+int main(){
+	int N;
+	scanf(&quot;%d&quot;, &amp;N);
+	calc(N, 'A', 'B', 'C');
+	//将 N 个盘子，从 A 柱子借助 B 柱子运送到 C 柱子
+}
+</code></pre>
+<p>题目描述<br>
+小贝想尝试更复杂的汉诺塔。<br>
+他更改了普通的汉诺塔的第 3 条规则，要求“只能将圆盘移动到相邻的柱子”。<br>
+也就是说，不能将圆盘从 A 柱移至 C 柱，也不能从 C 柱移至 A 柱。<br>
+你能帮助小贝解决这个特殊的汉诺塔问题吗？<br>
+输入格式<br>
+一个正整数 N，表示 A 柱上有 NN 个穿孔圆盘，N &lt; 14。<br>
+输出格式<br>
+你需要输出若干行，表示最优的移动方案（移动步数最少）。<br>
+每行表示一次移动，表示将圆盘从某一个塔移动到另一个塔：<br>
+格式：圆盘编号 塔的编号-&gt;塔的编号<br>
+输入样例<br>
+2<br>
+输出样例<br>
+1 A-&gt;B 1 B-&gt;C 2 A-&gt;B 1 C-&gt;B 1 B-&gt;A 2 B-&gt;C 1 A-&gt;B 1 B-&gt;C<br>
+时空限制<br>
+1s，256MB</p>
+<p>参考标准汉诺塔进行部分修改。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+void calc(int num, char x, char y, char z){ //表示将 num 个盘子，从 x 柱子借助 y 柱子运送到 z 柱子
+	if (!num) return; 
+	//num=0，不用运送 
+	calc(num - 1, x, y, z); 
+	//将num-1个盘子，从x柱子借助y柱子运送到z柱子 
+	printf(&quot;%d %c-&gt;%c\n&quot;, num, x, y);
+	//将剩下的一个盘子从x运到y 
+	calc(num - 1, z, y, x);
+	//将num-1个盘子，从z柱子借助y柱子运送到x柱子 
+	printf(&quot;%d %c-&gt;%c\n&quot;, num, y, z);
+	//将剩下的一个盘子从y运到z 
+	calc(num - 1, x, y, z);
+	//将num-1个盘子，从x柱子借助y柱子运送到z柱子 
+}
+int main(){
+	int N;
+	scanf(&quot;%d&quot;, &amp;N);
+	calc(N, 'A', 'B', 'C');
+	//将 N 个盘子，从 A 柱子借助 B 柱子运送到 C 柱子
+}
+</code></pre>
+<h2 id="0x27-子文略略略">0x27 子文略略略</h2>
+<p>题目描述</p>
+<p>子文是 0 ，但是他不想当 0 ，他想变成另一个数 x。<br>
+子文能做的操作只有两个：<br>
+1.将自己 +1<br>
+2.将自己 ×2<br>
+子文想知道，自己变成 x 至少要经过几次操作。</p>
+<p>输入格式<br>
+第一行一个正整数 T，表示数据组数。<br>
+接下来 T 行，每行一个正整数 x，表示子文想变成的数。<br>
+输出格式<br>
+输出 TT行，每行一个数，表示答案。</p>
+<p>输入样例<br>
+2<br>
+5<br>
+13<br>
+输出样例<br>
+4<br>
+6<br>
+样例解释<br>
+0⟶+1​ 1⟶+1 ​2⟶×2​ 4⟶+1​ 5<br>
+0⟶+1 ​1⟶+1 ​2⟶+1​ 3⟶×2​ 6⟶×2​ 12⟶+1​ 13<br>
+数据规模与约定<br>
+对于 50% 的数据，T=1，<br>
+对于 75% 的数据，T≤1000，<br>
+对于 100% 的数据，T≤10^6。<br>
+在以上每种梯度的数据中，又满足：<br>
+对于 20% 的数据，x≤100，<br>
+对于 40% 的数据，x≤10^3，<br>
+对于 60% 的数据，x≤10^6，<br>
+对于 80% 的数据，x≤10^9，<br>
+对于 100% 的数据，1≤x≤10^18。<br>
+时空限制<br>
+1s，256MB</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;math.h&gt;
+
+int shortest(long long int x){
+	int cnt;
+	if(x==1){
+		return 1;
+	}
+	if(x%2==0){
+		cnt=shortest(x/2)+1;
+	}else{
+		cnt=shortest(x-1)+1;
+	}
+	return cnt;
+}
+
+int main(){
+	
+	int n;
+	int x;
+	scanf(&quot;%d&quot;,&amp;n);
+	while(n--){
+		scanf(&quot;%lld&quot;,&amp;x);
+		printf(&quot;%d\n&quot;,shortest(x));
+	}
+	
+	
+	return 0;
+} 
+</code></pre>
+<h2 id="0x28-二叉树的层次遍历">0x28 二叉树的层次遍历</h2>
+<p>描述<br>
+现在给出一棵二叉树，希望你输出它的层次遍历<br>
+输入<br>
+第一行一个正整数 n，表示给定的树的节点的数目，规定节点编号 1∼n，其中节点 1是树根。<br>
+接下来 n 行，每行两个正整数 li, ri ​ ，分别表示节点 i 的左右孩子的编号。如果不存在左 / 右孩子，则以 −1 表示。两个数之间用一个空格隔开。<br>
+输出<br>
+输出对应二叉树的层次遍历<br>
+样例<br>
+输入<br>
+3<br>
+2 3<br>
+-1 -1<br>
+-1 -1<br>
+输出<br>
+1 2 3</p>
+<p>经典算法，使用队列和二叉树结构体实现。</p>
+<p>但这里输入的方式，可以用顺序表存储，直接输出。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+	
+	int n;
+	int a[1000] = {0};
+	a[0] = 1;
+	int i = 1;
+	scanf(&quot;%d&quot;,&amp;n);
+	while(n--){
+		scanf(&quot;%d %d&quot;,&amp;a[i],&amp;a[i+1]);
+		i += 2;
+	}
+	
+	for(int j=0;a[j]!=0;j++){
+		if(a[j]!=-1){
+			printf(&quot;%d &quot;,a[j]);
+		}
+		
+	}
+	return 0;
+}
+</code></pre>
+<h2 id="0x29-三次点击删除">0x29 三次点击删除</h2>
+<p>描述<br>
+给定一个字符串，每次“点击”，可以把字符串中“一对”相邻两个相同字母消除，例如，字符串&quot;abbc&quot;一次点击后可以生成&quot;ac&quot;，“aabcc”一次点击后可以生成“bcc”。但相同而不相邻、不相同的相邻字母都是不可以被消除的。编程实现输出给定字符串三次点击后的最终形态。<br>
+注意：（1）若三次点击消除后，仍存在相邻两个字母相同的情况，则输出0。（2）若最终的字符串为空串，则输出0。<br>
+输入<br>
+一个字符串，仅由小写字母组成。（字符串长度不大于300000）<br>
+输出<br>
+一个字符串，为“点击消除”后的最终形态。<br>
+样例<br>
+输入<br>
+abbc<br>
+输出<br>
+ac</p>
+<p>关键难点在于模拟删除，如abccba类型的，会变成  abba   aa    null。</p>
+<p>用栈的形式模拟比较字符，指针往后移动循环找相同字符（被比较字符），若找到，则把比较字符删除，即栈顶-1，并且继续往后比较。</p>
+<p>cnt记录消除次数。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int eliminate(char *str) {
+    int top = -1; // 模拟栈顶指针
+    int cnt = 0;
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (top &gt;= 0 &amp;&amp; str[top] == str[i]) {
+            // 如果栈顶字符与当前字符相同，则消除
+            top--;
+            cnt++;
+        } else {
+            // 否则将当前字符放入栈顶
+            str[++top] = str[i];
+        }
+    }
+    str[top + 1] = '\0'; // 结束符
+    return cnt;
+}
+
+int main(){
+	char string[300001];
+	while(scanf(&quot;%s&quot;,string)!=EOF){
+		int cnt = eliminate(string);
+		if(cnt&gt;3||strlen(string)==0){
+			printf(&quot;0\n&quot;);
+	
+		}else{
+			printf(&quot;%s\n&quot;,string);
+		}
+	}
+	return 1;
+	
+}
+</code></pre>
+<h2 id="0x30-二叉排序树">0x30 二叉排序树</h2>
+<p>描述<br>
+试写一个判别给定二叉树是否为二叉排序树的算法<br>
+输入<br>
+第 1 ~ N 行 在第i行有三个数Li,Ri,Vi，分别表示第i-1个点的左儿子下标，右儿子下标和值。如果第i-1个点左儿子不存在则Li=0，右儿子同理。数据保证Vi互不相同且输入的为一颗合法树。<br>
+第 N+1 行为一个正整数 N表示树有N个点<br>
+输出<br>
+如果树为合法二叉排序树输出N个数，用空格分隔，表示所有点从小到大排序后的数组。如果树不为合法二叉树则输出一个空行。<br>
+样例<br>
+输入<br>
+2 3 5<br>
+0 4 3<br>
+0 0 7<br>
+0 0 4<br>
+4<br>
+输出<br>
+3 4 5 7</p>
+<p>二叉树的构造，中序遍历二叉树。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+
+
+struct Tree
+{
+	int data;
+	int L;
+	int R;
+	struct Tree *left;
+	struct Tree *right; 
+};
+
+void Inorder(struct Tree *head)
+{
+	if(head!=NULL)
+	{
+	    Inorder(head-&gt;left);
+	    printf(&quot;%d &quot;,head-&gt;data);
+	    Inorder(head-&gt;right);
+	}
+}
+
+struct Tree *creat()
+{
+	struct Tree *P[20000]={0};
+	int num=0;
+	int L,R,V;
+	int i;
+	while(scanf(&quot;%d&quot;,&amp;L),L!=num)
+	{
+	    scanf(&quot;%d %d&quot;,&amp;R,&amp;V);
+	    num++;
+	    struct Tree *q=(struct Tree*)malloc(sizeof(struct Tree));
+	    q-&gt;data=V;
+	    q-&gt;L=L;
+	    q-&gt;R=R;
+	    q-&gt;left=NULL;
+	    q-&gt;right=NULL;
+	    P[num]=q;
+	}
+	for(i=1;i&lt;num;i++)
+	{
+	    L=P[i]-&gt;L;
+	    R=P[i]-&gt;R;
+	    if(L!=0)
+	    {
+	        P[i]-&gt;left=P[L];
+	        if(P[i]-&gt;data&lt;P[L]-&gt;data)
+	        {
+	            return NULL;
+	        }
+	    }
+	    if(R!=0)
+	    {
+	        P[i]-&gt;right=P[R];
+	        if(P[i]-&gt;data&gt;P[R]-&gt;data)
+	        {
+	            return NULL;
+	        }
+	    }
+	}
+	return P[1];
+}
+
+int main()
+{
+	struct Tree *head=creat();
+	Inorder(head);
+	return 0;
+}
+
+
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/leetcode-re-ti-100/">
+                  <h3 class="post-title">
+                    LeetCode热题100
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

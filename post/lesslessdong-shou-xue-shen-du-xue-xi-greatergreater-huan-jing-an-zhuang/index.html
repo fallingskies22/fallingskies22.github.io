@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>《动手学深度学习》- 环境安装 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1783248062137">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="前言
+https://zh.d2l.ai/chapter_installation/index.html
+https://www.zhihu.com/zvideo/1363284223420436480
+步骤
+安装python
+为了匹配教程..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1783248062137" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">《动手学深度学习》- 环境安装</h2>
+            <div class="post-date">2025-04-01</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/lesslessdong-shou-xue-shen-du-xue-xi-greatergreater-huan-jing-an-zhuang.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="前言">前言</h2>
+<p>https://zh.d2l.ai/chapter_installation/index.html<br>
+https://www.zhihu.com/zvideo/1363284223420436480</p>
+<h2 id="步骤">步骤</h2>
+<h3 id="安装python">安装python</h3>
+<p>为了匹配教程环境<br>
+安装python3.8.5<br>
+https://www.python.org/downloads/release/python-385/</p>
+<h3 id="安装miniconda">安装miniconda</h3>
+<p>https://repo.anaconda.com/miniconda/Miniconda3-py38_4.9.2-Windows-x86_64.exe</p>
+<p>任务栏搜索Anaconda Prompt</p>
+<p>打开即可执行命令，如<code>conda list</code>。</p>
+<p>创建一个新的环境</p>
+<pre><code class="language-sh">conda create --name d2l python=3.8.5 -y
+</code></pre>
+<p>激活环境</p>
+<pre><code class="language-sh">conda activate d2l
+</code></pre>
+<p>(注意：后续命令都在conda中执行)</p>
+<h3 id="安装深度学习框架和d2l软件">安装深度学习框架和d2l软件</h3>
+<p>CPU版本pytorch</p>
+<pre><code class="language-sh">pip install torch==1.12.0
+pip install torchvision==0.13.0
+
+pip install d2l==0.17.6
+</code></pre>
+<p>下载d2l需要安装rust环境<br>
+参考https://blog.csdn.net/shi_yu123456/article/details/146301425</p>
+<p>下载报错<code>ERROR: Failed building wheel for pywinpty</code>，需安装C++构建工具。<br>
+参考https://blog.csdn.net/qq_40682931/article/details/145815327</p>
+<p>GPU版本pytorch</p>
+<p>使用</p>
+<pre><code class="language-sh">nvidia-smi
+</code></pre>
+<p>查看显卡驱动版本</p>
+<p>在https://pytorch.org/安装对应版本的包</p>
+<pre><code class="language-sh">pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+</code></pre>
+<h3 id="下载d2l-notebook">下载D2L Notebook</h3>
+<p>https://zh-v2.d2l.ai/d2l-zh-2.0.0.zip</p>
+<h3 id="访问notebook">访问notebook</h3>
+<pre><code class="language-sh">jupyter notebook
+</code></pre>
+<p>需要切换到下载文件目录<br>
+使用<code>cd ..</code>切换到上层目录，只有切换到最上层才能切换磁盘。</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/utctf/">
+                  <h3 class="post-title">
+                    UTCTF - WEB - Writeup
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

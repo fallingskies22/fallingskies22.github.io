@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>LeetCode热题100 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1783248062137">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="哈希
+两数之和
+
+
+暴力求解方法略，两个for
+
+
+哈希表方法
+#include &lt;uthash.h&gt;
+
+
+/**
+ * Note: The returned array must be malloced, assume cal..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1783248062137" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">LeetCode热题100</h2>
+            <div class="post-date">2025-03-06</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/leetcode-re-ti-100.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="哈希">哈希</h1>
+<h2 id="两数之和">两数之和</h2>
+<ol>
+<li>
+<p>暴力求解方法略，两个for</p>
+</li>
+<li>
+<p>哈希表方法<br>
+<code>#include &lt;uthash.h&gt;</code></p>
+</li>
+</ol>
+<pre><code class="language-c">/**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+
+
+struct hashTable{
+    int key;
+    int val;
+    UT_hash_handle hh;
+}
+
+struct hashTable* hashTable;
+
+struct hashTable* find(int ikey){
+    struct hashTable* tmp;
+    HASH_FIND_INT(hashTable, &amp;ikey, tmp);
+    retrun tmp;
+}
+
+void insert(int ikey, int ival){
+    struct hashTable* it = find(ikey);
+    if(it == NULL){
+        struct hashTable* tmp = malloc(sizeof(struct hashTable));
+        tmp-&gt;key = ikey, tmp-&gt;val = ival;
+        HASH_ADD_INT(hashTable,key,tmp);
+    }else{
+        it-&gt;val = ival;
+    }
+}
+
+int* twoSum(int* nums, int numsSize, int target, int* returnSize) {
+    hashTable = NULL;
+    for(int i=0;i&lt;numsSize;i++){
+        struct hashTable* it = find(target-nums[i]);
+        if(it != NULL){
+            int* ret = malloc(sizeof(int)*2);
+            ret[0]=it-&gt;val,ret[1]=i;
+            *returnSize = 2;
+            return ret;
+        }
+        insert(nums[i],i);
+    }
+    *returnSize = 0;
+    return NULL;
+}
+</code></pre>
+<h2 id="字母异位词分组">字母异位词分组</h2>
+<p>太难了，不看。。</p>
+<h2 id="最长连续序列">最长连续序列</h2>
+<p>依次读取数字，加入哈希表<br>
+遍历哈希表，如果有x-1，则跳过。<br>
+否则，循环找x+1，取最大长度。</p>
+<pre><code class="language-c">struct HashEntry{
+    int key;
+    UT_hash_handle hh;
+};
+
+int longestConsecutive(int* nums, int numsSize) {
+    struct HashEntry* hashSet = NULL;
+    struct HashEntry* e;
+
+    for(int i=0;i&lt;numsSize;i++){
+        HASH_FIND_INT(hashSet, &amp;nums[i],e);
+        if(e == NULL){
+            e = malloc(sizeof(struct HashEntry));
+            e-&gt;key = nums[i];
+            HASH_ADD_INT(hashSet, key, e);
+        }
+    }
+
+    int ans = 0;
+    struct HashEntry* next;
+    HASH_ITER(hh, hashSet,e,next){
+        int x = e-&gt;key;
+        int y = x-1;
+        HASH_FIND_INT(hashSet, &amp;y, e);
+        if(e){
+            continue;
+        }
+        y = x;
+        do {
+            y++;
+            HASH_FIND_INT(hashSet, &amp;y, e);
+        }while(e);
+
+        ans = fmax(ans, y-x);
+    }
+
+    HASH_CLEAR(hh, hashSet);
+    return ans;
+}
+</code></pre>
+<h1 id="双指针">双指针</h1>
+<h2 id="移动零">移动零</h2>
+<p>个人做法<br>
+0移到最后，其余数字往前移。</p>
+<pre><code class="language-c">void moveZeroes(int* nums, int numsSize) {
+    int end = numsSize-1;
+    int start = 0;
+    for(int i=0;i&lt;=end;i++){
+        if(nums[i] == 0){
+            for(int j=i;j&lt;end;j++){
+                nums[j] = nums[j+1];
+            }
+            nums[end] = 0;
+            i--;
+            end--;
+        }
+    }
+    
+}
+</code></pre>
+<p>双指针做法</p>
+<p>左指针指向当前已经处理好的序列的尾部。左指针左边均为非零数；<br>
+右指针指向待处理序列的头部。右指针左边直到左指针处均为零。</p>
+<pre><code class="language-c">void swap(int *a, int *b){
+    int t = *a;
+    *a = *b, *b = t;
+}
+
+
+void moveZeroes(int* nums, int numsSize) {
+    int left = 0, right = 0;
+    while(right &lt; numsSize){
+        if(nums[right]){
+            swap(nums + left, nums + right);
+            left++;
+        }
+        right++;
+    }
+
+    
+}
+</code></pre>
+<h2 id="盛最多水的容器">盛最多水的容器</h2>
+<p>指针指向两端，当移动长的那根时，容量不会增大。<br>
+所以移动小的那根，不会漏掉更大的容量。<br>
+最后比较，取最大。</p>
+<pre><code class="language-c">int maxArea(int* height, int heightSize) {
+    int start = 0, end = heightSize-1;
+    int max = 0;
+    while(start!=end){
+        int v = (end-start)*fmin(height[start],height[end]);
+        max = fmax(v,max);
+        if(height[start]&lt;height[end]){
+            start++;
+        }else{
+            end--;
+        }
+
+    }
+    return max;
+}
+</code></pre>
+<h1 id="二叉树">二叉树</h1>
+<h2 id="二叉树的中序遍历">二叉树的中序遍历</h2>
+<pre><code class="language-c">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+/**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+void inorder(struct TreeNode* root, int* res, int* resSize){
+    if(root!=NULL){
+        inorder(root-&gt;left,res,resSize);
+        res[(*resSize)++] = root-&gt;val;
+        inorder(root-&gt;right,res,resSize);
+    }
+}
+
+int* inorderTraversal(struct TreeNode* root, int* returnSize) {
+    int* res = malloc(sizeof(int)*100);
+    *returnSize = 0;
+    inorder(root, res, returnSize);
+    return res;
+}
+</code></pre>
+<h2 id="二叉树的最大深度">二叉树的最大深度</h2>
+<pre><code class="language-c">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+int maxDepth(struct TreeNode *root) {
+    if (root == NULL) return 0;
+    return fmax(maxDepth(root-&gt;left), maxDepth(root-&gt;right)) + 1;
+}
+</code></pre>
+<h1 id="翻转二叉树">翻转二叉树</h1>
+<pre><code class="language-c">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+struct TreeNode* invertTree(struct TreeNode* root) {
+    if(root == NULL){
+        return NULL;
+    }
+    
+    struct TreeNode* left = invertTree(root-&gt;left);
+    struct TreeNode* right = invertTree(root-&gt;right);
+    root-&gt;left = right;
+    root-&gt;right = left;
+    return root;
+}
+</code></pre>
+<h2 id="对称二叉树">对称二叉树</h2>
+<pre><code class="language-c">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+
+bool check(struct TreeNode* p,struct TreeNode* q){
+    if(!p &amp;&amp; !q) return true; //两个节点都不存在
+    if(!p || !q) return false;//有一个节点不存在
+    return p-&gt;val == q-&gt;val &amp;&amp; check(p-&gt;left, q-&gt;right) &amp;&amp; check(p-&gt;right, q-&gt;left);
+}
+bool isSymmetric(struct TreeNode* root) {
+    return check(root-&gt;left, root-&gt;right);
+}
+</code></pre>
+<h2 id="二叉树的直径">二叉树的直径</h2>
+<p>同求二叉树深度，在代码中增加取左右子树深度和的最大值。</p>
+<pre><code class="language-c">/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+
+int ans;
+int depth(struct TreeNode* root){
+    if(root == NULL){
+        return 0;
+    }
+
+    int L = depth(root-&gt;left);
+    int R = depth(root-&gt;right);
+
+    ans = fmax(ans, L+R);
+    return fmax(L,R)+1;
+}
+
+int diameterOfBinaryTree(struct TreeNode* root) {
+    ans = 0;
+    depth(root);
+    return ans;
+}
+</code></pre>
+<h1 id="技巧">技巧</h1>
+<h2 id="只出现一次的数字">只出现一次的数字</h2>
+<p>异或运算，偶数次出现的数字都被消除。</p>
+<pre><code class="language-c">int singleNumber(int* nums, int numsSize) {
+    int single = 0;
+    for(int i=0;i&lt;numsSize;i++){
+        single ^= nums[i];
+    }
+    return single;
+}
+</code></pre>
+<h2 id="多数元素">多数元素</h2>
+<p>方法一：排序后，去中值</p>
+<p>使用快速排序</p>
+<pre><code class="language-c">int cmp(const void* a, const void *b){
+    return *(int *)a - *(int*)b;
+}
+
+
+int majorityElement(int* nums, int numsSize) {
+    qsort(nums, numsSize,sizeof(int),cmp);
+    return nums[numsSize/2];
+}
+</code></pre>
+<p>方法二：同归于尽消杀法</p>
+<p>https://leetcode.cn/problems/majority-element/solutions/3043071/duo-shu-yuan-su-by-magical-vvingxna-qtgz</p>
+<pre><code class="language-c">int majorityElement(int* nums, int numsSize) {
+    int flag=nums[0];
+    int flagnum=0;
+    int i=0;
+    while(i&lt;numsSize){
+        if(nums[i]==flag){
+            flagnum++;
+        }else{
+            if(flagnum==0){
+                flag=nums[i];
+                flagnum++;
+            }else{
+                flagnum--;
+            }
+        }
+        i++;
+    }
+    return flag;
+}
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/n-nuo-ji-suan-ji-kao-yan-ji-shi-gao-fen-pian/">
+                  <h3 class="post-title">
+                    [N诺] 计算机考研机试高分篇
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

